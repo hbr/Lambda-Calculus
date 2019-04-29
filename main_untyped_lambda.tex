@@ -1,0 +1,51 @@
+\documentclass[12pt]{article}
+%\documentclass{article}
+
+\usepackage{amsmath,amsthm,amssymb,xcolor,graphicx,tikz}
+\usepackage[pdftex]{hyperref}
+\usetikzlibrary{positioning}
+
+\begin{document}
+
+\input{common}
+
+\title{Lambda Calculus - Step by Step}
+\author{Helmut Brandl \\ \scriptsize (firstname dot lastname at gmx dot net)}
+\date{}
+
+\maketitle
+
+\abstract{
+
+  This little text gives a step by step introduction into untyped lambda
+  calculus. All needed theory is explained and no special know how is
+  assumed. Although elementary, all important theorems about untyped lambda
+  calculus including some undecidability theorems are given and proved within
+  this text.
+
+  It has been tried to use a notation which is easy to understand with a lot
+  of graphic notation to support a good intuition about the presented
+  material.  }
+
+
+\tableofcontents
+
+
+\include{motivation}
+
+\include{setrelation}
+
+\include{lambdaterms}
+
+\include{computation}
+
+\include{undecidability}
+
+\include{bibliography}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

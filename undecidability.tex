@@ -1,0 +1,230 @@
+\section{Undecidability}
+
+In the section \emph{Computable Functions}~\ref{sec:computable} we have
+defined a class of numeric functions and predicates which can be computed in
+lambda calculus. We call this class of functions/predicates lambda-computable.
+
+Now the question arises: \emph{Are there functions or predicates which are not
+  lambda computable}? The answer to this question is yes. This section of the
+paper proves that there are undecidable predicates.
+
+In order to prove the existence of undecidable predicates we use sets of
+lambda terms $A$ which are closed and nontrivial. We make this precise by the
+following definitions.
+
+\begin{definition}
+  A set of lambda terms $A$ is \emph{closed} if it contains with each lambda term $t$
+  also all lambda terms which are $\alpha$- and $\beta$-equivalent to $t$.
+\end{definition}
+
+
+\begin{definition}
+  A set of lambda terms $A$ is \emph{nontrivial} if it is neither empty nor
+  does it contain all possible lambda terms.
+\end{definition}
+
+\paragraph{Gödel Numbering}
+Since computable lambda function operate on church numerals we have to
+transform a lambda term $t$ into a church numeral $\ulcorner t \urcorner$
+which is a description of the lambda term $t$ in a way that having the church
+numeral the corresponding term can be reconstructed. We define $\ulcorner t
+\urcorner$ by
+$$
+\goedel{} :=
+\begin{cases}
+  \goedel{x_i} &:= \sigma_2 c_0 c_i \\
+  \goedel{a b} &:= \sigma_2 c_1 (\sigma_2 \goedel{a} \goedel{b}) \\
+  \goedel{\lambda x_i. a}
+    &:=  \sigma_2 c_2 (\sigma_2 \goedel{x_i} \goedel{a})
+\end{cases}
+$$
+
+Note that $\goedel{}$ is not a lambda term. It is easy, but very tedious, to
+construct by hand for every lambda term $t$ the corresponding lambda term
+$\goedel{t}$. However it is not possible to define a lambda term to do this
+compilation because the lambda calculus cannot do pattern match on lambda
+terms i.e. it cannot case split on the way the lambda term $t$ has been
+constructed. Later we define a lambda term which can compute $\goedel{c_n}$
+for church numerals $c_n$.
+
+\begin{definition}
+  A set $A$ of lambda terms is \emph{decidable} if there is a lambda term
+  $p_A$ representing a unary predicate on church numerals such that $p_A
+  \goedel{t}$ returns $\true$ if $t \in A$ and $\false$ if $t \notin A$.
+\end{definition}
+
+\paragraph{Self Application} Since lambda calculus does not have any
+restrictions on functions and arguments (they only have to be valid lambda
+terms) we can apply any lambda term $t$ to its description $\goedel{t}$
+i.e. the term
+$$ t \goedel{t}$$
+is a legal lambda term.
+
+Therefore we can define for all sets of lambda terms $A$ a set $B_A$ by
+$$ B_A := \{b \mid b \goedel{b} \in A\}.$$
+
+We assume that there is a lambda term $\self$ which satifies the specification
+$$ \self\, \goedel{t} \tobetaplus \goedel{t \goedel{t}}.$$
+A concrete definition of the lambda term $\self $ will be given later.
+
+We can use the lambda term $\self $ to see that for every decidable set of
+lambda terms $A$ the set $B_A$ is decidable as well. Proof: The term
+$$\lambda x.\, p_A (\self\, x)$$
+is a unary predicate which given a description $\goedel{b}$ of a term $b$
+decides wheather $b$ is an element of $B_A$.
+
+\paragraph{Basic Undecidability Theorem}
+
+\begin{theorem}
+  Every closed nontrivial set of lambda term $A$ is undecidable.
+  \begin{proof}
+    Assume that $A$ is decidable and $p_A$ is a lambda term which decides $A$.
+    \begin{enumerate}
+
+    \item
+      There are the terms $m_0 \in A$ and $m_1 \notin A$, because $A$ is
+      nontrivial.
+
+    \item
+      We define the lambda term $g$ by
+      $$ g := \lambda x. p_A (\self\, x) m_1 m_0$$
+      which has the property
+      $$ g \goedel{b} \tobetaplus
+      \begin{cases}
+        m_1 & \text{if } b \in B_A \\
+        m_0 & \text{if } b \notin B_A \\
+      \end{cases}.
+      $$
+
+    \item
+      Assuming $g \in B_A$ leads to a contradition
+      $$
+      \begin{array}{llll}
+        g \in B
+        & \imp & g \goedel{g} \tobetaplus m_1 & \text{definition of } g\\
+        & \imp & g \goedel{g} \notin A  & A \text{ is closed} \\
+        & \imp & g \notin B_A & \text{defintion of }B_A
+      \end{array}
+      $$
+
+    \item
+      Assuming $g \notin B_A$ leads to a contradition
+      $$
+      \begin{array}{llll}
+        g \notin B
+        & \imp & g \goedel{g} \tobetaplus m_0 & \text{definition of } g\\
+        & \imp & g \goedel{g} \in A  & A \text{ is closed} \\
+        & \imp & g \in B_A & \text{definition of }B_A
+      \end{array}
+      $$
+
+    \item
+      Therefore the assumption that $A$ is decidable cannot be valid.
+    \end{enumerate}
+  \end{proof}
+\end{theorem}
+
+
+\paragraph{Undecidability of Beta Equivalence}
+
+\begin{theorem}
+  Beta equivalence is undecidable.
+  \begin{proof}
+    Assume that beta equivalence is decidable.
+    \begin{enumerate}
+    \item
+      Then there is some binary predicate $p$ such that for two lambda
+      terms $a$ and $b$ the term $p \goedel{a} \goedel{b}$ returns $\true$ if
+      they are beta equivalent and $\false$ if they are not equivalent.
+    \item
+      Let $A$ be the set of lambda terms which contains $a$ and all $\alpha$-
+      and $\beta$-equivalent terms. Then by assumption the term $p \goedel{a}$
+      is a decider for the set $A$.
+    \item
+      The set $A$ is nontrivial for the following reason: If $a$ is
+      normalizing than $A$ can contain only normalizing terms. Therefore
+      e.g. the term $M M$ where $M$ is the mockingbird combinator which is not
+      normalizing is not in the set. If $a$ is not normalizing then $A$ cannot
+      contain any term in normal form.
+    \item
+      The set $A$ is closed and nontrivial, therefore it cannot be decidable
+      which contradicts the assumption that there is a decider for
+      $\beta$-equivalence.
+    \end{enumerate}
+  \end{proof}
+\end{theorem}
+
+
+
+\paragraph{Undecidability of the Halting Problem}
+
+Like the halting problem for Turing machines there is a halting problem for
+lambda calculus. The halting problem is solvable if there is a lambda term
+which determines if another lambda term is normalizing.
+
+\begin{theorem}
+  It is undecidable whether a lambda term $a$ is normalizing.
+  \begin{proof}
+    Assume that there is a lambda term $p$ such that $p \goedel{a}$ returns
+    $\true$ if $a$ is normalizing and $\false$ if $a$ is not normalizing.
+    \begin{enumerate}
+    \item
+      Let $A$ be the set which contains all lambda terms in normal form and
+      all $\alpha$- and $\beta$-equivalent terms. By definition $A$ is closed
+      and it is nontrivial (it contains all variables and it does not contain
+      $M M$.)
+    \item
+      The lambda term $p$ would be a decider for $A$, because a term $a$ must
+      be in this set if it is normalizing.
+    \item
+      The set $A$ however being closed and nontrivial cannot be decidable
+      which contradicts the assumption that being normalizing is decidable.
+    \end{enumerate}
+  \end{proof}
+\end{theorem}
+
+
+
+
+\paragraph{Implementation of $\self $}
+
+In the proof of the main undecidability theorem we used a lambda term $\self$
+with the specification
+$$ \self\, \goedel{a} \tobetaplus \goedel{a \goedel{a}}.$$
+
+Now we give the still missing implementation of that term.
+By definition of $\goedel{}$ the term we have the equality
+$$\goedel{a \goedel{a}}
+= \sigma_2 c_1 (\sigma_2 \goedel{a}
+\goedel{\goedel{a}}).$$
+
+The only unknown term on the right hand side of the equality is
+$\goedel{\goedel{a}}$ which is the description of the church numeral
+representing the lambda term $a$.
+
+Any church numeral has the form
+$$c_n = \lambda f x. f^n x.$$
+Since the names of bound variables are irrelevant we use $x_0$ for $x$ and
+$x_1$ for $f$.
+By definition of $\goedel{}$ we get
+$$
+\begin{array}{lll}
+  \goedel{x_0} &=& \sigma_2 c_0 c_0 \\
+  \goedel{x_1} &=& \sigma_2 c_0 c_1
+\end{array}.
+$$
+%
+With the step function
+$$ s := \lambda x.\, \sigma_2 c_2 (\sigma_2\, \goedel{x_1} x)$$
+the term
+$$ c_n s \goedel{x_0}$$
+computes $\goedel{{x_1}^n x_0}$
+and the function $f$ defined by
+$$ f:= \lambda x. \sigma_2 c_2 (\sigma_2 \goedel{x_1} x)$$ computes
+$\goedel{\lambda x_1.z}$ given $\goedel{z}$ as argument. I.e.
+$$f (f (c_n s \goedel{x_0}))$$
+computes the church numberal $\goedel{\lambda x_1 x_0. {x_1}^n x_0}$.
+The term $\self$ can be defined by
+$$ \self :=
+\lambda x.\, \sigma_2 c_1 (\sigma_2 x (f (f (x s \goedel{x_0}))))
+$$

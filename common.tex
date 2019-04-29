@@ -1,0 +1,50 @@
+\def\imp{\Rightarrow}
+\def\true{\text{true}}
+\def\false{\text{false}}
+\def\pair{\text{pair}}
+\def\fst{\text{fst}}
+\def\snd{\text{snd}}
+\def\succ{\text{succ}}
+\def\pred{\text{pred}}
+\def\self{\text{self}}
+\def\Prexp{\text{Pr}_{\text{exp}}}
+
+\newcommand{\goedel}[1]{\ulcorner #1 \urcorner}
+\newcommand{\rstar}[1]{#1^*}
+\newcommand{\rplus}[1]{#1^+}
+\newcommand{\reqv}[1]{#1^\sim}
+\newcommand{\toplus}{\rplus\to}
+\newcommand{\tostar}{\rstar\to}
+\newcommand{\tobeta}{\to_\beta}
+\newcommand{\tobetaplus}{\to^+_\beta}
+\newcommand{\tobetastar}{\to^*_\beta}
+\newcommand{\tobetap}{\to_{p}}
+\newcommand{\tobetapplus}{\to^+_{p}}
+\newcommand{\tobetapstar}{\to^*_{p}}
+\newcommand{\betaeqv}{\sim_\beta}
+\newcommand{\toeqv}{\reqv\to}
+\newcommand{\neglow}{\neg\,}
+\newcommand{\lambdaw}{\lambda\,}
+\newcommand{\upshift}{{\uparrow}}
+
+\newcommand{\diamg}[6]{
+  \begin{matrix}
+    #3 & #1 & #4 \\
+    #2 &      & #2 \\
+    #5 & #1 & #6
+  \end{matrix}
+}
+\newcommand{\diam} [4] {
+  \diamg{\to}{\downarrow}{#1}{#2}{#3}{#4}
+}
+\newcommand{\diamp} [4] {
+  \diamg{\to_p}{\downarrow_p}{#1}{#2}{#3}{#4}
+}
+
+\newcommand{\indrule}[2]{\begin{array}{l} #1 \\ \hline #2\end{array}}
+\newcommand{\ruleh}[2]{\begin{array}{c} #1 \\ \hline #2\end{array}}
+\newcommand{\rulev}[2]{\begin{array}{l} #1 \\ \hline #2\end{array}}
+
+\theoremstyle{definition} \newtheorem{definition}{Definition}[section]
+\theoremstyle{definition} \newtheorem{theorem}[definition]{Theorem}
+\theoremstyle{definition} \newtheorem{lemma}[definition]{Lemma}

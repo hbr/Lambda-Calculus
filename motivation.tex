@@ -1,0 +1,69 @@
+\section{Motivation}
+
+Why study lambda calculus?
+
+Let us put the question in some historical context. At the beginning of the
+20th century the famous mathematician David Hilbert challenged the
+mathematical community by the statement that mathematical problems must be
+decidable. At the 1930 annual meeting of the \emph{Society of German
+  Scientists and Physicians} he made his famous quote ``We must know, we will
+know''.
+
+\noindent
+\begin{tikzpicture}[scale=0.70]
+  \def\pict#1#2#3#4{
+    \node[fill=gray!20,text width=3.5cm,text centered] (#1) at #2
+    {\scriptsize \includegraphics[width=3cm,height=4cm]{#3} #4};
+  }
+  \pict{hilbert}{(0,7)}{hilbert.jpg}{David Hilbert}
+
+  \node[draw,fill=gray!30,text width=6cm] (text) at (10,8) {``Entscheidungsproblem''
+    (Decision Problem). Mathematics must be decidable. ``We must know, we will
+    know!''};
+
+  \pict{goedel}{(0,0)}{goedel.jpg}{Kurt Gödel~(1931): Incompleteness Theorems}
+  \pict{church}{(6,0)}{church.jpg}{Alonzo~Church~(1936): Lambda Calculus}
+  \pict{turing}{(12,0)}{turing.jpg}{Alan Turing~(1936): Turing Machine}
+
+  \draw [thick,->] (hilbert) -- (text) node[above,midway,sloped]{Challenge};
+\end{tikzpicture}
+
+
+The young mathematician Kurt Gödel attended the meeting and expressed some
+doubts to his collegues about the general decidability of mathematical
+statements. One year later in 1931 he published his famous incompleteness
+theorems~\cite{goedel1931}. He proved that for all consistent formal systems
+which are capable of expressing logic and doing simple arithmetics there are
+certain statements which are not provable withing the system but true. These
+incompleteness theorems are considered as the first serious blow of Hilbert's
+program.
+
+Five years later Alonzo Church~\cite{church1936} and Alan
+Turing~\cite{turing1936} independently proved that the \emph{decision problem}
+cannot be solved. Alonzo Church invented the lambda calculus and Alan Turing
+his automatic machine (today called Turing machine) which are both equivalent
+in expressiveness.
+
+Although Church's lambda calculus has been published slightly before Alan
+Turing published his paper on automatic machines usually Turing machines are
+used define computability and decidability. Turing machines resemble more the
+structure of modern computers than lambda calculus. A programming language is
+called \emph{Turing complete} if all possible algorithms can be coded within
+the language. Nobody talks about \emph{lambda complete}.
+
+However lambda calculus is a quite fascinating model of computation.  The
+lambda calculus invented by Alonzo Church is remarkably simple. It consists
+just of variables, function applications and lambda abstractions. But the
+calculus is sufficiently powerful to express all computable functions and
+decision procedures.
+
+Beside its expressive power lambda calculus is used as the theoretical base of
+functional languages like Haskell, ML, F\#.
+
+In this paper we explain the lambda calculus in its purest form as untyped
+lambda calculus.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main_untyped_lambda"
+%%% End:

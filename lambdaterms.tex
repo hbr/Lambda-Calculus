@@ -1,0 +1,789 @@
+\section{Lambda Terms}
+\label{sec:lambda}
+
+\subsection{Basic Definitions}
+
+Imagine a mathematical function with one argument which triplicates the
+argument and adds five to the result. How would you write such a function. In
+mathematics the most straightforward notation is
+$$ x \mapsto 3 \times x + 5.$$
+%
+The name of the variable $x$ is not important. We could write the same
+function as $y \mapsto 3\times y + 5$. The variables $x$ and $y$ are called bound
+variables because they are bound by the context definining the function.
+
+Now suppose you want to apply the function to an actual argument, say
+$2$. I.e. we want to compute $(x \mapsto 3\times x + 5)(2)$. We do it by
+replacing the variable $x$ in the expression $3\times x + 5$ defining the
+function by the argument $2$ resulting if $3\times 2 + 5$.
+
+More formally we could write
+$$ (x \mapsto 3 \times x + 5)(2) \to (3 \times x + 5)[x:=2] = 3\times 2 + 5.$$
+where $\to$ means \emph{reduces to}.
+
+That is already the essence of lambda calculus. In lambda calculus we write
+the function $$x \mapsto 3 \times x + 5$$ as $$\lambda x. 3 \times x + 5.$$
+and we write function application by juxtaposition
+$$ (\lambda x. 3\times x + 5) 2$$
+which reduces to
+$$ (\lambda x. 3\times x + 5) 2 \to_\beta (3 \times x + 5)[x:=2]$$.
+The application of the function to an argument is called a $\beta$-reduction.
+
+$\beta$-reduction is done by variable substitution which can be done purely
+mechanically i.e. it is the essence of a computation step.
+
+In lambda calculus we have no primitive data types like booleans, numbers
+pairs etc. There are only functions. However it is possible to represent data
+by functions as we shall see later. Data are represented by functions which
+capture the essence of what can be done by the data.
+
+E.g. boolean values can be used to decide between two alternatives. Therefore
+a boolean value is represented in lambda calculus by a function with two
+arguments which chooses the first or second argument depending on its value.
+
+Numbers are represented by functions which take two arguments, a function and
+a start value and the lambda term representing the number iterates the
+function n-times on the start value.
+
+
+
+\paragraph{Definition of Lambda Terms}
+
+\begin{definition}
+  Let $x$ range over a countably infinite set of variable names
+  $\{x_0, x_1, \ldots\}$ and $t$ over lambda terms, then the set of lambda
+  terms is defined by the grammar $$t ::= x \mid t\, t \mid \lambda x. t.$$
+\end{definition}
+
+A lambda term is either a variable $x$, an application $a\,b$ (the term $a$
+applied to the term $b$) or an abstraction $\lambda x.a$.
+
+We use the convention that application is left associative i.e. $a b c$ is
+parsed as $(a b) c$.
+
+Nested lambda abstractions $\lambda x. \lambda y. \ldots . t$
+are parsed as $\lambda x. (\lambda y. \ldots . t)$ and
+abbreviated as $\lambda x y \ldots\, . t$.
+
+
+\paragraph{Free and Bound Variables}
+
+In the abstraction $$ \lambda x. t$$ the variable $x$ is a bound variable. It
+is not vlsible to the outside world. This is the same convention as used in
+programming languages which allow the definition of procedures. The formal
+arguments names of the procedure/function arguments are just visible to the
+definition of the procedure/function and not to the outside world.
+
+Variables which are not bound by a lambda abstraction are free variables.
+
+\begin{definition}
+  The set of free variables $FV(t)$ of a lambda term $t$ is defined by
+  $$FV(t) :=
+  \begin{cases} FV(x) &= \{x\} \\
+     FV(a b) &= FV(a) \cup FV(b) \\
+     FV(\lambda x. t) &= FV(t) - \{x\}
+   \end{cases}
+   $$
+\end{definition}
+
+\begin{definition}
+  A lambda term without free variables is called a \emph{closed lambda term}.
+\end{definition}
+
+Evidently bound variables can be renamed without changing the meaning of the
+term. E.g. the two lamda terms
+$$\lambda x. x $$
+$$\lambda y. y  $$
+are considered as the same term which represents the identity
+function. Traditionally the terms are called $\alpha$-equivalent because you
+transform one into the other by just renaming bound variables.
+
+We write $t = u$ only if $u$ and $t$ are exactly the same term or
+$\alpha$-equivalent terms.
+
+Renaming of bound variables must be done in a way which does not change the
+structure of the term. The following two rules must be obeyed.
+\begin{enumerate}
+
+\item Keep different bound variables distinct.
+  $$\begin{array}{llll}
+      \text{legal:} & \lambda x y. x\, y  &  \text{rename to}  & \lambda a
+                                                                 b. a\, b \\
+      \text{illegal:} & \lambda x y. y      &  \text{rename to}  & \lambda x
+                                                                   x. x
+    \end{array} $$
+
+\item Do not capture free variables.
+  $$\begin{array}{llll}
+      \text{legal:} & \lambda x. x\, y  &  \text{rename to}  & \lambda z. z\,y
+                                                                \\
+      \text{illegal:} & \lambda x. x\,y &  \text{rename to}  & \lambda y. y\,y
+    \end{array} $$
+    The second rename renames the variable $x$ into the variable $y$ which as
+    originally a free variable but captured after the rename.
+\end{enumerate}
+
+
+\paragraph{Variable Substitution}
+
+\begin{definition}
+  The variable substitution $a[x:=t]$ is defined by
+  $$a[x:=t]~:=
+  \begin{cases} x[x:=t]  &:= t \\
+    y[x:=t] &:= y \quad \text{for}\quad x \ne y \\
+    (a b)[x:=t] &:= a[x:=t] \, b[x:=t] \\
+    (\lambda y.a)[x:=t]  &:= \lambda y. a[x:=t] \quad\text{for}\quad x \ne y
+    \land y \notin FV(t)
+   \end{cases}
+   $$
+\end{definition}
+
+Note: The condition on the last line is no restriction because we can always
+rename the bound variable $y$ to a fresh variable $z$ different from $x$ and
+not occuring free in $t$ since there are infinitely many variables available.
+
+
+\paragraph{Substitution Swap Lemma}
+
+The expression
+$$a[x:=b][y:=c]$$ describes the term $a$ where in a first step the variable
+$x$ is substituted by the term $b$ and then in a second step the variable $y$
+is substituted by the term $c$. Usually it is assumed that $x$ and $y$ are
+different variables and that $x$ does not occur free in $c$, i.e. $x\ne y
+\land x \notin FV(c)$.
+
+However two subsequent substitutions do not commute. The term
+$$ a[y:=c][x:=b]$$ is in general different from the previous term.
+Reason: Neither $a[x:=b][y:=c]$ nor $a[y:=c]$ do contain any
+$y$. But $b$ might contain $y$ and therefore $a[y:=c][x:=b]$ might contain
+$y$. In order to make the swapping correct we have to do the substitution
+$b[y:=c]$ before substituting the variable $x$ by $b$.
+
+\begin{theorem}
+  \label{substitutionswap}
+  Substitution Swap lemma: Let $x \ne y$ and $x \notin
+  FV(c)$. Then $$a[x:=b][y:=c] = a[y:=c]\big[x:= b[y:=c]\big]$$. Proof by
+  induction on the structure of $a$. We use the abbreviations
+  $$\begin{array}{ll}
+      s_1(a) &:= a[x:=b][y:=c] \\
+      s_2(a) &:= a[y:=c]\big[x:=b[y:=c]\big]
+    \end{array}.$$
+  \begin{enumerate}
+
+  \item $a$ is a variable. Lets call it $z$. Goal $s_1(z) = s_2(z)$
+    \begin{itemize}
+    \item $z \ne x \land z \ne y$: $s_1(z) = z = s_2(z)$
+    \item $z = x \land z \ne y$: $s_1(z) = b[y:=c] = s_2(z)$
+    \item $z \ne x \land z = y$: $s_1(z) = c = s_2(z)$
+    \end{itemize}
+
+  \item $a$ is the application $t\, u$. Goal $s_1(t\,u) = s_2(t\,u)$.
+    Induction hypotheses $s_1(t) = s_2(t)$ and $s_1(u) = s_2(u)$
+    $$\begin{array}{llll}
+        s_1(t\,u) &=& s_1(t) s_1(u) & \text{definition of substitution}\\
+       &=& s_2(t) s_2(u) & \text{induction hypothesis}\\
+        &=& s_2(t\,u) & \text{definition of substitution}
+      \end{array}$$
+
+    \item $a$ is the abstraction $\lambda z.t$. Goal $s_1(\lambda z.t) =
+      s_2(\lambda z.t)$. Induction hypothesis $s_1(t) = s_2(t)$.
+    $$\begin{array}{llll}
+        s_1(\lambda z. t) &=& \lambda z. s_1(t)  & \text{definition of substitution}\\
+       &=& \lambda z. s_2(t) & \text{induction hypothesis}\\
+        &=& s_2(\lambda z.t) & \text{definition of substitution}
+      \end{array}$$
+      with appropriate renaming of the bound variable $z$ in order to avoid
+      variable capture (i.e. $z$ must be different from $x$ and $y$ and must
+      not occur free neither in $a$ nor in $b$).
+  \end{enumerate}
+\end{theorem}
+
+
+
+
+\paragraph{Beta Reduction}
+
+Now we are able to define the essential computation step in lambda calculus
+which is beta reduction. Any term of the form
+$$ (\lambda x.a) b$$ is called a reducible expression or in short a
+\emph{redex} which reduces in one step to
+$$a[x:=b].$$ The redex can appear anywhere inside a lambda term.
+
+\begin{definition} \emph{Beta reduction} $\tobeta$ is a relation defined over lambda
+  terms by the rules
+  \begin{enumerate}
+  \item $(\lambda x.a) b \tobeta a[x := b]$
+  \item $\rulev{a\tobeta b}{a c \tobeta b c}$
+  \item $\rulev{b\tobeta c}{a b \tobeta a c}$
+  \item $\rulev{a \tobeta b}{\lambda x.a \tobeta \lambda x.b}$
+  \end{enumerate}
+\end{definition}
+
+Beta reduction $\to_\beta$ is a one step relation. The expression
+$t \to_\beta^+ u $ states that $t$ can be reduced to $u$ in one or more
+$\beta$-reduction steps.  The expression $t \to_\beta^* u $ states that $t$
+can be reduced to $u$ in zero or more $\beta$-reduction steps.
+
+Two terms $t$ and $u$ are called $\beta$-equivalent if $t \to_\beta^\sim u$ is
+valid. Recall from section~\ref{setrelation} that the equivalence
+closure~\ref{def:equivalenceclosure} means that $t$ can be transformed into
+$u$ by using zero or more beta reduction steps in forward (reduction) or
+backward (expansion) direction.
+
+\paragraph{Normal Forms}
+
+\begin{definition}
+  A $\lambda$-term is in \emph{normal form} if it is a terminal element of the
+  $\beta$-reduction relation.
+
+  A $\lambda$-term is \emph{normalizing} if it is a weakly terminating element of the
+  $\beta$-reduction relation.
+
+  A $\lambda$-term is \emph{strongly normalizing} if it is a strongly
+  terminating element of the $\beta$-reduction relation.
+\end{definition}
+In other words
+\begin{itemize}
+\item A $\lambda$-term is in normal form if it contains no reducible expression.
+\item A $\lambda$-term $t$ is normalizing if there is a reduction path of zero
+  or more steps $t \to_\beta^* u$ where $u$ is in normal form.
+\item A $\lambda$-term $t$ is strongly normalizing if there is all reduction
+  paths end up after zero or more steps in some normal form.
+\end{itemize}
+
+Clearly all terms in normal form are trivially normalizing and strongly
+normalizing.
+
+
+
+
+\subsection{Simple Computation with Combinators}
+
+In this subsection we demonstrate how lambda terms can be used to do simple
+computations. We base our terms on combinators which are closed lambda terms
+i.e. terms without free variables.
+
+The simplest combinator is the identity combinator defined as
+$$ I := \lambda x.a $$
+where $I$ is just an abbreviation for the term on the right hand side of the
+definition. The lambda calculus does not know the term $I$, it just knows
+terms like $\lambda x.x$. We use $I$ for us to formulate the calculus more
+readable for humans.
+
+The identity function takes one argument and returns exactly the same
+argument which can be proved by application of the rules for
+$\beta$-reduction
+$$\begin{array}{llll}
+  I a & = &  (\lambda x.x) a & \text{definition of $I$} \\
+       & \to_\beta & x[x:=a]  & \text{rule 1 of $\beta$-reduction} \\
+       & =              & a           & \text{definition of substitution}
+\end{array}.$$
+
+The mockingbird combinator is defined as
+$$ M := \lambda x. x x.$$
+Birdnames are used in this text as the names for combinators to honor Haskell
+Curry who is one of the inventors of combinatorial logic and who loved to
+watch birds and to honor Raymond Smullyan who wrote the book \emph{To Mock a
+  Mockingbird}~\cite{smullyan} using birds and forests and puzzles about them
+to teach combinatorial logic in an entertaining and amusing way.
+
+The mockingbird combinator receives one argument and applies it to itself. The
+term $M M$ has the interesting property to reduce to itself
+$$\begin{array}{llll}
+  M M & = &  (\lambda x.x x) M  & \text{definition of $M$} \\
+       & \to_\beta & (x x)[x:=M]   & \text{rule 1 of $\beta$-reduction} \\
+       & =              & M M              & \text{definition of substitution}
+\end{array}$$
+so that we have
+$$ MM \to_\beta MM \to_\beta MM \ldots$$
+which represents the simplest form of an \emph{endless loop} in lambda
+calculus.
+
+A very important combinator is the kestrel
+$$ K := \lambda x y. x$$
+which receives two arguments and returns the first, easily proved by
+$$\begin{array}{llll}
+    K a b & = & (\lambda x y. x) a b & \text{definition of $K$}  \\
+          & = &(\lambda x. \lambda y. x) a b & \text{shorthand expanded} \\
+          & \to_\beta & (\lambda y.x)[x:=a]\,b & \text{rule 1 of
+                                                   $\beta$-reduction}\\
+          & = & (\lambda y. a) b & \text{definition of substitution} \\
+          & \to_\beta & a[y:=b] & \text{rule 1 of $\beta$-reduction} \\
+          & = & a & \text{definition of substitution}
+  \end{array}.$$
+
+The kestrel shows that $\lambda$-terms can in some way \emph{store} values. If
+we apply the kestrel $K$ only to one argument $a$ we get $\lambda y.a$. This
+term stores the value $a$ within the abstraction. If later the term
+receives its second argument it spits out the stored value $a$ ignoring its
+second argument.
+
+The companion of the kestrel is the kite with the definition
+$$ K_I := \lambda x y. y$$ which receives two arguments and returns always the
+second i.e.
+$$ K_I a b \to_\beta^+ b$$
+which can be proved in a similar manner.
+
+A combinator with the same behaviour as the kite can be constructed as an
+application of the kestrel to the identity function
+$$ K I$$
+where
+$$ K I \to_\beta \lambda y. I$$
+so that we get
+$$ K I a b \to_\beta (\lambda y. I) a b \to_\beta I b \to_\beta b.$$
+
+Note that $K I$ is not $\alpha$-equivalent to $K_I$, but both terms are
+$\beta$-equivalent because they reduce to the $\alpha$-equivalent terms
+$\lambda y x.x$ and $\lambda x y. y$.
+
+The kestrel applied to one argument stores the argument a returns it by ignoring the
+second argument. The trush stores its first argument as well but in a more
+interesting manner
+$$ T := \lambda x f. f x.$$
+The trush stores its first argument and waits until it receives its second
+argument. After receiving its second argument it uses the second argument as a
+function and applies it to the first argument.
+
+Even more interesting in its storage behaviour is the vireo, defined as
+$$ V := \lambda x y f. f x y.$$
+
+The vireo applied to two arguments stores the arguments (i.e. it stores a pair
+of values). After receiving its third argument it applies the third argument
+as a function to the two stored values. Combining the vireo, the kestrel and
+the kite we can encode pairs. $V a b$ stores the pair $(a,b)$ and $V a b K$
+returns the first element of the pair and $V a b K_I$ returns the second
+element of the pair i.e. $V a b K \to_\beta^+ a$ and $V a b K_I \to_\beta^+ b$
+which can be proved by using the definitions and applying $\beta$-reduction
+and substitution.
+
+\paragraph{Summary of Combinators}
+
+Computing with $\lambda$-terms is purely mechanical, but it can be tedious if
+the terms become more complicated. Combinators serve as a kind of abstraction
+layer to make it easier to manipulate and prove assertions about lambda terms.
+
+Having a definition of an combinator e.g. the kestrel $$K := \lambda x y.x,$$
+the concrete definition is usually not necessery once the crucial property of
+the kestrel $$K a b \to_\beta^+ a$$ has been proved to be valid.
+
+In this text we don't use complicated $\lambda$-terms. We always use
+combinators with their corresponding properties to express compactly our
+claims and proves of these claims.
+
+In the following table the most important combinators together with their
+specifications and implementations are summarized.
+
+\begin{tabular}{|l|l|l|l|}
+  \hline
+  Name & Abbreviation & Specification & Implementation \\
+  \hline\hline
+  Bluebird & $B$ & $B f g x \to_\beta^+ f (g x)$   & $\lambda f g x. f (g x)$ \\
+  \hline
+  Identity & $I$ & $I x \to_\beta x$   & $\lambda x. x$ \\
+  \hline
+  Kestrel & $K$ & $K x y \to_\beta^+ x$   & $\lambda x y. x$ \\
+  \hline
+  Kite & $K_I$ & $K_I x y \to_\beta^+ y$   & $\lambda x y. y$ \\
+  \hline
+  Mockingbird & $M$ & $M x \to_\beta^+ x \, x$   & $\lambda x. x\,x$ \\
+  \hline
+  Starling & $S$ & $S f g x\to_\beta^+ f x (g x)$   & $\lambda f g x. f x(g x)$ \\
+  \hline
+  Trush & $T$ & $T x f\to_\beta^+ f\,x$   & $\lambda x f. f\,x$ \\
+  \hline
+  Turing  & $U$ & $U x f\to_\beta^+ f (x x f)$   & $\lambda x f. f (x x f)$ \\
+  \hline
+  Vireo & $V$ & $V x y f\to_\beta^+ f x y$   & $\lambda x y f. f x y$ \\
+  \hline
+\end{tabular}
+
+
+
+
+
+
+
+\subsection{Confluence - Church Rosser Theorem}
+
+A lambda term might contain more than one reducible expression. The
+$\beta$-reduction relation is therefore non-deterministic, you can choose any
+reducible expression to do a $\beta$-reduction step.
+
+Therefore the question arises, if different reduction paths end up at the same
+result. Is $\beta$-reduction confluent?
+
+Remember that confluence is a rather strong property as explained in the
+section \emph{Inductive Sets and Relations}~\ref{setrelation}. Confluence
+guarantees the uniquess of terminal elements (or normal forms in
+$\lambda$-calculus speak) provided that they exist.
+
+In order to prove that $\beta$-reduction is confluent we have to prove that
+$\to_\beta^*$ is a diamond, i.e. that
+$$\begin{matrix}
+  a & \to_\beta^* & b \\
+  \downarrow_\beta^* & & \downarrow_\beta^* \\
+  c & \to_\beta^* & \exists d
+\end{matrix}$$
+is valid.
+
+
+\paragraph{$\beta$-reduction is not a diamond}
+
+If $\to_\beta$ were a diamond we would be ready, because a diamond is
+confluent as proved in~\ref{th:diamondconfluent}. Unfortunately $\to_\beta$ is
+not a diamond for the following reason:
+
+The core of the reduction relation is $(\lambda x.a) b \to_\beta a[x:=b]$
+where $(\lambda x.a) b$ is the reducible expression. Both subterms $a$ and $b$
+might contain further reducible expressions. Since the variable $x$ might be
+contained in the expression $a$ zero, one or more times all reducible
+expressions of $b$ can be contained in $a[x:=b]$ zero, one or more times.
+
+If $b$ contains a reducible expression a reduction step $b \to_\beta c$ is
+possible for some $c$. We have the situation that two reduction paths are
+possible
+$$
+\begin{matrix}
+  (\lambda x.a) b & \to_\beta & a[x:=b] \\
+  \downarrow_\beta & & \\
+  (\lambda x.a) c  & \to_\beta & a[x:=c]
+\end{matrix}.$$
+
+There are 3 cases:
+\begin{itemize}
+\item
+  Case variable $x$ does not occur in $a$: Then $a[x:=b] $ and $a[x:=c]$
+  are the same expression and since $\to_\beta$ is not reflexive there is no
+  way to complete the diagram.
+
+\item
+  Case variable $x$ does occur once in $a$: Then $a[x:=b] \to_\beta
+  a[x:=c]$ is a valid reduction step and the diagram can be completed.
+
+\item
+  Case variable $x$ does occur 2 or more times in $a$: Then $a[x:=b]$ cannot
+  be reduced to $a[x:=c]$ in one step. 2 or more steps are necessary.
+\end{itemize}
+
+
+
+\paragraph{Properties of $\to_\beta^*$}
+As explained in the section \emph{Diamonds and
+  Confluence}~\ref{sec:diamondsconfluence}
+we can search for properties of  $\to_\beta^*$ which indicate that
+$\to_\beta^*$ is a diamond and use these properties to construct a diamond
+between $\to_\beta$ and $\to_\beta^*$.
+
+$\to_\beta^*$ has the property that it can do zero or more reduction steps in
+parallel in \emph{any} subexpression of a lambda expression. I.e. intuitively
+the following rules are valid:
+\begin{enumerate}
+\item
+  $a \to_\beta^* a$
+\item
+  $\ruleh {a \to_\beta^* b} {\lambda x.a \to_\beta^* \lambda x.b}$
+\item
+  $\ruleh {a \to_\beta^* b, \, c \to_\beta^* d} {ac \to_\beta^* bd}$
+\item
+  $\ruleh {a \to_\beta^* b, \, c \to_\beta^* d}  {(\lambda x.a) c \to_\beta^* b[x:=d]} $
+\end{enumerate}
+
+Allthough evident by intuition we have to prove these properties.
+
+\begin{theorem}
+  $\tobetastar$ satisfies
+  $\ruleh{
+    a\tobetastar b \quad
+    c \tobetastar d}
+  {ac \tobetastar bd}$.
+  %---------------
+
+Proof by induction on $a \tobetastar b$.
+\begin{enumerate}
+\item
+  Goal $ac \tobetastar ad$ assuming $c  \tobetastar d$.
+  Proof by subinduction on $c \tobetastar d$
+  \begin{enumerate}
+  \item
+    Case $c = d$. Trivial by reflexivity.
+  \item
+    Goal $ac \tobetastar ae$.
+    Premises $c \tobetastar d$ and $d \tobeta e$.
+    Induction hypothesis $ac \tobetastar ad$.\\
+    $\begin{bmatrix}
+      c   & \tobetastar      &  d     & \tobeta            &   e   \\
+           & \Downarrow_1 &         & \Downarrow_2 &        \\
+      ac & \tobetastar      &  ad   & \tobeta             &   ae \\
+          &                         & \Downarrow_3 &          &        \\
+      ac &                        & \tobetastar   &              &   ae
+    \end{bmatrix}$\\
+    $\Downarrow_1$ by induction hypothesis.
+    $\Downarrow_2$ by rule 3 of $\beta$-reduction.
+    $\Downarrow_3$ by rule 2 of $\tobetastar$.
+  \end{enumerate}
+\item
+  Goal $ac \tobetastar ed$.
+  Premises $a \tobetastar b$ and $b\tobeta e$.
+  Induction hypothesis $ac \tobetastar bd$.\\
+    $\begin{bmatrix}
+      a   & \tobetastar      &  b     & \tobeta            &   e   \\
+           & \Downarrow_1 &         & \Downarrow_2 &        \\
+      ac & \tobetastar      & bd    & \tobeta            &   ae \\
+           &                        & \Downarrow_3 &         &        \\
+      ac &                         & \tobetastar   &           &   ae
+    \end{bmatrix}$.\\
+    $\Downarrow_1$ by induction hypothesis.
+    $\Downarrow_2$ by rule 2 of $\beta$-reduction.
+    $\Downarrow_3$ by rule 2 of $\tobetastar$.
+  \end{enumerate}
+\end{theorem}
+
+\begin{theorem}
+  $\tobetastar$ satisfies
+  $\ruleh{
+    a\tobetastar b \quad
+    c \tobetastar d}
+  {(\lambda x.a)c \tobetastar b[x:=d]}$.
+  %-----------------------------
+  \\ Proof in the same manner as the previous theorem with induction on
+  $a\tobetastar b$ and then a subinduction on $c \tobetastar d$ for the
+  reflexive case.
+\end{theorem}
+
+
+\begin{theorem}
+  $\tobetastar$ satisfies
+  $\ruleh{
+    a\tobetastar b}
+  {\lambda x.a \tobetastar \lambda x.b}$.\\
+  %-----------------------------
+Proof in the same manner as the previous theorems without the need of a
+subinduction because there is only one premise.
+\end{theorem}
+
+
+\paragraph{Definition of Parallel $\beta$-reduction}
+
+Now that we have the found the properties of $\tobetastar$ which point into
+the direction that it is a diamond we can use these properties as rules to
+define the least relation satisfying these properties.
+
+
+\begin{definition}
+\label{def:parallelbeta}
+  % -------------------------------------------------------
+  \emph{Parallel beta reduction} $\tobetap$ is a relation
+  defined over lambda terms by the rules
+  % -------------------------------------------------------
+  \begin{enumerate}
+  \item $a \tobetap a$
+  \item $\rulev{a \tobetap b} {\lambda x.a \tobetap \lambda x.b}$
+  \item $\rulev{a\tobetap c \\ b \tobetap d}{a b \tobeta c d}$
+  \item $\rulev{a\tobetap c \\ b \tobetap d}{(\lambda x.a) b \tobetap c[x := d]}$
+  \end{enumerate}
+\end{definition}
+
+Obviously parallel $\beta$-reduction is a subset of parallel
+$\beta$-reduction.
+\begin{lemma}
+  Beta reduction is a subset of parallel beta reduction i.e.
+  %---------------------------------------
+  $a \tobeta b \imp a \tobetap b$.
+  Proof by induction on $a \tobeta b$. Trivial because each rule of $\tobeta$
+  is a special case of some rule of $\tobetap$.
+\end{lemma}
+
+
+
+\paragraph{Parallel $\beta$-Reduction is a Diamond}
+
+In order to prove that $\tobetap$ is a diamond we need some lemmas.
+
+\begin{lemma}
+  Parallel beta reduction preserves abstraction i.e.
+  $\lambda x.a \tobetap c \imp \exists b : a \tobetap b \land c = \lambda
+  x.b$. Proof by induction on $\tobetap$.
+  \begin{enumerate}
+  \item $c = \lambda x.a$. Trivial. Take $b = a$.
+  \item $\lambda x.a \tobetap \lambda x.b$ with $a \tobetap b$. Trivial. Take $b$.
+  \item The case $\lambda x.a = t u$ is syntactically impossible. Abstraction
+    and application are different.
+  \item The case $\lambda x.a = (\lambda x.u) v$ is syntactically
+    impossible. Abstraction and application are different.
+  \end{enumerate}
+\end{lemma}
+
+
+\begin{lemma}
+  Basic compatibility of substitution and parallel reduction.
+  $t \tobetap u \imp a[x := t] \tobetap a[x := u]$. Proof by induction on the
+  structure of $a$.
+  \begin{enumerate}
+  \item $a$ is a variable. Goal $z[x := t] \tobetap z[x := u]$. Case $z=x$
+    is satisfied because of the assumption $t \tobetap u$. Case $z\ne x$ is
+    satisfied by reflexivity $z \tobetap z$.
+  \item
+    $a$ is an application $b\, c$.
+    Goal $(b c)[x:=t] \tobetap (b c)[x:=u]$
+    $$
+    \begin{array}{llll}
+      (b c)[x:=t] &=& b[x:=t]\, c[x:=t] &              \text{definition of substitution}\\
+                      &\tobetap & b[x:=u]\, c[x:=u] & \text{ind hypo + rule 3} \\
+                      &=& (b c)[x:=u] &                       \text{definition of substitution}
+    \end{array}
+    $$
+  \item
+    $a$ is an abstraction $\lambda y.b$.
+    Goal $(\lambda y.b)[x:=t] \tobetap (\lambda y.b)[x:=u]$.
+    $$
+    \begin{array}{llll}
+      (\lambda y.b)[x:=t] &=& \lambda y. b[x:=t]  &\text{definition of substitution}\\
+      &\tobetap & \lambda y.b[x:=u] &\text{ind hypo + rule 2} \\
+      &=& (\lambda y.b)[x:=u] & \text{definition of substitution}
+    \end{array}
+    $$
+  \end{enumerate}
+\end{lemma}
+
+
+\begin{lemma}
+  Full compatibility of substitution and parallel reduction.
+  % a -> c and b -> d  =>  a[x:=b] -> c[x:=d]
+  % ----------------------------------
+  $a \tobetap c \land b \tobetap d  \imp a[x := b] \tobetap c[x := d]$. Proof
+  by induction on $a \tobetap c $.
+  \begin{enumerate}
+  \item
+    $a=c$. Prove by the previous lemma.
+  \item
+    Goal $(\lambda y.a) [x := b] \tobetap (\lambda y.c) [x := d]$.
+    Premise $a \tobetap c$. Induction
+    hypothesis $a[x := b] \tobetap c[x := d]$
+    $$
+    \begin{array}{llll}
+      (\lambda y.a)[x := b]  &=& \lambda y.a [x := b] &\text{definition substitution} \\
+                             &\tobetap& \lambda y.c[x := d]  &\text{induction hypo + rule 2} \\
+                             &=& (\lambda y.c)[x := d]           &\text{definition substitution}
+    \end{array}
+    $$.
+  \item
+    Goal $(a e) [x := b] \tobetap (c f) [x := d]$.
+    Premises $a\tobetap c, e\tobetap f$.
+    Induction hypotheses
+      $a[x := b] \tobetap c[x := d],
+       e[x := b] \tobetap f[x := d]$
+    $$
+    \begin{array}{llll}
+      (a e)[x := b]  &=& a[x := b]\, e[x := b] &\text{definition substitution}\\
+                     &\tobetap& c[x := d] \, f[x := d] &\text{induction hypo + rule 3} \\
+                     &=& (c f)[x := d] &\text{definition substitution}
+    \end{array}
+    $$.
+  \item
+    Goal $\big((\lambda y.a) c\big) [x := b] \tobetap \big(e[y:=f]\big)[x := d]$.
+    Premises $a \tobetap e, c \tobetap f$.
+    Induction hypotheses
+      $a[x:=b] \tobetap e[x := d],
+        c[x:=b]  \tobetap f[x := d]$
+    $$
+    \begin{array}{llll}
+      ((\lambda y.a) c)[x := b]  &=& (\lambda y.a[x := b])\, c[x := b] &
+                                                                         \text{definition substitution}\\
+                     &\tobetap& e[x := d]\big[y:=f[x := d]\big] &
+                                                                  \text{induction hypo + rule 4} \\
+                     &=& \big(e[y:=f]\big)[x := d] &
+                                                                  \text{substitution
+                                                           swap lemma}
+    \end{array}
+    $$
+  \end{enumerate}
+  $\qed$
+\end{lemma}
+
+
+
+
+
+\begin{theorem}
+  Parallel reduction $\tobetap$ is a diamond i.e.
+  %------------------------------------
+  $\begin{matrix}
+    a & \tobetap & b \\
+    \downarrow_p & & \downarrow_p \\
+    c & \tobetap & \exists d
+  \end{matrix}
+  $.
+  Proof by induction on $a \tobetap b$.
+  \begin{enumerate}
+  \item
+    Trivial reflexive case.
+    $\diamp
+    {a} {a}
+    {c} {c}
+    $
+
+  \item Goal
+    $\diamp
+    {\lambda x.a} {\lambda x.b}
+    {\lambda x.c} {?}$.
+    Parallel reduction preserves abstraction. Therefore the specific
+    $\lambda x.c$ instead of the more general $c$.
+    The premises $a\tobetap b, a \tobetap c$ and the induction hypothesis
+    guarantees the existence of a $d$ such that $\lambda x.d$ is the element
+    to fill the gap.
+
+  \item
+    Goal $\diamp {a e} {b f} {c}  {?}$. Premises $a \tobetap b, e \tobetap f$.
+    Proof by subinduction on $a e \tobetap c$.
+
+    \begin{enumerate}
+    \item Trivial reflexive case.
+    \item Syntactically impossible
+    \item
+      Goal $\diamp {a e} {b f} {g h} {?}$.
+
+      The premises $a \tobetap b, a \tobetap g, e \tobetap f, e \tobetap h$
+      with the corresponding induction hypotheses guarantee the existence of
+      two element $k$ and $m$ so that $ k m$ can fill the missing element in
+      the goal.
+
+    \item
+      Goal $\diamp {(\lambda x.a) e} {(\lambda x.b) f} {c[x:=g]} {?}$.
+      Parallel reduction preserves abstraction. Therefore the specific
+      $\lambda x.b$ in the upper right corner.
+      The premises $a \tobetap b, a \tobetap c, e \tobetap f, e \tobetap g$
+      and the corresponding induction hypotheses guarantee the existence of
+      two elements $d$ and $h$ so that $d[x:=h]$ fills the missing element
+      in the goal.
+    \end{enumerate}
+
+  \item
+    Goal $\diamp {(\lambda x.a) e} {b[x:=f]} {c} {?}$. Premises $a \tobetap b, e \tobetap f$.
+    Proof by subinduction on $(\lambda x.a) e \tobetap c$.
+    \begin{enumerate}
+    \item Trivial reflexive case.
+    \item Syntactically impossible
+    \item Mirror image of case 3d, just flipped at the northwest-southeast diagonal.
+    \item
+      Goal $\diamp {(\lambda x.a) e} {b[x:=f]} {c[x:=g]} {?}$
+      The premises $a \tobetap b, a \tobetap c, e \tobetap f, e \tobetap g$
+      and the corresponding induction hypotheses guarantee the existence of
+      two elements $d$ and $h$ so that $d[x:=h]$ fills the missing element
+      in the goal.
+    \end{enumerate}
+
+  \end{enumerate}
+  $\qed$
+\end{theorem}
+
+\paragraph{$\beta$-Reduction is Confluent}
+
+\begin{theorem}
+  Beta reduction is confluent.
+  %--------------------
+  Proof: With the parallel beta reduction$\tobetap$ we have found a diamond
+  relation between beta reduction $\tobeta$ and its transitive closure
+  $\tobetastar$. According to the confluence theorems of the chapter
+  ``Inductive Sets and Relations'' this is sufficient to prove the confluence
+  of beta reduction.
+\end{theorem}

@@ -1,0 +1,107 @@
+\section{Unique Terms}
+
+\begin{definition}
+  Let $x$ range over a countably infinite set of variables
+  $\{x_0, x_1, \ldots\}$ then the set of \emph{unique lambda terms} is defined by the
+  grammar
+  %
+  $$t ::= x \mid t t \mid \lambdaw t$$
+with the shorthands $\lambdaw^0 a = a$, $\lambdaw^{n'} a = \lambdaw \lambdaw^n a$.
+\end{definition}
+
+
+% Upshifting
+% --------
+\begin{definition} We define $a\upshift_i^n$ as the term $a$ where all
+  variables above or equal $x_i$ are \emph{upshifted} by $n$ according to
+$$ (\upshift) :=
+        \begin{cases}
+          x_k\upshift^n_i &:=
+          \begin{cases}
+            x_k, & k < i \\
+            x_{k+n} & i \le k
+          \end{cases}
+          \\
+          (a b)\upshift^n_i &:= a\upshift^n_i \, b\upshift^n_i
+          \\
+          (\lambdaw a) \upshift^n_i &:= \lambdaw a \upshift^n_{i'}
+        \end{cases}
+$$
+and use the shorthands $t\upshift = t\upshift_0^1$
+and
+$t\upshift^n = t\upshift^n_0$.
+\end{definition}
+
+
+
+
+% Variable substitution
+% -----------------
+\begin{definition}
+  The \emph{variable substitution} $a\lhd_i t$ is the term $a$ where the
+  variable $x_j$ has been substituted by the term $t\upshift^i$ according to
+$$ (\lhd) :=
+        \begin{cases}
+          x_k\lhd_i t &:=
+          \begin{cases}
+            x_k, & k < i
+            \\
+            t\upshift^i, & k = i
+            \\
+            x_{k-1} & i < k
+          \end{cases}
+          \\
+          (a b)\lhd_i t &:= a\lhd_i t\, b\lhd_i t
+          \\
+          (\lambdaw a) \lhd_i t&:= \lambdaw a \lhd_{i'} t\upshift
+        \end{cases}
+$$
+and use the shorthand $a\lhd b = a\lhd_0 b$. The substitution operator is left
+associative i.e. $a \lhd_i b \lhd_k c$ is parsed as $(a \lhd_i b) \lhd_k c$.
+\end{definition}
+
+
+% Substitution swap lemma
+% --------------------
+\begin{theorem}
+  It is possible to swap substitutions with the following equality
+  $$
+  \rulev
+  {k \le n}
+  {a \lhd_k b \lhd_n c = a \lhd_{n'} c \lhd (b \lhd_n c)}
+  $$
+  \begin{proof} Induction on the structure of $a$.
+    \begin{enumerate}
+    \item
+      Goal $x_i \lhd_k b \lhd_n c = x_i \lhd_{n'} c \lhd (b \lhd_n c)$.
+      \begin{enumerate}
+      \item Case $i < k$: Trivial, because nothing is substituted.
+      \item Case $i = k$:\\
+        $\begin{array}{lll}
+            x_k \lhd_k b \lhd_n c &=& b\upshift^k \lhd_n c \cr
+            &=& x
+          \end{array}
+          $
+      \item
+      \end{enumerate}
+    \item
+    \item
+    \end{enumerate}
+  \end{proof}
+\end{theorem}
+
+
+% Beta reduction
+% -----------
+\begin{definition} \emph{Beta reduction} $\tobeta$ is a relation defined over
+  unique lambda terms by the rules
+  \begin{enumerate}
+  \item $(\lambdaw a) b \tobeta a \lhd b$
+  \item $\rulev{a\tobeta b}{a c \tobeta b c}$
+  \item $\rulev{b\tobeta c}{a b \tobeta a c}$
+  \item $\rulev{a \tobeta b}{\lambdaw a \tobeta \lambdaw b}$
+  \end{enumerate}
+\end{definition}
+
+
+Test $\ulcorner a \urcorner $. Or $\ulcorner a\, \ulcorner a \urcorner \urcorner $.

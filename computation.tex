@@ -1,0 +1,574 @@
+\section{Computable Functions}
+\label{sec:computable}
+
+\subsection {Boolean Functions}
+
+\paragraph{Boolean Values}
+
+In lambda calculus there are no primitive data types. All lambda terms are
+functions. If we want to represent boolean values in lambda calculus we have
+to ask \emph{What can be done with a boolean value?}
+
+Evidently boolean values can be used to decide between alternatives. We can
+make the convention that the boolean value \emph{true} always decides for the
+first alternative and the boolean value \emph{false} always decides for the
+second alternative.
+
+In the section \emph{Lambda Terms}~\ref{sec:lambda} we have already seen the
+combinator kestrel $K$ which always returns the first argument of two
+arguments and the kite $K_I$ which always returns the second argument of two
+arguments. Therefore we use the definitions
+$$
+\begin{array}{lll}
+  \true  & := & K \\
+  \false & := & K_I
+\end{array}$$
+
+
+\begin{definition}
+  A lambda term $t$ defines a \emph{boolean value} if it reduces to $\true$ or
+  $\false$ in zero or more steps i.e. if
+  $t \tobetastar
+  \begin{cases} \true \\ \false
+  \end{cases}$
+  is valid.
+\end{definition}
+
+
+
+\paragraph{Boolean Functions}
+
+\begin{definition}
+  A lambda term $t$ represents an $n$-ary boolean function if given $n$
+  arguments $b_1, b_2, \ldots b_n$ reduces to a boolean value i.e. if
+  $$t b_1 b_2 \ldots b_n \tobetastar
+  \begin{cases} \true \\ \false
+  \end{cases}$$
+  is valid.
+\end{definition}
+
+
+
+\paragraph{Negation}
+
+Boolean negation must be a function taking one boolean argument and returning
+a boolean value which is a two argument function representing a choice.
+
+Remember the vireo which has the specification $V a b f \tobetaplus f a
+b$. The term $V\, \false\, \true$ stores the two boolean values and waits for the
+function to apply it to the two stored values. If we provide a boolean value
+it selects $\false$ in case its value is $\true$ and $\true$ in case its value
+is $\false$. This is exactly the specifaction of boolean negation. Therefore
+we define
+$$ (\lnot) := V\, \false\, \true.$$
+
+Note that we use the logical symbol $\lnot$ to represent the lambda term for
+boolean negation and we use the same symbol to denote negation on a logical
+level. It should be clear from the context wheather the lambda term or the
+logical symbol is meant.
+
+
+\paragraph{Conjunction} The expression $a \land b$ where $a$ and $b$ represent
+boolean values shall return $b$ in case that $a$ represents $\true$ and $a$
+otherwise. Its nearly trivial to define a lambda expression which has exactly
+this behaviour
+$$ (\land) := \lambda a b. a b a.$$
+
+\paragraph{Disjunction} The lambda term representing disjunction can be
+defined as
+$$ (\lor) := \lambda a b. a a b.$$
+You can verify the validity of this definition by applying the definition to
+all 4 possible cases of the truth table of disjunction.
+
+
+
+
+\subsection{Composition of Decomposition of Pairs}
+
+In order to represent pairs in lambda calculus we have to ask the question
+\emph{What can be done with a pair?}. The most natural answer: \emph{Extract
+  either the first or the second element}.
+
+We have seen already the vireo $V$ which stores two values and waits for the
+third argument to apply the third argument to the first two values. We have
+the kestrel $K$ to select the first element and the kite $K_I$ to select the
+second element. Therefore we can define the lambda terms
+$$
+\begin{array}{lll}
+  \pair & := & V \\
+  \fst   & := &\lambda p. p K \\
+  \snd  & := &\lambda p. p K_I \\
+\end{array}.
+$$
+
+Let us verify that the definitions are correct
+$$
+\begin{array}{llll}
+  \fst\, (\pair\, a\, b)  &=& (\lambda p. p K) (V a b)  & \text{definitions} \\
+  & \tobeta & (pK)[p:=V a b]      &\beta\text{-reduction}\\
+  & = & V a b K & \text{substitution} \\
+  & \tobetaplus & K a b  &\text{specification of } V \\
+  & \tobetaplus & a & \text{specification of } K
+\end{array}
+$$
+
+In the same manner the validity of $\snd\,(\pair\, a\, b) \tobetaplus b$ can
+be verified.
+
+
+
+\subsection{Numeric Functions}
+
+Numbers are represented by lambda terms as iterations. The lambda term $c_n$
+representing the natural number $n$ takes two arguments, a function $f$ and a
+start value $a$ and iterates the function $f$ $n$ times beginning with the
+start value $a$.
+
+\begin{definition}
+The $n$ iteration of the function $f$ on the start value $a$ is defined as
+$$
+f^n a :=
+\begin{cases}
+  f^0 a &:= a\\
+  f^{n'} a & := f (f^n a)
+\end{cases}
+$$
+where $n'$ denotes the successor of the natural number $n$.
+\end{definition}
+
+
+\paragraph{Church Numeral}
+
+\begin{definition}
+  The church numeral $c_n$ defined as
+  $$ c_n := \lambda f a. f^n a$$
+  is the lambda term representing the natural number $n$.
+\end{definition}
+
+\begin{definition}
+  The lambda term $t$ represents a number if it reduces in zero or more steps
+  to a church numeral i.e. if $$t \tobetastar c_n$$ is valid for some $n$.
+\end{definition}
+
+\begin{definition}
+  The term $t$ represents an $n$-ary numeric function if given $n$ arguments
+  $a_1, a_2, \ldots, a_n$ each one representing a number reduces in zero or
+  more steps to a church numeral i.e. if $$t a_1 a_2 \ldots a_n \tobetastar
+  c_m$$ is valid for some number $m$.
+\end{definition}
+
+
+\begin{definition}
+  The term $t$ represents an $n$-ary numeric predicate if given $n$ arguments
+  $a_1, a_2, \ldots, a_n$ each one representing a number reduces in zero or
+  more steps to a boolean value i.e. if
+  $$t a_1 a_2 \ldots a_n \tobetastar
+  \begin{cases} \true \\ \false
+  \end{cases}
+  $$ is valid.
+\end{definition}
+
+
+\paragraph{Zero Tester}
+
+A zero tester is a unary predicate on church numerals. It should return
+$\true$ if the number is the church numeral $c_0$ and $\false$ for all other
+church numerals.
+
+Remember that church numerals are functions with a function argument $f$ and a
+start value argument $a$ which iterate the function $n$ times starting at
+$a$. Therefore $c_0 f a$ always returns $a$ regardless of the function $f$. So
+our zero tester can have the shape $$\lambda x. x f\, \true$$ which does already
+the right thing if applied to the argument $c_0$.
+
+Now we need a lambda term for the iterated function $f$. The kestrel $K$
+applied to two arguments always returns the first argument. If applied only to
+one argument, it stores the argument and spits it out if it is applied to the
+second argument. Therefore $K\,\false$ always returns $\false$ for any
+argument. So we can use $K\,\false$ as the function argument $f$ in the above
+template.
+
+A valid definition of a zero tester is
+$$ 0? := \lambda x. x (K\, \false) \, \true.$$
+
+Proof:
+$$
+\begin{array}{lll}
+  0?\, c_0
+  &= &(\lambda x. x (K\, \false) \, \true) c_0\\
+  &\tobeta & (x (K\, \false) \, \true)[x:=c_0] \\
+  &= & c_0 (K\, \false) \, \true \\
+  &\tobetaplus & \true \\
+  \\
+  0?\, c_{n'}
+  &=& (\lambda x. x (K\, \false) \, \true) c_{n'}\\
+  &\tobeta & (x (K\, \false) \, \true)[x:=c_{n'}] \\
+  &= & c_{n'} (K\, \false) \, \true \\
+  &=&  (K\,\false)  ( (K\,\false)^n\, \true) \\
+  &\tobeta & \false
+\end{array}
+$$
+
+\paragraph{Successor Function}
+
+A lambda term representing the successor function takes a church numeral and
+returns a church numeral representing the successor of its argument. The
+signature of the successor function must be
+$$ \lambda x f a. \cdots$$
+where the first argument $x$ is the church numeral and the result must be a
+church numeral i.e. a function taking two arguments.
+
+We know that the term $x f a$ where $x$ represents a church numeral already
+does $n$ iterations of $f$ on $n$. The successor function just has to do one
+more iteration
+$$
+\succ := \lambda x f a. f (x f a).
+$$
+
+We prove the desired property $\succ\, c_n \tobetastar c_{n'}$ by
+$$
+\begin{array}{llll}
+    \succ\, c_{n} &= & (\lambda x f a. f (x f a)) c_{n} & \text{definition} \\
+     & \tobeta & \lambda f a. f (c_{n} f a) & \beta\text{-reduction} \\
+     & = & \lambda f a. f (f^{n} a) & \text{definition of }c_{n} \\
+     & = & \lambda f a. f^{n'} a) & \text{definition of }f^n a \\
+     & = & c_{n'} & \text{definition of }c_{n'}
+\end{array}
+$$
+
+
+
+
+
+
+\subsection{Primitive Recursion}
+
+The addition of natural numbers is defined recursively as
+$$
+(+) :=
+\begin{cases}
+  0 + m &:= m \\
+  n' + m &:= (n + m)'
+\end{cases}
+$$
+
+
+However lambda calculus does not work on numbers, it works on church numerals
+representing numbers. Wouldn't it be nice to define a lambda term $(+)$
+representing to addition of two lambda terms representing numbers as
+
+$$
+(+) :=
+\begin{cases}
+  c_0 + m &:= m \\
+  c_{n'} + m &:= \succ\, (n + m)
+\end{cases}
+$$
+
+And indeed, this is possible. We just have to explain how the definition is
+mapped into lambda calculus.
+
+Note that, strictly spoken, the expression $a + b$ where $a$, $b$ and $(+)$
+are lambda terms is not a lambda term according to our syntactic
+definition. In order to be precise we have to define a lambda term
+``$\text{plus}$'' which represents the addition function and write
+``$\text{plus}\, a \, b$'' instead of the expression $a + b$. However the
+latter is better readable and therefore we use it to denote the more
+cumbersome expression ``$\text{plus}\, a \, b$''.
+
+For convenience we use in the following the notation $\mathbf{x}$ to represent
+$n$ arguments $x_1 x_2\ldots x_n$ and $g \mathbf{x}$ to represent the function
+application $g x_1 x_2 \ldots x_n$ i.e.
+$$
+\begin{array}{lll}
+  \mathbf{x} & := x_1 x_2 \ldots x_n\\
+  g \mathbf{x} & := g x_1 x_2 \ldots x_n
+\end{array}
+.
+$$
+
+Suppose we have a lambda term $g$ representing an $n$-ary numeric function and
+a lambda term $h$ representing an $n''$-ary numeric function. Then in order to
+define an $n'$-ary function $f$ we can write
+$$
+f :=
+\begin{cases}
+  f c_0 \mathbf{x} &:= g \mathbf{x}\\
+  f c_{n'} \mathbf{x} &:= h (f c_n \mathbf{x}) c_{n'} \mathbf{x}
+\end{cases}
+$$
+and interpret this definition as an iteration in the following manner:
+\begin{itemize}
+  \item
+    A pair of to church numerals $c_i$ and $c_j$ is used to represent the
+    state of the iteration. The first numeral $c_i$ represent the number of
+    iterations done and the second numeral represents the intermediary result.
+
+  \item
+    The iteration is started with $p_0 := \pair\, c_0 \, (g\mathbf{x})$.
+
+  \item
+    The step function is represented by the lambda term
+    $$s := \lambda p. \pair\, i (h j i \mathbf{x})$$
+    where $i:= \succ (\fst\, p)$ and $j := \snd\, p$.
+
+    The step function extracts the iteration counter and the intermediate
+    result from the pair $p$ and constructs a new pair by applying the
+    successor function to the iteration counter and the function $h$ to the
+    intermediate result and the remaining arguments.
+
+  \item
+    The function $f$ is defined by the lambda term
+    $$ f := \lambda y \mathbf{x}. y \, s \, p_0$$
+    where $y$ is a church numeral representing the first argument and
+    $\mathbf{x}$ is the array of church numerals representing the remaining
+    $n'$ arguments. Remember that the expression $y s p_0$ iterates the step
+    function $s$ over its intial value $p_0$ as long as $y$ is a church numeral.
+\end{itemize}
+
+
+\subsection{Some Primitive Recursive Functions}
+
+With the method of the last section we can define a lot of numeric functions.
+
+\paragraph{Addition}
+$$ (+) :=
+\begin{cases}
+  c_0 + m := m \\
+  c_{n'} + m := \succ\, (c_n + m)
+\end{cases}
+$$
+
+\paragraph{Multiplication}
+$$ (\times) :=
+\begin{cases}
+  c_0 \times m := c_0 \\
+  c_{n'} \times m := m + c_n \times m
+\end{cases}
+$$
+
+\paragraph{Exponentiation}
+$$ \bullet^\bullet :=
+\begin{cases}
+  a^{c_0}  := c_1 \\
+  a^{c_{n'}} := a \times a^{c_n}
+\end{cases}
+$$
+
+\paragraph{Factorial}
+$$ (!) :=
+\begin{cases}
+  c_0!  := c_1 \\
+  c_{n'}! := c_{n'} \times c_n!
+\end{cases}
+$$
+
+\paragraph{Predecessor}
+$$ \pred :=
+\begin{cases}
+  \pred\, c_0 := c_0 \\
+  \pred\, c_{n'} := c_n
+\end{cases}
+$$
+
+
+\paragraph{Difference}
+$$ (-) := \lambda a b. b\, \pred\, a $$
+
+The term $c_n - c_m$ applies the predecessor function $m$ times to $c_n$. The
+result is the difference if $n > m$ or $c_0$ if $n \le m$.
+
+\paragraph{Comparison}
+$$ (\le) := \lambda a b.\, 0?\, (a - b) $$
+
+\paragraph{Strict Comparison}
+$$ (<) := \lambda a b.\, \succ\, a \le b $$
+
+
+\paragraph{Numeric Equality}
+$$ (\equiv) := \lambda a b.\, a \le b \land b \le a$$
+
+The symbol $=$ is already reserved for exact equality or $\alpha$-equivalence
+of lambda terms. Therefore the symbol $\equiv$ is used to denote the lambda
+term which represents the equality function for church numerals.
+
+
+\paragraph{Bounded Minimization} Let $g$ be a lambda term representing an
+$n'$-ary predicate over church numerals. Then it makes sense to ask, if there
+is a least number $y$ which makes $g y \mathbf{x}$ $\true$. The expression
+$\mu^y g \mathbf{x}$ should return this least number or $y$ in case that there
+is no number strictly below $y$ such that $g y \mathbf{x}$ is satisfied.
+
+$$\mu :=
+\begin{cases}
+  \mu^{c_0} g \mathbf{x}    & :=  c_0 \\
+  \mu^{c_{n'}} g \mathbf{x} & :=
+  \big(\lambda z.\, (g z \mathbf{x}) z (\succ\, z)\big) (\mu^{c_n} g \mathbf{x})
+\end{cases}
+$$
+
+Once $\mu^{c_n} g \mathbf{x}$ satisfies the predicate, the number remains
+constant throughout the iteration. As long as $\mu^{c_n} g \mathbf{x}$ does
+not yet satisfy the predicate, the successor is tried until the predicate is
+satisfied or upper limit is reached.
+
+
+
+\paragraph{Division}
+$$ (\div) := \lambda a b.\, \mu^a\, (\lambda x. a < \succ\, x \times b)$$
+
+This function only works correctly if the divisor $b$ is not zero. It computes
+the least church numeral $x$ such that $\succ\,x \times b$ is greater than the
+church numeral $a$. In that case the church numeral $x \times b$ is exactly
+$a$ or leaves some remainder less than $b$.
+
+
+
+
+\paragraph{Divides Exactly} The term $a\mid b$ shall return $\true$ if $a$
+divides $b$ without remainder, otherwise it shall return $\false$. The
+definition
+$$ (\mid) :=
+\lambda a b.\,
+\neglow a\equiv c_0 \land
+(b \div a)\times a \equiv b
+$$
+satisfies this requirement.
+
+
+
+
+\paragraph{Prime Number Tester}
+$$\Pr? :=
+\lambda x.\, c_2 \le x \land
+x \equiv \mu^x (\lambda z.\, c_2 \le z \land z\mid x)$$
+
+The term $\mu^x (\lambda z.\, c_2 \le z \land z\mid x)$ computes the least
+church numeral $z$ strictly below $x$ which is greater or equal $c_2$ and
+divides $x$ exactly. If this number does not exist, the term computes $x$. In
+that case $x$ is a prime number.
+
+
+
+\paragraph{i-th Prime Number} We need a function $\Pr$ such that $\Pr c_0$
+computes $c_2$, $\Pr c_1$ computes $c_3$, $\Pr c_2$ computes $c_5$ \ldots
+
+If $z$ is a prime number then there is a prime number between $z$ and
+$z!'$. We can use this fact to define $\Pr$ recursively.
+$$
+\Pr :=
+\begin{cases}
+  \Pr c_0    &:= c2 \\
+  \Pr c_{n'} &:=
+  \big(\lambda z.\,
+  \mu^{\succ z!}(\lambda y.\, \Pr y \land z < y)\big)
+  (\Pr c_n)
+\end{cases}
+$$
+
+
+
+\paragraph{Prime Exponent} If we have a church numeral $x$ we want to be able
+to compute the exponent $e$ of the $i$th prime number such that $(\Pr i)^e$
+divides $x$ exactly. The term $\Prexp i x$ shall compute the exponent.
+
+The definition
+$$ \Prexp :=
+ \lambda i x.\, \mu^x (\lambda e.\, \neglow  (\Pr i)^{\succ\, e} \mid x)
+$$
+satisfies that requirement.
+
+
+\paragraph{Encode Pairs of Church Numerals into a Church Numeral}
+
+We can map a pair of natural numbers $n$ and $m$ into another natural number
+by the formula
+$$ 2^n (2m+1) -1.$$
+It is not too difficult to see that both numbers $n$ and $m$ can be recovered
+from a number $k$ to which the pair has been mapped i.e. that the mapping is
+bijective. The number $n$ is the exponent of the prime factor of $2$ in
+$z+1$. Then the number $m$ can be found in an obvious way from
+$\frac{z+1}{2^n}$.
+
+We have already defined all functions to compute the mapping $\sigma_2$ and its two
+inverses $\sigma_{21}$ and $\sigma_{22}$ as lambda terms.
+$$
+\begin{array}{lll}
+  \sigma_2 &:= &\lambda a b.\,  {c_2}^a \times (c_2 \times b + c_1) - c_1
+  \\
+  \sigma_{21} &:=& \lambda x.\, \Prexp c_0 (\succ\, x)
+  \\
+  \sigma_{22} &:=& \lambda x.\,(\pred\, (\succ\, x\div {c_2}^{\sigma_{21} x}))
+                   \div c_2
+\end{array}
+$$
+
+Note that this encoding of pairs of church numerals is completely different
+from the lambda term $\pair$ and its inverses $\fst$ and $\snd$. The latter
+functions encode pairs of arbitrary lambda terms and extract the first and the
+second component of the pair while the functions $\sigma_2$, $\sigma_{21}$ and
+$\sigma_{22}$ perform an arithmetic encoding of pairs of numbers and extract
+the first and the second number of the pair of numbers.
+
+
+
+
+\subsection{General Recursion}
+
+\paragraph{The Problem} Suppose we have a lambda term $g$ representing an
+$n'$-ary predicate and we know that for all arrays of church numerals
+$\mathbf{x}$ there exists a church numeral $y$ such that $g y \mathbf{x}$ is
+satisfied.
+
+If we had the ability to program a loop in lambda calculus we could start an
+unbounded iteration at the church numeral $c_0$ and stepwise increase the
+number by one until the predicate $g$ is satisfied.
+
+Unfortunately we just know that a number exists, but we are not able to
+specify any bound in order to use the bounded $\mu$ operator as done in the
+previous chapter.
+
+\paragraph{Step Function} In order to program some unbounded search in lambda
+calculus we need a function which performs one step in this search, i.e.
+\begin{itemize}
+\item Check if the boolean expression $g y \mathbf{x}$ is satisfied.
+\item If yes, return $y$.
+\item If no, apply a next step on $\succ\, y$.
+\end{itemize}
+
+The last point would be a recursive call. Unfortunately we have no direct
+means to perform a recursive call in lambda calculus. Therefore we define the
+step function $s$ in a way that it receives the function $f$ which does the
+next step as an argument
+$$ s := \lambda g \mathbf{x} f y.\, (gy\mathbf{x}) y \big(f (\succ\, y)\big).$$
+
+
+\paragraph{Turing Combinator} Now we need a method to perform the unbounded
+search. Remember the specification of the turing combinator
+$$ U a f \tobetaplus f (a a f).$$
+
+If we use instead of the term $a$ the turing combinator $U$ and add an
+additional argument $y$ we get the
+potential infinite loop
+$$ U U f y\tobetaplus f (U U f) y \tobetaplus f (f (U U f)) y \tobetaplus
+\cdots $$
+
+Now let's see what happens if we use $s g \mathbf{x}$ for $f$  and $c_m$ for $y$:
+$$
+\begin{array}{lll}
+  U U f c_m  &\tobetaplus & s g\mathbf{x} (U U f) c_m\\
+  &\tobetaplus&  (g c_m \mathbf{x}) c_m \big(U U f (\succ\, c_m)\big)
+\end{array}.
+$$
+
+The term returns $c_m$ if $g c_m \mathbf{x}$ is satisfied. Otherwise it starts
+the next iteration on $\succ\, c_m$.
+
+
+\paragraph{Unbounded Minimization} Having all this, we can define the unbouded
+$\mu $ operator which receives an $n'$-ary predicate $g$, an $n$ array of
+church numerals $\mathbf{x}$ such that the $\mu $ operator returns the least
+church numeral $y$ which satisfies the predicate $g y \mathbf{x}$ if such a
+term exists
+$$ \mu := \lambda g \mathbf{x}.\, U U (s g \mathbf{x}) c_0$$
+where $s$ is the above defined step function.

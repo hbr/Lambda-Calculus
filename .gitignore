@@ -1,0 +1,10 @@
+*.log
+*.aux
+*.gz
+*.toc
+*.dvi
+*.out
+*.rel
+*.pdf
+*~
+_region_*
