@@ -264,7 +264,9 @@ computations. We base our terms on combinators which are closed lambda terms
 i.e. terms without free variables.
 
 The simplest combinator is the identity combinator defined as
-$$ I := \lambda x.a $$
+
+$$ I := \lambda x.x $$
+
 where $I$ is just an abbreviation for the term on the right hand side of the
 definition. The lambda calculus does not know the term $I$, it just knows
 terms like $\lambda x.x$. We use $I$ for us to formulate the calculus more
@@ -488,7 +490,7 @@ the following rules are valid:
   $\ruleh {a \to_\beta^* b, \, c \to_\beta^* d}  {(\lambda x.a) c \to_\beta^* b[x:=d]} $
 \end{enumerate}
 
-Allthough evident by intuition we have to prove these properties.
+Although evident by intuition we have to prove these properties.
 
 \begin{theorem}
   $\tobetastar$ satisfies
@@ -583,7 +585,7 @@ define the least relation satisfying these properties.
   \end{enumerate}
 \end{definition}
 
-Obviously parallel $\beta$-reduction is a subset of parallel
+Obviously $\beta$-reduction is a subset of parallel
 $\beta$-reduction.
 \begin{lemma}
   Beta reduction is a subset of parallel beta reduction i.e.
@@ -729,7 +731,7 @@ In order to prove that $\tobetap$ is a diamond we need some lemmas.
     Parallel reduction preserves abstraction. Therefore the specific
     $\lambda x.c$ instead of the more general $c$.
     The premises $a\tobetap b, a \tobetap c$ and the induction hypothesis
-    guarantees the existence of a $d$ such that $\lambda x.d$ is the element
+    guarantee the existence of a $d$ such that $\lambda x.d$ is the element
     to fill the gap.
 
   \item
@@ -787,3 +789,8 @@ In order to prove that $\tobetap$ is a diamond we need some lemmas.
   ``Inductive Sets and Relations'' this is sufficient to prove the confluence
   of beta reduction.
 \end{theorem}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main_untyped_lambda"
+%%% End:
