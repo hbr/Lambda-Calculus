@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Helmut Brandl" />
+  <meta name="keywords" content="Lambda Calculus" />
+  <title>Limits of Computability in Lambda Calculus</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    div.abstract {
+      margin: 2em 2em 2em 2em;
+      text-align: left;
+      font-size: 85%;
+    }
+    div.abstract-title {
+      font-weight: bold;
+      text-align: center;
+      padding: 0;
+      margin-bottom: 0.5em;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Limits of Computability in Lambda Calculus</h1>
+<p class="author">Helmut Brandl</p>
+<div class="abstract">
+<div class="abstract-title">Abstract</div>
+<p>Show the limits of computability.</p>
+</div>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a>
+<ul>
+<li><a href="#background" id="toc-background">Background</a></li>
+<li><a href="#barberville" id="toc-barberville">Barberville</a></li>
+</ul></li>
+<li><a href="#lambda-calculus-basics"
+id="toc-lambda-calculus-basics">Lambda Calculus Basics</a>
+<ul>
+<li><a href="#lambda-terms" id="toc-lambda-terms">Lambda terms</a></li>
+<li><a href="#reduction" id="toc-reduction">Reduction</a></li>
+<li><a href="#notation" id="toc-notation">Notation</a></li>
+<li><a href="#booleans" id="toc-booleans">Booleans</a></li>
+<li><a href="#pairs" id="toc-pairs">Pairs</a></li>
+<li><a href="#church-numerals-and-arithmetics"
+id="toc-church-numerals-and-arithmetics">Church Numerals and
+Arithmetics</a></li>
+</ul></li>
+<li><a href="#encoding-of-lambda-terms"
+id="toc-encoding-of-lambda-terms">Encoding of Lambda Terms</a>
+<ul>
+<li><a href="#required-functions-for-encoding"
+id="toc-required-functions-for-encoding">Required Functions for
+Encoding</a></li>
+<li><a href="#self-reference" id="toc-self-reference">Self
+Reference</a></li>
+<li><a href="#goedelchurch-numbering"
+id="toc-goedelchurch-numbering">Goedel/Church Numbering</a></li>
+</ul></li>
+<li><a href="#undecidability" id="toc-undecidability">Undecidability</a>
+<ul>
+<li><a href="#basic-undecidability" id="toc-basic-undecidability">Basic
+Undecidability</a></li>
+<li><a href="#undecidability-of-beta-equivalence"
+id="toc-undecidability-of-beta-equivalence">Undecidability of Beta
+Equivalence</a></li>
+<li><a href="#undecidability-of-the-halting-problem"
+id="toc-undecidability-of-the-halting-problem">Undecidability of the
+Halting Problem</a></li>
+</ul></li>
+</ul>
+</nav>
+<style>
+body{
+    margin-left: 20px;
+    width: 600px;
+}
+
+pre{
+    margin-left: 10px;
+    padding: 5px;
+    background-color: #F0F0F0;
+}
+</style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W295PVPC2K"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-W295PVPC2K');
+</script>
+<p><strong><a href="../index.html">Up</a> <a
+href="https://hbr.github.io">Home</a></strong></p>
+<h1 id="introduction">Introduction</h1>
+<h2 id="background">Background</h2>
+<p>We explore the limits of computability, i.e. the question: <em>Are
+there functions which cannot be computed?</em></p>
+<p>At the turn of the 19th/20th century there was a great optimism
+regarding this question. Most of the mathematicians thought that every
+mathematical function must be computable, every mathematical question
+has to be decidable.</p>
+<p>The famous german mathematician David Hilbert formulated a program
+(today called <em>Hilbert’s program</em>) to ground all mathematics on
+axioms and formal proofs and prove that such a system is free of
+inconsistencies. In such a formal system it should be possible to prove
+or disprove all mathematical statements. He expressed his belief with
+his famous sentence</p>
+<blockquote>
+<p><em>We must know, we will know</em>.</p>
+</blockquote>
+<p>This optimism had not been restricted to mathematics. It had been
+present in all science and technology. The Eiffel tower has been build
+for the world exposition in 1889. A 324 m high steel building
+representing the power of technology. Albert Einstein published 1905 his
+theory of relativity and in 1915 his theory of general relativity. Both
+theories had been verified by various experiments. The Wright brothers
+invented and flew the first airplane in 1903.</p>
+<p>But let’s go back to mathematics. In 1901 Bertrand Russel discovered
+a paradox in naive set theory. It has been customary to talk about the
+set of all sets. Bertrand Russel found out that this leads to the
+paradoxical</p>
+<blockquote>
+<p><em>set of all sets which do not contain themself.</em></p>
+</blockquote>
+<p>Does this unversal set contain itself? If yes, it contains itself and
+therefore cannot be in the set. If no, it does not contain itself and
+therefore must contain itself.</p>
+<p>In order to avoid such paradoxes which lead to contradictions,
+Whitehead and Russel published in 1910, 1912 and 1913 the famous
+<em>Principia Mathematica</em> which provided a foundation for
+mathematics free of paradoxes.</p>
+<p>The young viennese mathematician Kurt Goedel invented a technique
+called <em>Goedel Numbering</em>. He used this technique to formulate a
+sentence similar to Russel’s paradox as a mathematical statement about
+natural numbers. Such a statement can be expressed in the formalism of
+Principia Mathematica and therefore can be injected into Principia
+Mathematica like a Trojan horse. In his famous incompleteness theorem
+(1931) Goedel demonstrated that paradoxical statements can be injected
+into all formalisms which are powerful enough to express basic
+arithmetics.</p>
+<p>Imagine the blow to Hilbert’s program! All formal theories
+sufficiently powerful are either inconsistent or incomplete.</p>
+<p>The positive side of Goedels incompleteness theorem: Paradoxes are
+not necessarily bad. They are part of the mathematicians toolkit to
+prove something.</p>
+<p>In 1936 Alan Turing and Alonzo Church proved independently that there
+are undecidable (or uncomputable) problems in mathematics. They
+basically used the technique of Goedel numbering in their proofs.</p>
+<p>In this paper we are going to show that there are functions which
+cannot be computed in lambda calculus. Note that functions can return a
+boolean value and a not computable boolean valued function represents an
+undecidable predicate.</p>
+<p>We don’t use a lot of math here. We continue to express the ideas in
+programmer’s terms like we did in <a
+href="../lambda2/lambda.html">Programming with Lambda Calculus</a>.
+Everybody who is able to program functions should be able to follow.</p>
+<h2 id="barberville">Barberville</h2>
+<p>Nearly all proofs of undecidability use the encoding of some logical
+paradox. Let’s review the outline of such proofs using the example of
+the <em>barber paradox</em>.</p>
+<p>Definition:</p>
+<blockquote>
+<p>A village has the <em>barber</em> property if there is a barber in
+the village who shaves all the men in the village who do not shave
+themselves.</p>
+</blockquote>
+<p>Theorem:</p>
+<blockquote>
+<p>A village with the barber property does not exist.</p>
+</blockquote>
+<p>Proof:</p>
+<p>Let’s assume by way of contradiction that such a village exists. Then
+there is a barber who shaves every man in the village who does not shave
+himself.</p>
+<p>Now there are two possibilities:</p>
+<ol type="1">
+<li><p>The barber shaves himself: This is not possible because the
+barber can only shave men who do not shave themselves. Therefore the
+assumption that the barber shaves himself leads to a
+contradiction.</p></li>
+<li><p>The barber does not shave himself: This is not possible because
+the barber shaves all the men who do not shave themselves. Therefore the
+assumption that the barber does not shave himself leads to a
+contradiction as well.</p></li>
+</ol>
+<p>The assumption that such a village exists leads to a contradicion.
+Therefore we have to conclude that a village with the barber property
+cannot exist.</p>
+<p>Note that some kind of self reference is essential in all paradoxes.
+In order to use this technique to show that some predicates are
+undecidable in lambda calculus we have to introduce some self
+referential lambda terms. I.e. we need some lambda terms and encoded
+versions of them.</p>
+<p>In order to do this, we need some techniques. After having the
+machinery the actual proof is not complicated.</p>
+<h1 id="lambda-calculus-basics">Lambda Calculus Basics</h1>
+<p>This section summarizes some basic knowledge of lambda calculus which
+is required to understand the rest of the text.</p>
+<p>If the summary is too compressed, then read the text <a
+href="../lambda2/lambda.html">Programming with Lambda Calculus</a> which
+gives more detailed introduction.</p>
+<h2 id="lambda-terms">Lambda terms</h2>
+<p>A lambda term is either a variable, an application of a function term
+to a variable term or a lambda abstraction.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>    t   <span class="op">::=</span>     x           <span class="co">-- variable</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>        <span class="op">|</span>       (a b)       <span class="co">-- application of &#39;a&#39; to the argument &#39;b&#39;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">|</span>       (\ x <span class="op">:=</span> a)  <span class="co">-- abstraction</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                   <span class="op">^</span>    <span class="op">^</span> definition term</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                   <span class="op">|</span> bound variable</span></code></pre></div>
+<p>where <code>x</code> ranges over an infinite supply
+<code>x0, x1, x2, ...</code> of variables and <code>a, b, t</code> range
+over arbitrary lambda terms.</p>
+<p>In mathematical texts the abstraction <code>(\x := a)</code> is
+usually written as <img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20%5Clambda%20x.%20a"
+alt="\lambda x. a" title="\lambda x. a" class="math inline" />. In this
+text we prefer an ascii notation in order to be able to write lambda
+terms more like terms in a functional programming language. However the
+mathematical notation and the ascii notation denote the same thing.</p>
+<p>The name of a bound variable is irrelevant. The names of bound
+variables can be changed consistently as long as the change does not
+interfere with variables which are not bound by the same binder. This
+restriction is necessary, because a renaming must not make a free
+variable bound.</p>
+<p>Bound variable names in lambda calculus have the same character as
+formal argument names in programming languages.</p>
+<p>All functions in lambda calculus have only one argument. This is not
+a restriction, because the function applied to an argument can return
+another function which can be applied another argument.</p>
+<h2 id="reduction">Reduction</h2>
+<p>The lambda term <code>(\ x := exp) a</code> is a reducible
+expression. The basic reduction step is</p>
+<pre><code>    (\ x := exp) a      ~&gt;      exp[x := a]
+                        ^
+                        read &quot;reduces to&quot;</code></pre>
+<p>where <code>exp[x:=a]</code> is the term <code>exp</code> where all
+free variables in <code>exp</code> have been replaced by the term
+<code>a</code>. Note that it might be necessary to rename bound
+variables in <code>exp</code> before doing the substution in such a way
+that they do not interfere with any free variables in <code>a</code>.
+This is always possible since we have an infinite supply of
+variables.</p>
+<p>Example:</p>
+<pre><code>    ((\ x := (\ y := x)) a) b
+    ~&gt; (\ y := x)[x:=a] b
+    =  (\ y := a) b
+    ~&gt; a[y:=b]
+    =  a</code></pre>
+<p>Note that the last equality is valid. <code>a</code> must not contain
+the free variable <code>y</code>. Otherwise we would have been obliged
+to rename <code>y</code> to a new variable which is not contained in
+<code>a</code>.</p>
+<h2 id="notation">Notation</h2>
+<p>In order to avoid excessive brackets we use some conventions.</p>
+<ol type="1">
+<li><p>Outer brackets can be ommitted.</p></li>
+<li><p>Function application associates to the left. I.e.
+<code>((a b) c) d)</code> can be written as
+<code>a b c d</code>.</p></li>
+<li><p>Functions with more than one argument can be written in a
+compressed form. I.e. instead of writing <code>\ x := (\y := exp)</code>
+we can write <code>\ x y := exp</code>.</p></li>
+</ol>
+<h2 id="booleans">Booleans</h2>
+<p>Data types in lambda calculus are represented by functions which
+<em>do something</em> which is meaningful for the data type.</p>
+<p>A boolean term has two values, true and false. We can encode such
+values in lambda calculus as functions taking two arguments and
+returning either the first in case of a true value and the second in
+case of a false value.</p>
+<pre><code>    true  := (\ x y := x)
+    false := (\ x y := y)</code></pre>
+<p>Therefore <code>true a b ~&gt; a</code> and
+<code>false a b ~&gt; b</code>.</p>
+<p>Note that we use the reduction symbol <code>~&gt;</code> in a sloppy
+manner. <code>t ~&gt; u</code> can mean that <code>t</code> reduces to
+<code>u</code> in one step or in more steps. In this paper there is no
+need to distinguish between one step and multistep reduction. In other
+contexts it might be necessary to use different symbols.</p>
+<p>In order to make our notation look more like definitions in a
+programming language we can write the definitions of <code>true</code>
+and <code>false</code> as</p>
+<pre><code>    true  x y := x
+    false x y := y</code></pre>
+<p>But remember that definitions are just abbreviations to make the
+terms more readable. Lambda calculus does not know of any definitions.
+The corresponding lambda term can always be obtained by expanding the
+definitions. This is always possible, because no recursive definitions
+are allowed. Definitions are just abbreviations.</p>
+<h2 id="pairs">Pairs</h2>
+<p>We can use our notation to define pairs in lambda calculus.</p>
+<pre><code>    pair x y f := f x y</code></pre>
+<p>If we apply <code>pair</code> only to two arguments
+<code>pair a b</code> we get a function which expects another argument
+and then applies the missing argument to the first two arguments. This
+fact can be used to define the following projections</p>
+<pre><code>    first p     :=  p (\ x y := x)
+    second p    :=  p (\ x y := y)</code></pre>
+<p>The following reduction shows that <code>first</code> behaves as
+expected extracting the first part of a pair.</p>
+<pre><code>    first (pair a b)
+    =  first ((\ x y f := f x y) a b)
+    ~&gt; first (\ f := f a b)
+    =  (\ f := f a b) (\x y := x)
+    ~&gt; (f a b)[f:= (\x y := x)]
+    =  (\x y := x) a b
+    ~&gt; (\ y := x)[x:=a] b
+    =  (\ y := a) b
+    ~&gt; a[y:=b]
+    =  a</code></pre>
+<p>Note again that <code>a</code> must not contain <code>y</code>.
+Otherwise the variable <code>y</code> must be renamed to another
+variable which does not occur in <code>a</code>.</p>
+<h2 id="church-numerals-and-arithmetics">Church Numerals and
+Arithmetics</h2>
+<p>We can represent numbers in lambda calculus as functions with two
+arguments. The first argument is a function and the second is a start
+value. The so represented number is a lambda term which applies the
+function argument <code>n</code> times on the start value.</p>
+<p>Such lambda terms are called <em>Church Numerals</em>.</p>
+<p>The number zero is represented by the term</p>
+<pre><code>    zero f s := s</code></pre>
+<p>which is in our notation equivalent to</p>
+<pre><code>    zero := (\ f s := s)</code></pre>
+<p>The function <code>zero</code> applies the function argument
+<code>f</code> zero times on the start value <code>s</code>.</p>
+<p>The successor function takes a Church numeral <code>n</code> and a
+function argument <code>f</code> and a start value <code>s</code> and
+applies the function <code>f</code> one more time upon the start value
+than <code>n</code> already does.</p>
+<pre><code>    successor n f s := f (n f s)</code></pre>
+<p>Make sure that you understand that the partial application
+<code>successor n</code> returns a Church numeral if supplied with a
+Church numeral argument.</p>
+<p>Having this we can define arbitrary Church numerals</p>
+<pre><code>    one := successor zero
+    two := successor one
+    ...</code></pre>
+<p>We can define addition as the iterated application of the successor
+function, multiplication as the iterated addition of a number and
+exponentiation as the iterated multiplication of a number.</p>
+<pre><code>    plus  n m  := n successor m
+    times n m  := n (plus m) zero
+    power n m  := m (times n) one</code></pre>
+<p>Addition, multiplication and exponentiation are just simple
+iterations. In order to implement the predecessor function we need a
+little trick.</p>
+<p>We want a function <code>predecessor</code> which returns for any
+number the predecessor of that number and which returns
+<code>zero</code> for the predecessor of the number
+<code>zero</code>.</p>
+<p>We implement the function by iterating over a pair of numbers of the
+form</p>
+<pre><code>    pair counter predecessor-of-counter</code></pre>
+<p>with the start value <code>pair zero zero</code>. At each iteration
+we copy the counter to the predecessor field and increment the counter.
+At the end of the iteration we extract the second component of the
+pair.</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>    predecessor n <span class="op">:=</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>        second</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>            (n step (pair zero zero))</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">where</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>            step p <span class="op">:=</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                p (\ counter <span class="fu">pred</span><span class="op">-</span>counter <span class="op">:=</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                    pair (successor counter) counter)</span></code></pre></div>
+<p>These arithmetic functions are sufficient for the rest of the
+text.</p>
+<p>The paper <a href="../lambda2/lambda.html">Programming with Lambda
+Calculus</a> shows many more functions which can be implemented in
+lambda calculus. All computable functions can be implemented in lambda
+calculus.</p>
+<h1 id="encoding-of-lambda-terms">Encoding of Lambda Terms</h1>
+<p>It is not possible to write a lambda term which can inspect its own
+arguments i.e. find something about the structure of its arguments. E.g.
+a lambda term <code>isVariable</code> where <code>isVariable a</code>
+returns <code>true</code>, if <code>a</code> is a variable and otherwise
+<code>false</code>, is not possible.</p>
+<p>A lambda term can only use its arguments as functions and apply it to
+other arguments or as arguments to feed them to other arguments. This is
+due to the fact that lambda terms are either variables, applications or
+abstractions.</p>
+<p>Therefore we must encode a boolean value as a function taking two
+arguments and returning either the first or the second depending on its
+truth value. We have to encode numbers as functions taking two arguments
+and applying the first argument n times on the second argument.</p>
+<p>All arithmetic functions expect their arguments to be Church
+numerals. E.g. the function <code>successor</code> expects one argument
+which has to be a Church numeral to compute the Church numeral of the
+successor of the number represented by its argument.</p>
+<p>All our functions expressed in lambda calculus do the <em>right
+thing</em> only if their arguments have the correct form. The lambda
+calculus cannot check if the argument is a Church numeral and throw an
+exception in case of failure.</p>
+<p>If we want to have lambda terms which are self referential we have to
+give the lambda term an argument, which is some encoding of itself. The
+most popular encoding is Goedel numbering which is in lambda calculus
+the encoding of lambda terms as Church numerals. However Goedel
+numbering is not the only way to encode lambda terms. We separate in the
+following the parts which are independent of the encoding technique and
+the parts which do the actual encoding as Church numerals.</p>
+<h2 id="required-functions-for-encoding">Required Functions for
+Encoding</h2>
+<p>We use the following notation.</p>
+<pre><code>    lambda term                 encoded term
+
+    a                           &lt;a&gt;</code></pre>
+<p>The correspondence between a lambda term <code>a</code> and its
+encoding <code>&lt;a&gt;</code> must be one-to-one. I.e. two different
+lambda terms must not have the same encoding.</p>
+<p>In order to encode lambda terms we need the functions
+<code>var</code>, <code>appl</code>, <code>lam</code> and
+<code>wrap</code> which satisfy the following requirements.</p>
+<pre><code>    var c[i]            ~&gt;          &lt;xi&gt;
+    app &lt;a&gt; &lt;b&gt;         ~&gt;          &lt;a b&gt;
+    lam c[i] &lt;a&gt;        ~&gt;          &lt;\ xi := a&gt;
+    wrap &lt;a&gt;            ~&gt;          &lt; &lt;a&gt; &gt;</code></pre>
+<ol type="1">
+<li><p>The function <code>var</code> expects a Church numeral
+representing the number <code>i</code> and returns the encoding of the
+variable <code>xi</code>.</p></li>
+<li><p>The function <code>app</code> expects an encoding of the lambda
+terms <code>a</code> and <code>b</code> and returns the encoding of the
+lambda term <code>a</code> applied to <code>b</code> i.e. the encoding
+of <code>a b</code>.</p></li>
+<li><p>The function <code>lam</code> expects a Church numeral
+representing the number <code>i</code> and an encoding of the lambda
+term <code>a</code> and returns an encoding of the lambda term
+<code>\ xi := a</code></p></li>
+<li><p>The function wrap expects an encoding of the lambda term
+<code>a</code> and returns the encoding of the encoding of the lambda
+term <code>a</code>.</p></li>
+</ol>
+<p>In order to satisfy the <em>one-to-one</em> requirement, the
+functions <code>var</code>, <code>app</code>, <code>lam</code> and
+<code>wrap</code> have to be one-to-one. Remember that the composition
+of one-to-one functions is one-to-one as well. I.e. all combinations of
+the four basic functions are one-to-one.</p>
+<h2 id="self-reference">Self Reference</h2>
+<p>All four functions are needed to encode self referential terms. E.g.
+to generate the encoding of the term <code>a &lt;a&gt;</code> i.e. the
+encoding of the term <code>a</code> applied to its encoding we can use
+the equivalence</p>
+<pre><code>    &lt;a &lt;a&gt;&gt;            =   app &lt;a&gt; (wrap &lt;a&gt;)</code></pre>
+<p>I.e. the function</p>
+<pre><code>    self x := app x (wrap x)</code></pre>
+<p>satisfies the specification</p>
+<pre><code>    self &lt;a&gt;    ~&gt;  &lt;a &lt;a&gt;&gt;</code></pre>
+<h2 id="goedelchurch-numbering">Goedel/Church Numbering</h2>
+<p>In this section we show how to encode lambda terms as Church
+numerals, i.e. a term of the form <code>&lt;a&gt;</code> is the Church
+numeral encoding the term <code>a</code>.</p>
+<p>Before doing that we define a mathematical pairing function <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20%5B.%2C.%5D"
+alt="[.,.]" title="[.,.]" class="math inline" /> which maps pairs of
+natural numbers one-to-one and onto to the natural numbers. There are
+many possibilities. We choose the function <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Bn%2Cm%5D%20%3A%3D%202%5En%20%282m%20%2B%201%29%20-%201"
+alt="[n,m] := 2^n (2m + 1) - 1" title="[n,m] := 2^n (2m + 1) - 1"
+class="math display" /></p>
+<p>Note that this is a mathematical function and has nothing to do with
+a lambda term.</p>
+<p>Some example values:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">n</th>
+<th style="text-align: center;">m</th>
+<th style="text-align: center;">[n,m]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">11</td>
+</tr>
+</tbody>
+</table>
+<p>In order to see that the pairing function is one-to-one and onto we
+show that given the value of <img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20%5Bn%2Cm%5D"
+alt="[n,m]" title="[n,m]" class="math inline" /> we can uniquely recover
+<img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20n" alt="n"
+title="n" class="math inline" /> and <img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20m" alt="m"
+title="m" class="math inline" />. Assume <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20z%20%3D%20%5Bn%2Cm%5D"
+alt="z = [n,m]" title="z = [n,m]" class="math inline" />. We divide <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20z%20%2B%201"
+alt="z + 1" title="z + 1" class="math inline" /> by <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%202" alt="2"
+title="2" class="math inline" /> until we get an odd number. <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20n" alt="n"
+title="n" class="math inline" /> is the number of times, we can divide
+<img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20z%20%2B%201"
+alt="z + 1" title="z + 1" class="math inline" /> by <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%202" alt="2"
+title="2" class="math inline" />. Since all odd numbers can be uniqueley
+represented by <img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%202m%20%2B%201"
+alt="2m + 1" title="2m + 1" class="math inline" />, we get a unique
+value for <img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20m" alt="m"
+title="m" class="math inline" />.</p>
+<p>For example let <img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20z%20%3D%2011"
+alt="z = 11" title="z = 11" class="math inline" />. We get <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20z%20%2B%201%20%3D%2012"
+alt="z + 1 = 12" title="z + 1 = 12" class="math inline" />. Dividing 12
+subsequently by 2 we get the sequence <img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%206%2C3"
+alt="6,3" title="6,3" class="math inline" /> i.e. we can divide 2 times
+by 2 and therefore <img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20n%20%3D%202"
+alt="n = 2" title="n = 2" class="math inline" />. Resolving the equation
+<img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%203%20%3D%202m%20%2B%201"
+alt="3 = 2m + 1" title="3 = 2m + 1" class="math inline" /> we get <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20m%20%3D%20%283%20-%201%29%2F%202%20%3D%201"
+alt="m = (3 - 1)/ 2 = 1" title="m = (3 - 1)/ 2 = 1"
+class="math inline" />.</p>
+<p>We can transform the mathematical pairing function <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%202%5En%20%282m%20%2B%201%29%20-%201"
+alt="2^n (2m + 1) - 1" title="2^n (2m + 1) - 1" class="math inline" />
+into a lambda term.</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>    compress n m <span class="op">:=</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- Compute the pairing function [n,m] where</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- n and m are Church numerals representing</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- the numbers.</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>        predecessor</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>            (times</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>                (power two n)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>                (successor (times two m)))</span></code></pre></div>
+<p>We use the function <code>compress</code> to do the basic encoding of
+lambda terms.</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>    var i <span class="op">:=</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- Encoding of xj where i is the Church numeral</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- representing the index j.</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>        compress zero i</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    app enca encb <span class="op">:=</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- Encoding of the lambda term a b, where</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- enca and encb are the encodings of a and b.</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>        compress one (compress enca encb)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    lam i enca <span class="op">:=</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- Encoding of (\xj := a) where i is the Church</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- numeral representing the index j and enca is</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- the Church numeral representing the lambda term a.</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>        compress two (compress i enca)</span></code></pre></div>
+<p>The first argument is the Church numeral for the numbers 0, 1, or 2
+depending whether the lambda term is a variable, an application or an
+abstraction. This shows that the encoding is not onto. The Church
+numerals for the numbers 3, 4, … are never used in the top level
+compress functions. I.e. there are Church numerals which do not encode a
+lambda term. But this is not a problem, because we only require that the
+encoding is one-to-one, i.e. that there are never two lambda terms which
+have the same encoding.</p>
+<p>We still have to define the function <code>wrap</code> which given
+the encoding of a lambda term returns the encoding of the encoding of
+the the lambda term. In order to achieve that we first encode
+<code>zero</code> and <code>successor</code> and then use these
+encodings to define <code>wrap</code>.</p>
+<p>Remember the definition of <code>zero</code> and
+<code>successor</code>.</p>
+<pre><code>    zero := (\ f s := s)
+
+    successor := (\n f s := f (n f s))</code></pre>
+<p>These functions have the bound variables <code>s</code>,
+<code>f</code> and <code>n</code>. But formally we have only the
+variables <code>x0</code>, <code>x1</code>, <code>x2</code>, … We use
+here the convention to number the bound variables <em>inside-out</em>,
+i.e. the innermost bound variable gets the name <code>x0</code>, the
+next outer variable gets the name <code>x1</code> and so on. Since the
+names of bound variables are arbitrary as long as they don’t interfere
+with the outside world, this choice is as good as any other choice.</p>
+<p>The encoding of the lambda term <code>zero</code> is a
+straightforward application of the basic encoding functions.</p>
+<pre><code>    zero := (\ x1 x0 := x0)
+
+    enc_zero :=
+        lam one (lam zero (var zero))</code></pre>
+<p>The encoding of the successor function looks a little bit more
+complicated. But no magic is involved. Just a systematic use of the
+basic encoding functions <code>var</code>, <code>app</code> and
+<code>lam</code>.</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>    successor <span class="op">:=</span> (\x2 x1 x0 <span class="op">:=</span> x1 (x2 x1 x0))</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    enc_successor <span class="op">:=</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>        lam two (lam one (lam zero enc)) <span class="kw">where</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>            enc <span class="op">:=</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                app</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>                    (var one)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>                    (app (app (var two) (var one)) (var zero))</span></code></pre></div>
+<p>Having an encoding of <code>zero</code> and <code>successor</code>,
+the definition of <code>wrap</code> is easy.</p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>    wrap enca <span class="op">:=</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- Given the encoding enca of a lambda term a,</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- compute the encoding of the encoding of a.</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>        enca (app enc_successor) enc_zero</span></code></pre></div>
+<p>Note that the argument <code>enca</code> is the encoding of some
+lambda term. Therefore it is a Church numeral. Church numerals can be
+used to iterate the application of the encoding of the successor
+function <code>enca</code> times to get an encoding of <code>enca</code>
+which is an encoding of the encoding of the corresponding lambda
+term.</p>
+<p>You see: Encoding of lambda terms as Church numerals is not
+difficult. It is only necessary to be careful in distinguishing lambda
+terms and their encodings properly.</p>
+<h1 id="undecidability">Undecidability</h1>
+<p>This chapter proves some undecidability theorems. In order to do this
+we have to encode lambda terms. From the previous chapter we need only
+two facts.</p>
+<ol type="1">
+<li><p>There is a unique encoding of lambda terms which maps a lambda
+term <code>a</code> into its encoding <code>&lt;a&gt;</code>. The
+encoding is unique in the sense that different lambda terms never have
+the same enconding, i.e. the encoding is one-to-one.</p></li>
+<li><p>There is a lambda term <code>self</code> which maps the encoding
+<code>&lt;a&gt;</code> of the lambda term <code>a</code> into the lambda
+term <code>&lt; a &lt;a&gt; &gt;</code> which represents the encoding of
+the lambda term <code>a</code> applied to its own encoding
+<code>&lt;a&gt;</code>.</p></li>
+</ol>
+<p>Nothing more is needed in the proofs.</p>
+<p>In the proofs we work with set of lambda terms.</p>
+<p>Definition: Non-trivial set</p>
+<blockquote>
+<p>We say a set <code>A</code> of lambda terms is <em>non-trivial</em>
+if it is neither empty nor contains all possible lambda terms.</p>
+</blockquote>
+<p>I.e. for each non-trivial set of lambda terms there is always a
+lambda term <code>m0</code> which is in the set and a lambda term
+<code>m1</code> which is not in the set.</p>
+<p>Definition: Closed set</p>
+<blockquote>
+<p>We say a set <code>A</code> of lambda terms is <em>closed</em> if it
+contains with each lambda term <code>a</code> all lambda terms which are
+alpha or beta equivalent to the term.</p>
+</blockquote>
+<p>Definition: Decider</p>
+<blockquote>
+<p>We say a lambda term <code>p</code> is a decider for a set of lambda
+terms <code>A</code> if for any term <code>a</code> the application
+<code>p &lt;a&gt;</code> either returns <code>true</code> or
+<code>false</code> depending on the fact whether <code>a</code> is in
+<code>A</code> or <code>a</code> is not in <code>A</code>.</p>
+</blockquote>
+<h2 id="basic-undecidability">Basic Undecidability</h2>
+<p>Theorem: <em>Any set <code>A</code> of lambda terms which is
+non-trivial and closed does not have a decider.</em></p>
+<p>We prove this theorem by assuming that it is decidable i.e. that
+there is a decider <code>p</code> for the set <code>A</code> and derive
+a contradiction from the assumption.</p>
+<p>Since the set <code>A</code> is nontrivial there is term
+<code>m0</code> which is in the set and a term <code>m1</code> which is
+not in the set.</p>
+<p>Using <code>p</code>, <code>self</code>, <code>m0</code> and
+<code>m1</code> we define the term <code>g</code></p>
+<pre><code>    g := (\ x := p (self x) m1 m0)</code></pre>
+<p>Let’s see what happens if we apply <code>g</code> to the description
+of a lambda term <code>a</code>.</p>
+<pre><code>    g &lt;a&gt;   ~&gt;  p (self &lt;a&gt;) m1 m0
+            ~&gt;  p (&lt;a &lt;a&gt;&gt;) m1 m0
+
+            ~&gt;  m1,             if a &lt;a&gt; is in A
+            ~&gt;  m0,             if a &lt;a&gt; is not in A</code></pre>
+<p>The whole thing gets more interesting if we apply <code>g</code> to
+its own description. We have to distinguish the cases that
+<code>g &lt;g&gt;</code> is in <code>A</code> and
+<code>g &lt;g&gt;</code> is not in <code>A</code>:</p>
+<p><code>g &lt;g&gt;</code> is in <code>A</code>:</p>
+<pre><code>    g &lt;g&gt;   ~&gt;  p (self &lt;g&gt;) m1 m0
+            ~&gt;  p (&lt;g &lt;g&gt;&gt;) m1 m0
+            ~&gt;  true m1 m0
+            ~&gt;  m1</code></pre>
+<p><code>g &lt;g&gt;</code> and <code>m1</code> are betaequivalent.
+However this would require that <code>m1</code> is in <code>A</code> by
+the closedness of <code>A</code> and contradicts the assumption that
+<code>m1</code> is not in <code>A</code>.</p>
+<p><code>g &lt;g&gt;</code> is not in <code>A</code>:</p>
+<pre><code>    g &lt;g&gt;   ~&gt;  p (self &lt;g&gt;) m1 m0
+            ~&gt;  p (&lt;g &lt;g&gt;&gt;) m1 m0
+            ~&gt;  false m1 m0
+            ~&gt;  m0</code></pre>
+<p><code>m0</code> and <code>g &lt;g&gt;</code> are betaequivalent. This
+would require that <code>g &lt;g&gt;</code> is in <code>A</code> by the
+closedness of <code>A</code> and contradicts the assumuption that
+<code>g &lt;g&gt;</code> is not in <code>A</code>.</p>
+<p>Conclusion: The assumption that there exists a decider <code>p</code>
+for the terms in <code>A</code> leads to a contradiction. Therefore such
+a decider cannot exist.</p>
+<p>Note how the application of the term <code>g</code> to its own
+description <code>&lt;g&gt;</code> and the existence of a decider
+<code>p</code> are essential to prove the contradiction.</p>
+<h2 id="undecidability-of-beta-equivalence">Undecidability of Beta
+Equivalence</h2>
+<p>Theorem: <em>It is undecidable if two arbitrary lambda terms
+<code>a</code> and <code>b</code> are beta equivalent.</em></p>
+<p>We proof this theorem by contradiction assuming that there is a
+lambda term <code>q</code> such that <code>q &lt;a&gt; &lt;b&gt;</code>
+returns <code>true</code>, if <code>a</code> and <code>b</code> are beta
+equivalent and otherwise <code>false</code>.</p>
+<ol type="1">
+<li><p>We form the set <code>A</code> which contains <code>a</code> and
+all beta (or alpha) equivalent terms. Therefore <code>A</code> is closed
+by definition.</p></li>
+<li><p><code>A</code> is nonempty, because it contains at least the term
+<code>a</code>.</p></li>
+<li><p><code>A</code> cannot contain all lambda terms for the following
+reasons:</p>
+<ol type="1">
+<li><p>If <code>a</code> is normalizing, then any term which does not
+reduce to a normal form cannot be contained in <code>A</code>. There are
+terms which do not reduce to a normal form
+(e.g. <code>(\x := x x)(\x := x x)</code>).</p></li>
+<li><p>If <code>a</code> does not reduce to a normal form, then any term
+in normal form cannot be in <code>A</code>. There are terms in normal
+form (e.g. <code>\ x := x</code>).</p></li>
+</ol></li>
+<li><p><code>A</code> is nontrivial.</p></li>
+<li><p>Because <code>A</code> is closed and non-trivial there cannot be
+a decider for <code>A</code>.</p></li>
+<li><p>Since <code>q &lt;a&gt;</code> is a decider for <code>A</code> we
+get a contradiction.</p></li>
+</ol>
+<p>Therefore the assumption that a decider <code>q</code> exists must be
+false.</p>
+<h2 id="undecidability-of-the-halting-problem">Undecidability of the
+Halting Problem</h2>
+<p>Theorem: <em>It is undecidable if an arbitrary lambda term
+<code>a</code> reduces to a normal form.</em></p>
+<p>We prove this theorem by contradiction assuming that there is a
+lambda term <code>q</code> such that <code>q &lt;a&gt;</code> returns
+<code>true</code>, if <code>a</code> reduces to a normal form and
+otherwise <code>false</code>.</p>
+<ol type="1">
+<li><p>We form the set <code>A</code> which contains all lambda terms
+which reduce to a normal form.</p></li>
+<li><p><code>A</code> is certainly closed because it contains all normal
+forms and all terms which reduce to a normal form i.e. all terms which
+are alpha or beta equivalent.</p></li>
+<li><p><code>A</code> is certainly nontrivial, because there are terms
+which are in normal form (e.g. all variables) and are therefore in the
+set and because there are terms which do not have a normal form and are
+therefore not in <code>A</code>.</p></li>
+<li><p><code>q</code> would be a decider for <code>A</code>.</p></li>
+</ol>
+<p>Since a non-trival closed set cannot have a decider, the existence
+that a term like <code>q</code> exists leads to a contradiction and
+therefore must be false.</p>
+<!-- Links -->
+</body>
+</html>
