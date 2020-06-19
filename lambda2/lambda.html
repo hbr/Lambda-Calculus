@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Helmut Brandl" />
+  <meta name="keywords" content="Lambda Calculus" />
+  <title>Programming with Lambda Calculus</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    div.abstract {
+      margin: 2em 2em 2em 2em;
+      text-align: left;
+      font-size: 85%;
+    }
+    div.abstract-title {
+      font-weight: bold;
+      text-align: center;
+      padding: 0;
+      margin-bottom: 0.5em;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+      margin-bottom: 0em;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Programming with Lambda Calculus</h1>
+<p class="author">Helmut Brandl</p>
+<div class="abstract">
+<div class="abstract-title">Abstract</div>
+<p>An introduction into lambda calculus emphasizing the use of lambda
+calculus as a programming language.</p>
+</div>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#sec:motivation"
+id="toc-sec:motivation">Motivation</a></li>
+<li><a href="#basics-of-lambda-calculus"
+id="toc-basics-of-lambda-calculus">Basics of Lambda Calculus</a>
+<ul>
+<li><a href="#definitions" id="toc-definitions">Definitions</a></li>
+<li><a href="#combinators" id="toc-combinators">Combinators</a></li>
+<li><a href="#type-annotations" id="toc-type-annotations">Type
+Annotations</a></li>
+<li><a href="#terminating-and-non-terminating-computations"
+id="toc-terminating-and-non-terminating-computations">Terminating and
+Non Terminating Computations</a></li>
+</ul></li>
+<li><a href="#arithmetic" id="toc-arithmetic">Arithmetic</a>
+<ul>
+<li><a href="#church-numerals" id="toc-church-numerals">Church
+Numerals</a></li>
+<li><a href="#simple-arithmetics" id="toc-simple-arithmetics">Simple
+Arithmetics</a></li>
+<li><a href="#simple-predicates" id="toc-simple-predicates">Simple
+Predicates</a></li>
+<li><a href="#recursion" id="toc-recursion">Recursion</a></li>
+<li><a href="#searching-with-predicates"
+id="toc-searching-with-predicates">Searching with Predicates</a></li>
+<li><a href="#unbounded-search" id="toc-unbounded-search">Unbounded
+Search</a></li>
+</ul></li>
+<li><a href="#data-types" id="toc-data-types">Data Types</a>
+<ul>
+<li><a href="#construction-principle"
+id="toc-construction-principle">Construction Principle</a></li>
+<li><a href="#church-numerals-revisited"
+id="toc-church-numerals-revisited">Church Numerals Revisited</a></li>
+<li><a href="#lists" id="toc-lists">Lists</a></li>
+<li><a href="#trees" id="toc-trees">Trees</a></li>
+</ul></li>
+<li><a href="#bibliography" id="toc-bibliography">References</a></li>
+</ul>
+</nav>
+<style>
+body{
+    margin-left: 20px;
+    width: 600px;
+}
+
+pre{
+    margin-left: 10px;
+    padding: 5px;
+    background-color: #F0F0F0;
+}
+</style>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-168044895-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-168044895-2');
+</script>
+<h1 id="sec:motivation">Motivation</h1>
+<p>Lambda calculus is a fascinating topic for the following reasons.</p>
+<ol type="1">
+<li><p>It is simple. It just consists of variables, functions and
+function applications.</p></li>
+<li><p>Despite of being simple it is possible to express any computable
+function in the calculus.</p>
+<p>This is the reason why Alonzo Church <span class="citation"
+data-cites="church1936">(1936)</span> invented the lambda calculus. He
+wanted to explore the limits of computability and decidability. If you
+want to prove that something is undecidable you need a clear definition
+what you mean by <em>computable</em> or <em>decidable</em>. Lambda
+calculus is the proper tool.</p></li>
+<li><p>It is fun. In lambda calculus we don’t care about execution. We
+just express functions. And as you will see: We can express arbitrarily
+complex and interesting functions. No matter if their execution would
+last longer than the universe exists.</p></li>
+<li><p>We can learn a lot about computation. In lambda calculus we can
+express iteration, recursion, arbitrary data structures by using only
+variables, functions and function applications.</p></li>
+</ol>
+<p>In the following I do not expect any prior knowledge. The reader
+should have some experience with programming.</p>
+<p>All concepts are introduced step by step.</p>
+<p>Many texts on lambda calculus use a lot of math. The goal usually is
+not to do programming in lambda calculus, only to demonstrate its
+computational power.</p>
+<p>In this text we use lambda calculus as a programming language. We
+build first simple functions and step by step compose the simple
+functions to more complex functions. At the end, the same goal is
+achieved: Demonstrate the expressive power of lambda calculus. But I
+hope that leaving out math notation makes the topic more accessible.</p>
+<h3 id="comments-questions-remarks-discussion">Comments, Questions,
+Remarks, Discussion</h3>
+<p>Feel free to post any question, comment, remark or discusion as a
+github issue on <a
+href="https://github.com/hbr/Lambda-Calculus/issues">https://github.com/hbr/Lambda-Calculus/issues</a></p>
+<!--
+[Table of Contents](toc.md)
+
+- Definitions
+
+    - Lambda terms and reduction
+
+    - Conventions
+
+    - Rename bound variables
+
+    - Substitution
+
+    - Substitution Example
+
+- Combinators
+
+    - Projections
+
+    - Partial Application and Storage
+
+    - Booleans
+
+    - Pairs
+
+- Type Annotations
+
+    - Syntax with Types
+
+    - Pairs with Types
+
+- Terminating and Non Terminating Computations
+
+    - Normal Forms
+
+    - Loops
+
+-->
+<h1 id="basics-of-lambda-calculus">Basics of Lambda Calculus</h1>
+<h2 id="definitions">Definitions</h2>
+<h3 id="terms-and-reduction">Terms and Reduction</h3>
+<p>In lambda calculus everything is a function. A <em>lambda term</em>
+is either a variable, a function application or a function
+abstraction.</p>
+<pre><code>term ::=    x               -- variable
+        |   \ x := term     -- function
+        |   term term       -- application</code></pre>
+<p>We pronounce the term <code>\ x := e</code> <em>lambda x body e</em>.
+The backslash should remind us of the greek letter <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20%5Clambda"
+alt="\lambda" title="\lambda" class="math inline" />.</p>
+<p>The most interesting term is the function term.</p>
+<pre><code>\ x := term
+  ^    ^-- body (might contain variable x)
+  |
+  \------  bound variable</code></pre>
+<p>The bound variable is meaningful only within the body. We can change
+the name of the bound variable arbitrarily as long as we change it
+consistently within the body.</p>
+<p>What can we do with a function? We can apply it to an argument and
+get <code>(\ x := e) a</code>. This term is called a reducible
+expression (short redex). As the name says, this expression can be
+reduced or we can compute the result of the function applied to the
+argument.</p>
+<pre><code>(\x := e) a ~&gt; e[x:=a]</code></pre>
+<p>where <code>~&gt;</code> reads <em>reduces to</em> and
+<code>e[x:=a]</code> is the expression <code>e</code> where all
+occurrences of the variable <code>x</code> have been replaced by
+<code>a</code>. A reduction is the most elementary <em>computation
+step</em> in lambda calculus.</p>
+<p>We pronounce the substitution <code>e[x:=a]</code> <em>e with a for
+x</em>.</p>
+<p>Example: Application of the identity function</p>
+<pre><code>(\x := x) a ~&gt; x[x:=a] = a</code></pre>
+<h3 id="conventions">Conventions</h3>
+<p>There are some conventions which make writing lambda terms more
+convenient.</p>
+<p>Function application associates to the left</p>
+<pre><code>f a b c             =           ((f a) b) c</code></pre>
+<p>Nested function abstractions associate to the right</p>
+<pre><code>\ x := \y := e      =           \x := (\y := e)</code></pre>
+<p>and the arguments of nested function abstractions can be
+compressed.</p>
+<pre><code>\ x := \y := e      =           \ x y := e</code></pre>
+<h3 id="rename-bound-variables">Rename Bound Variables</h3>
+<p>The names of bound variable are irrelevant. We can change the names
+arbitrarily without changing really the term.</p>
+<pre><code>\ x := x            =           \ y := y
+
+\ x y := x          =           \ z u := z
+
+\ x y := y          =           \ z u := u
+
+\ x x := x          =           \ x y := y</code></pre>
+<p>This is the same as with any other programming language. The names of
+formal arguments of a function are irrelevant to the caller of the
+function.</p>
+<p>Furthermore we have to make sure to choose names for bound variables
+which cannot change the meaning of an expression.</p>
+<p>The last example demonstrates that a variable is always bound by the
+innermost binder.</p>
+<h3 id="substitution">Substitution</h3>
+<p>Since the basic computation step is based on substitution, we better
+define substitution exactly.</p>
+<pre><code>x[x:=e]             =       e                   -- same variable
+
+y[x:=e]             =       y                   -- different variables
+
+(a b)[x:=e]         =       a[x:=e]  b[x:=e]    -- independent substitution
+
+(\y := t)[x:=e]     =       \y := t[x:=e]       -- pull into abstraction
+        -- y must not occur in e !!             -- hygiene condition
+</code></pre>
+<p>The effect of the substitution applied to a variable depends on the
+variable name.</p>
+<p>The substitution of an application is done on both terms
+independently.</p>
+<p>We are allowed to pull a substitution into a lambda abstraction only
+if the replacement term does not contain the bound variable of the
+abstraction.</p>
+<p>This is a <em>hygiene condition</em> which is not really a
+restriction, because we can always rename the bound variable so that the
+hygiene condition is satisfied.</p>
+<p>The hygiene condition guarantees that the name of the bound variable
+does not <em>interfere</em> with variable names in the world outside the
+abstraction.</p>
+<h3 id="substitution-example">Substitution Example</h3>
+<pre><code>(\ x y := x) a b
+
+=   (\x := (\ y := x)) a b
+
+~&gt;  (\ y := x)[x:=a] b          -- y not in a !!
+
+=   (\ y := a) b
+
+~&gt;  a[y:=b]
+
+=   a</code></pre>
+<p>The hygiene condition tells us that <code>y</code> must not occur in
+<code>a</code> (otherwise we would have to rename <code>y</code>).</p>
+<p>So we get</p>
+<pre><code>(\ x y := x) a b    ~&gt;      a</code></pre>
+<p>i.e. the term <code>\x y := x</code> applied to two arguments returns
+the first argument and ignores the second argument.</p>
+<p>In the same manner</p>
+<pre><code>(\ x y := y) a b    ~&gt;      b</code></pre>
+<p>can be shown.</p>
+<h2 id="combinators">Combinators</h2>
+<p>Lambda terms where all variables are bound are called
+<em>combinators</em>.</p>
+<h3 id="projections">Projections</h3>
+<p>We have seen already the combinators <code>\ x y := x</code> and
+<code>\x y := y</code>. In order to use them later on we give them
+names.</p>
+<pre><code>K   :=  \ x y := x
+KI  :=  \ x y := y</code></pre>
+<p>We have chosen the names <code>K</code> and <code>KI</code> to be
+inline with the literature on lambda calculus which uses the names <em>K
+combinator</em> and <em>KI combinator</em>.</p>
+<p>These two definitions give just names to the coresponding lambda
+terms. The names are only for humans. The lambda calculus does not know
+of any names which we give to combinators. I.e. whenever we see
+<code>K</code> in a lambda term we always mean the term
+<code>\ x y := x</code>.</p>
+<p>In order to write the definition of <code>K</code> and
+<code>KI</code> more like function definitions in a programming language
+we use the syntax</p>
+<pre><code>K x y := x
+
+KI x y := y</code></pre>
+<p>which we pronounce <em>K x y with body x</em>. We just replaced the
+backslash by a name. Therefore we call <code>\ x y := x</code> an
+anonymous or unnamed function and <code>K x y := x</code> a named
+function.</p>
+<p>But note that we always mean the same thing. <code>K x y := x</code>
+is the same as <code>K := \ x y := x</code>. The first form just uses
+syntactic sugar.</p>
+<h3 id="partial-application-and-storage">Partial Application and
+Storage</h3>
+<p>What happens if we apply a function with two arguments to only one
+argument?</p>
+<p>Nothing special. Lambda calculus only knows of functions with one
+argument. However the function can return another function which then
+can be applied to the remaining argument.</p>
+<p>But let’s see what happens of we apply the <code>K</code> combinator
+to one argument.</p>
+<pre><code>K a
+
+=   (\ x y := x) a
+
+=   (\ x := (\ y := x)) a
+
+~&gt;  (\ y := x)[x:=a]
+
+=   \y := a                 -- y must not occur in a!!</code></pre>
+<p>Now we have a function which ignores any arguments to which it is
+applied. The term <code>K a</code> <em>stores</em> the term
+<code>a</code> and returns it to any other term which applies
+<code>K a</code> to an arbitrary argument.</p>
+<p>Note that the hygiene condition is important to guarantee that
+<code>K a</code> returns exactly <code>a</code> if applied to another
+argument. If we hadn’t required that <code>y</code> must not occur in
+<code>a</code>, then the application <code>K a b</code> would return
+<code>a[y:=b]</code> which in that case could be different from
+<code>a</code>.</p>
+<h3 id="boolean">Boolean</h3>
+<p>Lambda calculus does not have any primitive values. It only has
+functions — nothing else.</p>
+<p>We have to find a way to express boolean values as functions.</p>
+<p>Since there are only two boolean values, we can encode booleans as
+functions taking two arguments. The boolean value <em>true</em> returns
+the first argument and the boolean value <em>false</em> returns the
+second argument.</p>
+<p>I.e. booleans are <em>decisions</em> which decide between two
+alternatives where the alternatives are represented the by the two
+function arguments.</p>
+<pre><code>true x y  := x
+
+false x y := y</code></pre>
+<p>Note that <code>true</code> and <code>K</code> and <code>false</code>
+and <code>KI</code> are defined by the same lambda term. We use
+different names to express different intentions. But again: This is just
+for us. From the viewpoint of the lambda calculus the terms are
+equivalent.</p>
+<p>It is not too difficult to define boolean functions. Negation can be
+defined as</p>
+<pre><code>not b := b false true</code></pre>
+<p>The correctness of the definition can be shown by the following
+reductions.</p>
+<pre><code>not true
+
+~&gt;  true false true         -- definition &#39;not&#39;
+
+~&gt;  false                   -- &#39;true&#39; selects the first argument
+
+
+not false
+
+~&gt;  false false true        -- definition &#39;not&#39;
+
+~&gt;  true                    -- &#39;false&#39; selects the second argument</code></pre>
+<p>More boolean functions</p>
+<pre><code>and a b :=  a b false   -- if &#39;a&#39; is true, return &#39;b&#39;, otherwise &#39;false&#39;
+
+or a b  :=  a true b    -- if &#39;a&#39; is true, return &#39;true&#39;, otherwise &#39;b&#39;</code></pre>
+<h3 id="pair">Pair</h3>
+<p>A lambda term representing a pair of values has to <em>store</em> in
+some sense the values. We have already seen that lambda calculus is able
+to store one value. Remember the term <code>K a</code> which
+<em>stores</em> the value <code>a</code> and returns it if another
+argument is given to the term.</p>
+<p>The right choice to represent a pair is a lambda term which expects
+three arguments. The first two arguments are the terms which form the
+pair of values. The third argument is a function using these two values
+as arguments.</p>
+<pre><code>(,) x y := \ f := f x y</code></pre>
+<p>Here we use the comma operator to use the notation <code>(a,b)</code>
+to express the pair of <code>a</code> and <code>b</code>. We could have
+chosen e.g. the name <code>pair</code> and written <code>pair a b</code>
+instead of <code>(a,b)</code>.</p>
+<p>The term <code>(a,b)</code> is a partial application. It expects a
+further argument which should be a function taking two arguments.</p>
+<p>We can use the combinators <code>K</code> and <code>KI</code> to
+extract either the first or the second component of the pair.</p>
+<pre><code>first p := p K
+
+second p := p KI</code></pre>
+<p>Let’s see this in action on the term <code>first (a,b)</code>.</p>
+<pre><code>first (a,b)
+
+=   (a,b) K                     -- definition of &#39;first&#39;
+
+=   (\ x y f := f x y) a b K    -- definition of &#39;(,)&#39;
+
+~&gt;  K a b
+
+~&gt;  a</code></pre>
+<h2 id="type-annotations">Type Annotations</h2>
+<p><em>Untyped lambda calculus</em> does not know of any types.
+Therefore the name. However the programmer thinks in types. We have
+already talked about booleans and pairs. These are <em>types</em>. We
+use types to express our intentions.</p>
+<p>Since we want to do <em>programming</em> in lambda calculus, we want
+to be able to express our intentions in the source code.</p>
+<h3 id="example-boolean">Example: Boolean</h3>
+<p>We have already seen, that a boolean value is represented as a choice
+between the two arguments which follow. Usually our intention is to
+express a choice between two things of the same kind, and not a choice
+between a string and a number.</p>
+<p>The lambda calculus does not care what arguments you provide. But we
+can use types to express our intentions.</p>
+<pre><code>true (x: A) (y: A): A   := x
+
+false (x: A) (y: A): A  := y</code></pre>
+<p>We use capital letters to express any type. Here the definitions tell
+us, that we can use the functions <code>true</code> and
+<code>false</code> on any two arguments provided that they have the same
+<em>type</em>. Both functions then return a value of exactly that
+type.</p>
+<p>But what type do the terms <code>true</code> and <code>false</code>
+have? They have the type</p>
+<pre><code>true:  A -&gt; A -&gt; A
+false: A -&gt; A -&gt; A</code></pre>
+<p>We can use <code>Boolean</code> as an abbreviation for
+<code>A -&gt; A -&gt; A</code>.</p>
+<p>Since these are just annotations which are ignored by the compiler,
+we don’t need formal rules. Otherwise we would have to switch to
+<em>typed lambda calculus</em> which we won’t do here.</p>
+<p>Remember: <strong>Type annotations are comments</strong>.</p>
+<h3 id="example-pair">Example: Pair</h3>
+<p>If <code>(a,b)</code> is a pair of values, then the types of
+<code>a</code> and <code>b</code> can be different. However the type of
+the third argument, the function which uses the two values has to be
+consistent with the component types.</p>
+<p>We can express the constraint in the following way.</p>
+<pre><code>(,) (x: A) (y: B): (A -&gt; B -&gt; C) -&gt; C
+:=
+    \ f := f x y</code></pre>
+<p>The type of <code>(,)</code> is then</p>
+<pre><code>(,): A -&gt; B -&gt; (A -&gt; B -&gt; C) -&gt; C</code></pre>
+<p>Since we are not formal on type annotations we can use
+<code>Pair A B</code> to express the type of a pair where the first
+component is of type <code>A</code> and the second component is of type
+<code>B</code>.</p>
+<p>We can add type annotations to the terms <code>K</code>,
+<code>KI</code>, <code>first</code> and <code>second</code> as well.</p>
+<pre><code>K (x: A) (y: B): A  := x
+
+KI (x: A) (y: B): B := y
+
+first (p: Pair A B): A := p K
+
+second (p: Pair A B): B := p KI</code></pre>
+<p>If we use type annotations, then we have to type a little bit more.
+However the definitions are much more readable. Understanding the
+definitions in 3 months from now is easier with type annotations.</p>
+<p>And our version of lambda calculus looks more and more like a
+programming language.</p>
+<h2 id="terminating-and-non-terminating-computations">Terminating and
+Non Terminating Computations</h2>
+<p>Up to now all lambda terms we have used have <em>terminated</em> in
+the sense that we reached a state, where no more reducible expressions
+are in the term.</p>
+<p>Is this always the case? Unfortunately not. In the following we show
+how to construct potentially endless loops in lambda calculus.</p>
+<h3 id="normal-forms">Normal Forms</h3>
+<p>We call a lambda term to be in normal form if it contains no more
+redexes.</p>
+<p>A term not in normal form can contain one or more redexes. A
+computation step is done by choosing any redex and reduce it. Therefore
+evaluating a lambda term might be non deterministic.</p>
+<p>A reduction sequence might lead to a term in normal form or be an
+infinite sequence.</p>
+<pre><code>
+t1 ~&gt; t2 ~&gt; t3 ~&gt; .......  ~&gt; tN        -- &#39;tN&#39; is in normal form
+
+t1 ~&gt; t2 ~&gt; t2 ~&gt; .............................</code></pre>
+<p>We call a lambda term strongly normalizing, if any sequence of
+reduction steps finally leads to a term in normal form.</p>
+<p>We call a lambda term weakly normalizing, if there is a reduction
+sequence which leads to a term in normal form.</p>
+<h3 id="loops">Loops</h3>
+<p>We can apply a lambda term to itself. This is the easiest form to
+build an infinite loop.</p>
+<pre><code>M x := x x</code></pre>
+<p>Let’s see what happens if we apply <code>M</code> to itself.</p>
+<pre><code>M M
+
+=   (\ x := x x) M
+
+~&gt;  (x x)[x:=M]
+
+~&gt;  M M
+
+~&gt;  M M
+
+...</code></pre>
+<p>I.e. the term <code>M M</code> is neither strongly nor weakly
+normalizing. It is diverging.</p>
+<p>The term <code>M M</code> is not useful at all. It is just a silly
+term to demonstrate what can go wrong, because an infinite loop is
+certainly not desirable.</p>
+<p>But we can construct another term which is only potentially non
+terminating.</p>
+<pre><code>U x f := f (x x f)</code></pre>
+<p>Let’s see what happens if we apply <code>U U</code> to an arbitrary
+argument.</p>
+<pre><code>U U g
+
+=   (\ x f := f (x x f)) U g
+
+~&gt;  g (U U g)
+
+~&gt;  g (g (U U g))
+
+~&gt;  g (g (g (U U g)))
+
+...</code></pre>
+<p>Here we get a potentially infinite reduction sequence. But we can
+choose <code>g</code> in a manner that it might in some states ignore
+its argument i.e. which might generate some <em>exit condition</em> from
+the loop.</p>
+<p>In this introductory chapter we don’t look deeper into this
+possibility. We just wanted to demonstrate that we can program
+<em>loops</em> in lambda calculus which are potentially infinite.</p>
+<h1 id="arithmetic">Arithmetic</h1>
+<h2 id="church-numerals">Church Numerals</h2>
+<p>We want to encode the natural numbers <code>0, 1, 2, ...</code> in
+lambda calculus. Since lambda calculus only has functions, we have to
+figure out a way to encode numbers as functions.</p>
+<p>What can we do with a number <code>n</code>? We can do something
+<code>n</code> times. And what can lambda calculus do? Correct answer:
+<strong>Function application</strong>.</p>
+<p>Therefore we encode a natural number as a function which takes a
+function argument and a start value and iterates the function
+<code>n</code> times on the start value.</p>
+<p>This is called the <em>Church encoding</em> of numbers and the
+encoded numbers are called <em>Church numerals</em>.</p>
+<p>So we encode the number zero as</p>
+<pre><code>zero f s := s</code></pre>
+<p>The successor function just takes a church numeral and applies the
+function one more time.</p>
+<pre><code>successor n :=
+    \ f s := f (n f s)</code></pre>
+<p>We can use the combinators <code>zero</code> and
+<code>successor</code> to generate arbitrary church numerals.</p>
+<pre><code>one := successor zero
+
+two := successor one
+
+...</code></pre>
+<p>Let’s check, if the definition really behaves as expected.</p>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>one</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span>   successor zero              <span class="co">-- definition &#39;one&#39;</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span>   \ f s <span class="op">:=</span> f (zero f s)       <span class="co">-- definition &#39;successor&#39;</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="op">~&gt;</span>  \ f s <span class="op">:=</span> f s                <span class="co">-- apply &#39;zero&#39; to &#39;f&#39; and &#39;s&#39;</span></span></code></pre></div>
+<p>I.e. we see that <code>one</code> really applies the function
+<code>f</code> once on the start value <code>s</code>.</p>
+<p>Let’s do the same for <code>two</code>.</p>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>two</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span>   successor one               <span class="co">-- definition &#39;two&#39;</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="ot">=</span>   \ f s <span class="op">:=</span> f (one f s)        <span class="co">-- definition &#39;successor&#39;</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="op">~&gt;</span>  \ f s <span class="op">:=</span> f (f s)            <span class="co">-- see previous derivation</span></span></code></pre></div>
+<p>So we see the function <code>f</code> applied 2 times on the start
+value <code>s</code>.</p>
+<h2 id="simple-arithmetics">Simple Arithmetics</h2>
+<p>Church numerals are iterations. We can use that to do simple
+arithmetics. To add the numbers <code>n</code> and <code>m</code> which
+are represented as church numerals we simply apply the successor
+function <code>n</code> times with start value <code>m</code>.</p>
+<pre><code>(+) n m :=
+    n successor m</code></pre>
+<p>Multiplication of the numbers <code>n</code> and <code>m</code> is
+defined as <code>n</code> times the iterated addition of <code>m</code>
+on the number <code>zero</code>.</p>
+<pre><code>(*) n m :=
+    n ((+) m) zero</code></pre>
+<p>The exponentiation <code>n ^ m</code> is defined as
+<code>n * n * .... * n * one</code>, i.e. it is an <code>m</code> times
+iterated multiplication. There is no problem to define exponentiation in
+lambda calculus</p>
+<pre><code>(^) n m :=
+    m ((*) n) one
+</code></pre>
+<h2 id="simple-predicates">Simple Predicates</h2>
+<p>A predicate is a function returing a boolean value. Predicates are
+<em>deciders</em>. We want to be able to decide, if a number is zero, is
+an even number or is an odd number.</p>
+<p>The encoding of the predicate <code>isZero</code> as an iteration is
+surprisingly simple. Evidently the start value of the iteration is
+<code>true</code>, because the number <code>zero</code> is zero. The
+iteration function just ignores the result of the previous iterations
+and returns <code>false</code>.</p>
+<pre><code>isZero n :=
+    n (\ _ := false) true</code></pre>
+<p>The evenness and oddness predicates can be represented as iterations
+as well. The start value for <code>isEven</code> is <code>true</code>
+and the start value for <code>isOdd</code> is false to return the
+correct value for the number zero.</p>
+<p>On each iteration step we toggle the truth value of the result by
+using the function <code>not</code>.</p>
+<pre><code>isEven n :=
+    n not true
+
+isOdd n :=
+    n not false</code></pre>
+<h2 id="recursion">Recursion</h2>
+<p>Up to now all functions on church numerals have used iterations. This
+technique has its limits. Assume you want to write the predecessor
+function which returns zero for zero (since zero has no predecessor) and
+the actual predecessor for any other number. Trying iteration our
+function looks like</p>
+<pre><code>predecessor n :=
+    n (\ x := ?) zero</code></pre>
+<p>The start value is clear. According to the definition it has to be
+<code>zero</code>. But how to design the step function? The task of the
+step function is to map the predecessor of the predecessor into the
+predecessor of the current number. In nearly all cases adding one does
+the job. But it fails for the number one, since the predecesssor of
+<code>zero</code> is <code>zero</code> we would compute <code>one</code>
+as the predecessor of <code>one</code> which is wrong.</p>
+<p>Alonzo Church, the inventor of the lambda calculus, had been puzzled
+to find a proper definition of the predecessor function. A difficult
+situation when you want to define a calculus where all computable
+functions can be encoded and the calculus fails on such a simple task as
+to compute the predecessor of a natural number.</p>
+<p>One of his phd students, the mathematician Stephen Kleene (pronounced
+Klay-nee), came up with a solution which not only let us encode the
+predecessor function, but also a lot of other complex functions.</p>
+<p>The problem with iteration: The step function has only access to the
+function result of the function called on the predecessor argument, but
+not to the value of the predecessor itself. The iteration
+<em>consumes</em> the numbers. This is clear if we look at the type
+signatures of the start value <code>s</code> and the iteration function
+<code>f</code>.</p>
+<pre><code>s: A
+
+f: A -&gt; A</code></pre>
+<p><code>s</code> has a value of some type <code>A</code> and the
+iteration function <code>f</code> maps step by step the value into its
+final result value. What we want is the following types:</p>
+<pre><code>s: A
+
+f: Natural -&gt; A -&gt; A</code></pre>
+<p>We want the step function <code>f</code> having access to an
+iteration counter and the result of the overall function for this
+iteration counter. The function <code>f</code> then computes the result
+of the next iteration.</p>
+<p>We can reach this goal if we do the iteration with the pair
+`(iteration counter, result) and finally extract the second component of
+the pair.</p>
+<p>For the predecessor function trying to compute the predecessor of a
+number n we would expect the following sequence of pairs</p>
+<pre><code>    (0, 0)
+    (1, 0)
+    (2, 1)
+    ....
+    (n, n-1)</code></pre>
+<p>or more generally</p>
+<pre><code>    (0, result for iteration 0)
+    (1, result for iteration 1)
+    (2, result for iteration 2)
+    ....
+    (n, result for iteration n)</code></pre>
+<p>where at the end we extract the second component of the pair.</p>
+<p>The following function does exactly that</p>
+<div class="sourceCode" id="cb48"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>nat<span class="op">-</span>rec (n<span class="op">:</span> <span class="dt">Natural</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>        (f<span class="op">:</span> <span class="dt">Natural</span> <span class="ot">-&gt;</span> <span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">A</span>)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>        (s<span class="op">:</span> <span class="dt">A</span>)<span class="op">:</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">A</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="op">:=</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    second (n step (zero, s)) <span class="kw">where</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>        step p <span class="op">:=</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>            p (\ i res <span class="op">:=</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>                    (i <span class="op">+</span> one, f i res))</span></code></pre></div>
+<p>Note how the <code>step</code> function has two components. The first
+component just increments the iteration counter and the second component
+uses the function <code>f</code> to compute from the iteration counter
+and the result of the previous iteration the result of the current
+iteration.</p>
+<p>Having such a generic recursor, the encoding of the predecessor
+function is just a piece of cake.</p>
+<pre><code>predecessor n :=
+    nat-rec n (\ i _ := i) zero
+</code></pre>
+<p><code>predecessor zero</code> is <code>zero</code> because of the
+start value <code>zero</code>. <code>predecessor one</code> is
+<code>zero</code> because the iteration counter is <code>zero</code>.
+<code>predecessor n</code> receives at the last iteration the iteration
+counter <code>n - 1</code> which is exactly the required result. The
+iteration function <code>f</code> just used the iteration counter to
+compute the next result and ignores the result of the previous
+iteration.</p>
+<p>Based on the function <code>predecessor</code> we can encode the
+difference between two natural numbers</p>
+<pre><code>(-) n m :=
+    m predeccessor n</code></pre>
+<p>Coding of comparison functions is now easy.</p>
+<pre><code>(&lt;=) n m :=
+    isZero (n - m)</code></pre>
+<pre><code>(&lt;) n m :=
+    successor n &lt;= m</code></pre>
+<pre><code>equal n m :=
+    n &lt;= m and m &lt;= n</code></pre>
+<p>Even the factorial function computing <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%201%5Ctimes%202%5Ctimes%203%5Ctimes%20...%5Ctimes%20n"
+alt="1\times 2\times 3\times ...\times n"
+title="1\times 2\times 3\times ...\times n" class="math inline" /> is
+now possible which uses the recursive definition <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Cbegin%7Barray%7D%7Blll%7D%0A0%21%20%26%3D%26%201%0A%5C%5C%0An%21%20%26%3D%26%20n%20%2A%20%28n-1%29%21%20%5Cquad%5Ctext%7Bfor%20%7D%200%20%3C%20n%0A%5Cend%7Barray%7D"
+alt="\begin{array}{lll}
+0! &amp;=&amp; 1
+\\
+n! &amp;=&amp; n * (n-1)! \quad\text{for } 0 &lt; n
+\end{array}" title="\begin{array}{lll}
+0! &amp;=&amp; 1
+\\
+n! &amp;=&amp; n * (n-1)! \quad\text{for } 0 &lt; n
+\end{array}" class="math display" /></p>
+<pre><code>factorial n :=
+    nat-rec
+        n
+        (\ i res := res * (i + one))
+        one</code></pre>
+<p>It might not be immediately obvious that <code>factorial</code>
+really does the right thing. In order to be sure, the following table
+shows the computation steps for different arguments.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">argument</th>
+<th style="text-align: left;">computation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">1 * 1</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">1 * 1 * 2</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">1 * 1 * 2 * 3</td>
+</tr>
+</tbody>
+</table>
+<h2 id="searching-with-predicates">Searching with Predicates</h2>
+<h3 id="bounded-search">Bounded Search</h3>
+<p>It is a standard task to find a number <code>i</code> which satisfies
+a certain predicate <code>p</code>. We want to write a function which
+finds the smallest number below a certain bound which satisfies the
+predicate. In case that no number below the bound satisfies the number,
+the function should return the bound.</p>
+<p>The result cannot be computed by simple iteration, we need the
+recursor <code>nat-rec</code>. The recursor gives to the step function
+always the iteration counter <code>i</code> of the previous step and the
+result <code>res</code> of the previous step.</p>
+<p>We want the recursor to maintain the invariant that all numbers below
+the previous result do not satisfy the predicate i.e. to maintain</p>
+<pre><code>for all j: j &lt; res =&gt; not (p j)</code></pre>
+<p>It is easy to find a start value for <code>res</code> which satisfies
+the invariant. Just use <code>zero</code>, because there is no number
+below 0 and therefore all numbers below 0 do not satisfy
+<code>p</code>.</p>
+<p>As long as <code>res</code> does not satisfy <code>p</code>, we
+increment <code>res</code> by one.</p>
+<p>As soon as we encounter the first value of <code>res</code> which
+satisfies <code>p res</code> we have encountered the smallest number and
+therefore we do not change the value of <code>res</code> anymore.</p>
+<p>With this preparation, it is easy to write the function
+<code>least-below</code> and convince ourself that the implementation is
+correct.</p>
+<div class="sourceCode" id="cb56"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>least<span class="op">-</span>below (n<span class="op">:</span> <span class="dt">Natural</span>) (p<span class="op">:</span> <span class="dt">Natural</span> <span class="ot">-&gt;</span> <span class="dt">Boolean</span>)<span class="op">:</span> <span class="dt">Natural</span> <span class="op">:=</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Least number &#39;i&#39; below &#39;n&#39; satisfying &#39;p i&#39;</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- or &#39;n&#39; if there is no such number.</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>    n (\ res <span class="op">:=</span> p res res (res <span class="op">+</span> one)) zero</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- maintain the invariant: all numbers below</span></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- &#39;res&#39; do not satisfy &#39;p&#39;.</span></span></code></pre></div>
+<p>The expression <code>p res</code> checks if <code>res</code>
+satisfies the predicate. If the answer is <code>true</code>, then the
+value <code>res</code> is kept for the next iteration. If the answer is
+<code>false</code>, then the value of <code>res</code> is incremented.
+If no number below <code>n</code> satisfies the predicate
+<code>p</code>, then the value <code>zero</code> is incremented
+<code>n</code> times, i.e. <code>n</code> is returned as the final
+result.</p>
+<p>Next we want to implement an existential quantifier with an upper
+bound.</p>
+<p>If we find a number below the bound which satisfies a certain
+predicate, we know that at least one number below the bound exists,
+which satisfies the predicate. The existential quantifier with an upper
+bound can be implemented by looking at the result of
+<code>least-below</code> and comparing it with the bound.</p>
+<div class="sourceCode" id="cb57"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>exist<span class="op">-</span>below (n<span class="op">:</span> <span class="dt">Natural</span>) (p<span class="op">:</span> <span class="dt">Natural</span> <span class="ot">-&gt;</span> <span class="dt">Boolean</span>)<span class="op">:</span> <span class="dt">Boolean</span> <span class="op">:=</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Is there a number &#39;i&#39; below &#39;n&#39; satisfying &#39;p i&#39;?</span></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>    least<span class="op">-</span>below n p <span class="op">&lt;</span> n</span></code></pre></div>
+<p>If there exists no number below a bound which does not satisfy a
+certain predicate, then all numbers below the bound satisfy the
+predicate. Therefore implementation of the universal quantifier with an
+upper bound is easy as well.</p>
+<div class="sourceCode" id="cb58"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span><span class="op">-</span>below (n<span class="op">:</span> <span class="dt">Natural</span>) (p<span class="op">:</span> <span class="dt">Natural</span> <span class="ot">-&gt;</span> <span class="dt">Boolean</span>)<span class="op">:</span> <span class="dt">Boolean</span> <span class="op">:=</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Are all numbers &#39;i&#39; below &#39;n&#39; satsifying &#39;p i&#39;?</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">not</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>        (exist<span class="op">-</span>below</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>            n</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>            (\ x <span class="op">:=</span> <span class="fu">not</span> (p x)))</span></code></pre></div>
+<h3 id="division">Division</h3>
+<p>With these helper functions based on predicates we can implement
+division functions and functions computing prime numbers.</p>
+<p>The value of <code>a</code> divided by <code>b</code>
+i.e. <code>a / b</code> is the unique solution <code>x</code> of the
+inequalities</p>
+<pre><code>b * x &lt;= a
+
+a &lt; b * (x + 1)</code></pre>
+<p>Division by zero is undefined. In the case <code>b = 0</code> the
+second inequality is cannot be satisfied. In that case we want the
+expression <code>a / b</code> to return <code>a</code> in order to have
+a total function.</p>
+<p>We can use <code>least-below</code> with upper bound <code>a</code>
+to find the smallest number <code>x</code> which satisfies the second
+inequality. In case that no such numbers exist, we get as expected the
+upper bound <code>a</code>. But are we sure that the first inequality is
+satisfied?</p>
+<p>From the reasoning above we know, that the function
+<code>least-below</code> maintains the invariant for all numbers
+strictly below <code>x</code></p>
+<pre><code>not (a &lt; b * (x + 1))</code></pre>
+<p>which is equivalent to</p>
+<pre><code>b * (x + 1) &lt;= a</code></pre>
+<p>and</p>
+<pre><code>b * x + b &lt;= a</code></pre>
+<p>which in turn implies</p>
+<pre><code>b * x &lt;= a</code></pre>
+<p>Therefore the first inequality is maintained by the function
+<code>least-below</code>.</p>
+<p>I.e. the following implementation is correct.</p>
+<pre><code>(/) a b :=
+    least-below
+        a
+        (\ x :=
+            a &lt; b * (x + one))</code></pre>
+<p>The function <code>divides a b</code> shall decide, if <code>a</code>
+divides <code>b</code> exactly i.e. if there exist a solution
+<code>x</code> satisfying</p>
+<pre><code>x * a = b</code></pre>
+<p>The number <code>b / a</code> is a good candidate for the solution
+<code>x</code>, because according to its definition it satisfies</p>
+<pre><code>b / a * a &lt;= b</code></pre>
+<p>So we just compute <code>b / a * a</code> and compare it with
+<code>b</code>.</p>
+<pre><code>divides a b :=
+    equal (b / a * a) b</code></pre>
+<h3 id="prime-numbers">Prime Numbers</h3>
+<p>Prime numbers are very important in number theory and cryptography.
+In this section we show the implementation of some important prime
+number functions.</p>
+<p>A prime number is a natural number greater than 1 which is only
+divisible by 1 and itself.</p>
+<p>If we reformulate the definition a little bit, we can implement it
+and get a prime number tester in lambda calculus.</p>
+<pre><code>isPrime n :=
+    one &lt; n
+    and
+    all-below
+        n
+        (\ x :=
+            x &lt;= one
+            or
+            not (divides x n))</code></pre>
+<p>If we want to compute the <code>n</code>th prime number, we have to
+think a little bit.</p>
+<p>We know that <code>two</code> is the first prime number.</p>
+<p>If we have the <code>i</code>th prime number <code>pi</code>, we get
+the next prime number by finding the smallest number <code>x</code>
+strictly above <code>pi</code> which satisfies <code>isPrime x</code>.
+In order to use the function <code>least-below</code> we need an upper
+bound for the search.</p>
+<p>Let’s find an upper bound for the next prime number above
+<code>pi</code>. We form the product <code>z = p0 * p1 * ... * pi</code>
+of all prime numbers below <code>pi</code> including <code>pi</code>.
+Certainly none of these prime numbers divides <code>z + 1</code> because
+each division leaves the remainder 1. Therefore <code>z + 1</code> is
+either a prime number or there exists a prime number different from the
+prime numbers in the product dividing <code>z + 1</code>. Therefore
+<code>z + 2</code> is a strict upper bound for the next prime
+number.</p>
+<p>Next we observe that <code>z &lt;= factorial pi</code> is valid,
+because the factorial is the product of more numbers than
+<code>z</code>. Therefore <code>factorial pi + 2</code> is a strict
+upper bound for the next prime number above <code>pi</code>.</p>
+<p>Now the implementation is straightforward.</p>
+<div class="sourceCode" id="cb69"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>nth<span class="op">-</span>prime n <span class="op">:=</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>    n f two <span class="kw">where</span></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>        f p_i <span class="op">:=</span></span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>                <span class="co">-- p_i is the &#39;i&#39;th prime</span></span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>            least<span class="op">-</span>below</span>
+<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a>                (factorial p_i <span class="op">+</span> two)</span>
+<span id="cb69-7"><a href="#cb69-7" aria-hidden="true" tabindex="-1"></a>                (\ x <span class="op">:=</span> p_i <span class="op">&lt;</span> x <span class="fu">and</span> isPrime x)</span></code></pre></div>
+<blockquote>
+<p>Note that the above reasoning to find an upper bound for the next
+prime number is the reasoning which has been used by Euclid to prove
+that there are infinitely many prime numbers.</p>
+</blockquote>
+<p>From number theory we know that every natural number above zero has a
+unique prime number factorisation. I.e. each positive number
+<code>n</code> can be written as the infinite product</p>
+<pre><code>n = p0 ^ e0 * p1 ^ e1 * p2 ^ e2 * ...</code></pre>
+<p>where <code>pi</code> is the <code>i</code>th prime number and
+<code>ei</code> is the corresponding exponent. For <code>n = 1</code>
+all exponents are 0.</p>
+<p>We want to have a function which computes for all numbers
+<code>n</code> the exponent <code>ei</code> of the <code>i</code>th
+prime number.</p>
+<p>For each pair <code>(pi,ei)</code></p>
+<pre><code>divides (pi ^ k) n</code></pre>
+<p>is valid for all <code>k &lt;= ei</code> and</p>
+<pre><code>divides (pi ^ (ei + 1)) n</code></pre>
+<p>is invalid.</p>
+<p>Therefore we can find the exponent by a search for the least number
+which does not satisfy the last proposition.</p>
+<p>The upper bound for the search is easy to find. Since all prime
+numbers are greater than 1, all exponents are lower than
+<code>n</code>.</p>
+<div class="sourceCode" id="cb73"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>prime<span class="op">-</span><span class="fu">exponent</span> i n <span class="op">:=</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Exponent of the &#39;i&#39;th prime number in &#39;n&#39;</span></span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>    least<span class="op">-</span>below</span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>        n</span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>        (\ x <span class="op">:=</span></span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">not</span> (divides</span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>                    ((nth<span class="op">-</span>prime i) <span class="op">^</span> (x <span class="op">+</span> one))</span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a>                    n))</span></code></pre></div>
+<p>The prime factorization for the number 0 is not defined. However the
+function <code>prime-exponent i zero</code> returns <code>zero</code>.
+This is no problem. We have just assigned an arbitrary result to the
+function for arguments, where it is mathematically undefined. For all
+other arguments the function returns the correct exponent.</p>
+<h2 id="unbounded-search">Unbounded Search</h2>
+<p>If we have a predicate <code>p: Natural -&gt; Boolean</code> and know
+that there exists a number which satifies the predicate, then we can
+find the least number by an unbounded search. In traditional programming
+languages we would use a while-loop which has the continuation condition
+<code>not (p i)</code> and which increments in the body of the loop the
+number by one until the continuation condition is violated.</p>
+<p>In lambda calculus we don’t have while loops. Therefore we have to
+find a way to do the search with functions.</p>
+<p>We would like to write the function in the following form</p>
+<div class="sourceCode" id="cb74"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>search<span class="op">-</span>least (p<span class="op">:</span> <span class="dt">Natural</span> <span class="ot">-&gt;</span> <span class="dt">Boolean</span>)<span class="op">:</span> <span class="dt">Natural</span> <span class="op">:=</span></span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">iterate</span> step zero <span class="kw">where</span></span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>        step <span class="op">:=</span> <span class="op">?</span></span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">iterate</span> <span class="op">:=</span> <span class="op">?</span></span></code></pre></div>
+<p>which iterates a step function as long as needed starting with
+<code>zero</code> and maintaining the invariant, that all numbers below
+the current number do not satisfy the predicate.</p>
+<p>The function <code>step</code> needs as an argument the current
+number to check. We could try the following.</p>
+<pre><code>step i :=
+    p i i ?</code></pre>
+<p>If the term <code>p i</code> returns true, then <code>p i i ?</code>
+returns the value <code>i</code> which satisfies the predicate. But we
+don’t know what to return in case that <code>i</code> does not satisfy
+the predicate. If we had recursive functions in lambda calculus we would
+just replace the question mark with <code>step (i + one)</code>.
+Unfortunately this is not a valid lambda term.</p>
+<p>But we can give the step function another argument, which is a
+continuation (traditionally called <code>k</code>) knowing how to do the
+rest of the computation.</p>
+<pre><code>step k i :=
+    p i i (k (i + one))</code></pre>
+<p>Now the rest of the difficulty remains on the unkwnown term
+<code>iterate</code>. We just know that this term has to do some kind of
+<em>self replication</em> to implement the loop. In the chapter
+<em>Basics of Lambda Caluculus</em> we have already encountered a
+combinator <code>U</code> which does some kind of replication.</p>
+<pre><code>U x y := y (x x y)</code></pre>
+<p>The combinator <code>U</code> expects two arguments and returns a
+term which contains both arguments twice. It is interesting to see what
+happens, if we evaluate <code>U U step i</code>. We get</p>
+<pre><code>U U step i    ~&gt;  step (U U step) i</code></pre>
+<p>I.e. <code>U U step i</code> calls <code>step</code> with
+<code>U U step</code> as first argument and <code>i</code> as second
+argument. Now <code>step</code> is in the function position and has
+control of what to do next. The function <code>step</code> evaluates
+<code>p i</code>. If the result is <code>true</code> then it returns
+<code>i</code> and the iteration terminates. If <code>p i</code>
+evaluates to <code>false</code> then it returns
+<code>(U U step) (i + one)</code> and the iteration can continue.</p>
+<p>The iteration is started with <code>U U step zero</code> i.e. we can
+use <code>U U</code> as <code>iterate</code> and we are ready.</p>
+<p>We see, that we have implemented an iteration which stops, as soon as
+a number is encountered which satisfies the predicate. The complete
+function reads</p>
+<div class="sourceCode" id="cb79"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>search<span class="op">-</span>least (p<span class="op">:</span> <span class="dt">Natural</span> <span class="ot">-&gt;</span> <span class="dt">Boolean</span>)<span class="op">:</span> <span class="dt">Natural</span> <span class="op">:=</span></span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">U</span> <span class="dt">U</span> step zero <span class="kw">where</span></span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>        step k i <span class="op">:=</span></span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>                <span class="co">-- invariant: all numbers below `i` do not</span></span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>                <span class="co">-- satisfy `p i`.</span></span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>            p i i (k (i <span class="op">+</span> one)</span>
+<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">U</span> x y <span class="op">:=</span></span>
+<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a>            y (x x y)</span></code></pre></div>
+<p>It might be necessary to read this section twice or more to
+understand the tricky mechanism to implement the unbounded search. But
+it is possible.</p>
+<p>However I admire the genious, who invented it. I would have never
+found such a cleverly constructed lambda term by myself.</p>
+<p>Some remarks:</p>
+<ul>
+<li><p>All functions constructed before this section on unbounded search
+are strongly normalizing (provided that their arguments are of the
+proper kind). The function <code>search-least</code> is only weakly
+normalizing (provided that a number exists which satisfies the
+predicate, otherwise it is diverging).</p>
+<p>I.e. there are only some reduction sequences, which terminate with
+the desired result. But there are other reductions sequences which are
+infinite. The subterm <code>U U step</code> has an infinite reduction
+sequence, because it reduces to <code>step (U U step)</code> which
+contains itself as a subterm.</p>
+<p>However there are reduction strategies, which find for all weakly
+normalizing terms a reduction path which terminates.</p></li>
+<li><p>As long as you remain in constructive mathematics, you don’t need
+unbounded search. Unbounded search needs a guarantee, that a number
+satisfying the predicate exists. In constructive mathematics an
+existence proof requires a construction of an object which satisfies the
+condition. But if you have a construction of such an object, you can use
+it as an upper bound and use <code>least-below</code> to find the
+smallest number satisfying the predicate.</p></li>
+<li><p>The availability of unbounded search makes lambda calculus as
+expressive as general recursive functions. The class of general
+recursive functions consists of the constant zero, the successor
+function, all projections (<code>K</code> and <code>KI</code> cover the
+special case with two arguments, but the generalization to more
+argumentes is obvious) and are closed under primitive recursion
+(<code>nat-rec</code>) and minimization (<em>unbounded search</em>).</p>
+<p>There are many definitions of computable functions. E.g.</p>
+<ul>
+<li><p>Recursive functions</p></li>
+<li><p>Turing machines</p></li>
+<li><p>Lambda calculus</p></li>
+</ul>
+<p>Fortunately it can be proved that they are all equivalent i.e. they
+define the same class of functions.</p></li>
+</ul>
+<h1 id="data-types">Data Types</h1>
+<p>Data types are an important means to structure computations. We think
+of data types like <code>Boolean</code>, <code>Natural</code>,
+<code>List</code>, <code>Tree</code>, etc. In the previous chapters
+represented the types <code>Boolean</code> and <code>Natural</code> in
+lambda calculus.</p>
+<p>Since lambda calculus has only functions, we have to represent
+objects of a certain type as functions. We represented the type
+<code>Boolean</code> as a function taking two arguments and returning
+one of the them depending on its boolean value. We represented natural
+numbers as functions taking two arguments. The first argument is a
+function and the second a start value. A natural number iterates the
+function <code>n</code> times on the start value.</p>
+<p>It is possible to define any datatype in lambda calculus. In
+textbooks on lambda calculus you are many times shown that it is
+possible e.g. to represent lists. It sometimes look like some rabbit has
+been pulled out of the hat by some magic.</p>
+<p>But no magic and no genious is needed to find lambda representations
+of datatypes. There is a construction principle which is fairly general.
+In this chapter we present the construction principle and show it on
+some old (natural numbers) and new (lists and trees) examples.</p>
+<h2 id="construction-principle">Construction Principle</h2>
+<p>In order to understand the construction principle, we have to
+understand a seemingly unrelated topic: Algebra.</p>
+<p>An important example of an algebra is the concept of a
+<em>group</em>. A group must have</p>
+<ul>
+<li>a set of elements</li>
+<li>a unit element (i.e. a constant)</li>
+<li>a unary function which applied to an element returns its
+inverse</li>
+<li>a binary function which let us combine elements</li>
+</ul>
+<p>Apart from that it takes some properties. The unit element must be
+neutral with respect to the binary operation. An element combined with
+its inverse is the unit element. The binary operation is associative.
+However we don’t need the properties here. The operations are
+sufficient.</p>
+<p>In a functional language you could define a datatype like</p>
+<div class="sourceCode" id="cb80"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Group</span> <span class="dt">A</span> <span class="op">:=</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>    el<span class="op">:</span>    <span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">Group</span> <span class="dt">A</span></span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>    unit<span class="op">:</span>  <span class="dt">Group</span> <span class="dt">A</span></span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>    inv<span class="op">:</span>   <span class="dt">Group</span> <span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">Group</span> <span class="dt">A</span></span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>    (<span class="op">&lt;*&gt;</span>)<span class="op">:</span> <span class="dt">Group</span> <span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">Group</span> <span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">Group</span> <span class="dt">A</span></span></code></pre></div>
+<p>with three constructors for the constant, the unary and the binary
+operation, and one constructor (<code>el</code>) to produce elements
+from some generator set <code>A</code>.</p>
+<p>We can use such a type to form expressions and each expression has
+some tree associated with it.</p>
+<pre><code>-- expression
+    inv (el 1 &lt;*&gt; unit) &lt;*&gt; el 0
+
+-- expression tree
+                  &lt;*&gt;
+                   |
+         ---------------------
+         |                   |
+        inv                el 0
+         |
+        &lt;*&gt;
+      ---------
+      |       |
+    el 1     unit</code></pre>
+<p>The numbers are just a silly example for an arbitrary generator set.
+Usually the set of generators is finite.</p>
+<p>But anyhow. The possible expressions don’t have any intrinsic
+meaning. Speaking in terms of abstract algebra we have defined a
+<em>signature</em>. A <em>signature</em> is a set of operation symbols
+where each operation symbol has an arity. An operation symbol with arity
+0 is a constant.</p>
+<p>The signature just defines a collection of wellformed expressions in
+that algebra.</p>
+<p>In order to give a meaning (i.e. semantics) to the expressions, we
+have to define a function which <em>evaluates</em> the expression to a
+value of some type <code>R</code> (standing for the result type).</p>
+<p>This can be done by assigning a meaning to each operator symbol. For
+programming this means that every symbol has to get type signature.</p>
+<table style="width:57%;">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">symbol</th>
+<th style="text-align: left;">type signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>el</code></td>
+<td style="text-align: left;"><code>A -&gt; R</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>unit</code></td>
+<td style="text-align: left;"><code>R</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>inv</code></td>
+<td style="text-align: left;"><code>R -&gt; R</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>&lt;*&gt;</code></td>
+<td style="text-align: left;"><code>R -&gt; R -&gt; R</code></td>
+</tr>
+</tbody>
+</table>
+<p>Note that <code>Group A</code> has been replaced by <code>R</code>
+i.e. each group expression corrensponds to some value in its
+interpretation.</p>
+<p>A lambda term representing some group expression is a function with
+four arguments, one for each operation symbol. Each argument is a
+function (or constant) according to the type signature. I.e. a lambda
+term representing a group expression is an <strong>evaluator</strong> of
+that group expression.</p>
+<p>It is straightforward to define the four constructors in lambda
+calculus.</p>
+<div class="sourceCode" id="cb82"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>el (a<span class="op">:</span> <span class="dt">A</span>)<span class="op">:</span> <span class="dt">Group</span> <span class="dt">A</span> <span class="op">:=</span></span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>    \ e u i m <span class="op">:=</span> e a</span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a>unit<span class="op">:</span> <span class="dt">Group</span> <span class="dt">A</span> <span class="op">:=</span></span>
+<span id="cb82-5"><a href="#cb82-5" aria-hidden="true" tabindex="-1"></a>    \ e u i m <span class="op">:=</span></span>
+<span id="cb82-6"><a href="#cb82-6" aria-hidden="true" tabindex="-1"></a>        u</span>
+<span id="cb82-7"><a href="#cb82-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb82-8"><a href="#cb82-8" aria-hidden="true" tabindex="-1"></a>inv (g<span class="op">:</span> <span class="dt">Group</span> <span class="dt">A</span>)<span class="op">:</span> <span class="dt">Group</span> <span class="dt">A</span> <span class="op">:=</span></span>
+<span id="cb82-9"><a href="#cb82-9" aria-hidden="true" tabindex="-1"></a>    \ e u i m <span class="op">:=</span></span>
+<span id="cb82-10"><a href="#cb82-10" aria-hidden="true" tabindex="-1"></a>        i (g u i m)</span>
+<span id="cb82-11"><a href="#cb82-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb82-12"><a href="#cb82-12" aria-hidden="true" tabindex="-1"></a>(<span class="op">&lt;*&gt;</span>) (g1 g2<span class="op">:</span> <span class="dt">Group</span> <span class="dt">A</span>)<span class="op">:</span> <span class="dt">Group</span> <span class="dt">A</span> <span class="op">:=</span></span>
+<span id="cb82-13"><a href="#cb82-13" aria-hidden="true" tabindex="-1"></a>    \ e u i m <span class="op">:=</span></span>
+<span id="cb82-14"><a href="#cb82-14" aria-hidden="true" tabindex="-1"></a>        m (g1 e u i m) (g2 e u i m)</span></code></pre></div>
+<p>Having this we can write the expression
+<code>inv (el one &lt;*&gt; unit) &lt;*&gt; zero</code> in lambda
+calculus.</p>
+<p>A lambda expression of type <code>Group A</code> has the complicated
+looking type</p>
+<pre><code>(A -&gt; R) -&gt; R -&gt; (R -&gt; R) -&gt; (R -&gt; R -&gt; R) -&gt; R</code></pre>
+<p>But remember that we use type annotations as comments to document our
+intentions. The lambda calculus described here is untyped.</p>
+<h2 id="church-numerals-revisited">Church Numerals Revisited</h2>
+<p>Let’s revisit church numerals to see how they fit into the
+construction principle.</p>
+<p>In a functional programming language we would define natural numbers
+as</p>
+<div class="sourceCode" id="cb84"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Natural</span> <span class="op">:=</span></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>    successor<span class="op">:</span> <span class="dt">Natural</span> <span class="ot">-&gt;</span> <span class="dt">Natural</span></span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>    zero<span class="op">:</span>      <span class="dt">Natural</span></span></code></pre></div>
+<p>Interpreted as an abstract algebra:</p>
+<pre><code>-- expression
+    successor (successor zero)
+
+-- expression tree
+        successor
+           |
+        successor
+           |
+          zero</code></pre>
+<table style="width:57%;">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">symbol</th>
+<th style="text-align: left;">type signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>successor</code></td>
+<td style="text-align: left;"><code>R -&gt; R</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>zero</code></td>
+<td style="text-align: left;"><code>R</code></td>
+</tr>
+</tbody>
+</table>
+<p>A lambda term representing an expression of the algebra must have the
+type</p>
+<pre><code>(R -&gt; R) -&gt; R -&gt; R</code></pre>
+<p>We get the following lambda terms for the constructors</p>
+<pre><code>zero: Natural :=
+    \ f s := s
+
+succ (n: Natural): Natural :=
+    \ f s := f (n f s)
+</code></pre>
+<h2 id="lists">Lists</h2>
+<p>Now let’s apply the construction pattern to lists and look at a
+definition of the list type in a functional programming language.</p>
+<div class="sourceCode" id="cb88"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">List</span> <span class="dt">A</span> <span class="op">:=</span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>    cons<span class="op">:</span> <span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">A</span></span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>    nil<span class="op">:</span>  <span class="dt">List</span> <span class="dt">A</span></span></code></pre></div>
+<p>We interpret the type definition as the definition of an algebra and
+look at the expressions it generates and at corresponding expressions
+trees.</p>
+<pre><code>-- expression
+    cons 0 (cons 1 (cons 2 nil))
+
+-- expression tree
+           cons
+            |
+        ---------
+        |       |
+        0      cons
+                |
+             --------
+             |      |
+             1     cons
+                    |
+                 -------
+                 |      |
+                 2     nil</code></pre>
+<p>The definition has two symbols <code>cons</code> and <code>nil</code>
+with the following type signatures.</p>
+<table style="width:57%;">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">symbol</th>
+<th style="text-align: left;">type signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>cons</code></td>
+<td style="text-align: left;"><code>A -&gt; R -&gt; R</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>nil</code></td>
+<td style="text-align: left;"><code>R</code></td>
+</tr>
+</tbody>
+</table>
+<p>Therefore a lambda term of type <code>List A</code> must have the
+type</p>
+<div class="sourceCode" id="cb90"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>(<span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">R</span> <span class="ot">-&gt;</span> <span class="dt">R</span>) <span class="ot">-&gt;</span> <span class="dt">R</span> <span class="ot">-&gt;</span> <span class="dt">R</span></span></code></pre></div>
+<p>We apply the construction principle and get the lambda terms for the
+constructors.</p>
+<pre><code>nil: List A :=
+    \ f s := s
+
+cons (head: A) (tail: List A): List A :=
+    \ f s :=
+        f head (tail f s)</code></pre>
+<p>By applying the constructors we can form expressions to construct
+arbitrary lists
+e.g. <code>cons zero (cons one (cons two nil))</code>.</p>
+<p>Each list expression is a lambda term which iterates over the list
+given the folding function <code>f</code> and the start value
+<code>s</code> as arguments.</p>
+<p>Some simple list functions:</p>
+<pre><code>length (list: List A) :=
+    list (\ a res := res + one) zero
+
+sum (list: List Natural) :=
+    list (\ a res := a + res) zero</code></pre>
+<p>We get the concatenation of the two lists <code>a</code> and
+<code>b</code> by folding <code>cons</code> over the list <code>a</code>
+with the start value <code>b</code>.</p>
+<pre><code>concat (a b: List A): List A :=
+    a cons b</code></pre>
+<p>A list reversal is done by reversing the tail and concate the
+resversed tail with the one element list of the head.</p>
+<pre><code>reverse (a: List A): List A :=
+    a
+        (\ head res := concat res (cons head nil))
+        nil</code></pre>
+<p>If we want to compute the tail of a list we face the same problems as
+with the predecessor function on church numerals. Since the empty list
+does not have a tail, we accept the empty list as the tail of an empty
+list.</p>
+<p>We can solve the problem in the same manner as with the church
+numerals. We define a list recursor which internally not only has access
+to the result of the previous iteration, but also to the previous lists.
+I.e. the folding function has the type
+<code>A -&gt; List A -&gt; R -&gt; R</code>.</p>
+<p>Internally the recursor uses pairs
+<code>(tail list, previous result)</code> starting with
+<code>(nil, s)</code> and throwing away the tail list at the end of the
+iteration.</p>
+<div class="sourceCode" id="cb95"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>list<span class="op">-</span>rec (list<span class="op">:</span> <span class="dt">List</span> <span class="dt">A</span>) (f<span class="op">:</span> <span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">List</span> <span class="dt">A</span> <span class="ot">-&gt;</span> <span class="dt">R</span> <span class="ot">-&gt;</span> <span class="dt">R</span>) (s<span class="op">:</span> <span class="dt">R</span>)<span class="op">:</span> <span class="dt">R</span></span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a><span class="op">:=</span></span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>    second (list step start) <span class="kw">where</span></span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>        start <span class="op">:=</span></span>
+<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>            (nil, s)</span>
+<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>        step a p <span class="op">:=</span></span>
+<span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a>            p (\ <span class="fu">tail</span> res <span class="op">:=</span></span>
+<span id="cb95-8"><a href="#cb95-8" aria-hidden="true" tabindex="-1"></a>                (cons a <span class="fu">tail</span>, f a <span class="fu">tail</span> res))</span></code></pre></div>
+<p>Now we can define the function <code>tail</code>.</p>
+<pre><code>tail (list: List A): List A :=
+    list-rec
+        list
+        (\ head tail res := tail)
+        nil</code></pre>
+<p>In the same manner we can define a function <code>head</code>. In
+that case we have to provide a default value since we cannot pull out an
+arbitrary list element from an empty list.</p>
+<pre><code>head (list: List A) (default: A): A :=
+    list-rec
+        list
+        (\ hd tl res := hd)
+        default</code></pre>
+<h2 id="trees">Trees</h2>
+<p>I hope that the construction principle becomes clearer and clearer.
+As a last expample we show how to represent binary trees as lambda
+terms.</p>
+<p>In order to keep things simple we look at binary trees which store
+information only in the leaves.</p>
+<p>A type definition of such a tree in a functional programming language
+looks like</p>
+<pre><code>class Tree A :=
+    node: Tree A -&gt; Tree A -&gt; Tree A
+    leaf: A -&gt; Tree A</code></pre>
+<p>As before we look at the expressions and expression trees of the
+corresponding algebra.</p>
+<pre><code>-- expression
+    node (node (leaf 0) (leaf 1)) (leaf 2)
+
+-- expression tree
+            node
+             |
+        --------------
+        |            |
+       node        leaf 2
+        |
+    -----------
+    |         |
+  leaf 0   leaf 1</code></pre>
+<table style="width:57%;">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">symbol</th>
+<th style="text-align: left;">type signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>node</code></td>
+<td style="text-align: left;"><code>R -&gt; R -&gt; R</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>leaf</code></td>
+<td style="text-align: left;"><code>A -&gt; R</code></td>
+</tr>
+</tbody>
+</table>
+<p>A lambda term representing a tree has two arguments one representing
+the binary operation on the node and one which maps the leaf information
+into the result type. I.e. the type <code>Tree A</code> is represented
+by a lambda term having the type</p>
+<pre><code>(R -&gt; R -&gt; R) -&gt; (A -&gt; R) -&gt; R</code></pre>
+<p>The lambda terms representing the two constructors look like.</p>
+<pre><code>leaf a :=
+    \ nd lf :=
+        lf a
+
+node a b
+    \ nd lf :=
+        nd (a nd lf) (b nd lf)</code></pre>
+<p>With these constructors we can form tree expressions like
+<code>node (node (leaf 0) (leaf 1)) leaf 2</code>.</p>
+<p>Some simple functions on trees:</p>
+<div class="sourceCode" id="cb102"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>count<span class="op">-</span>nodes tree <span class="op">:=</span></span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Count the nodes in a tree including the leaf nodes.</span></span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>    tree</span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>        (\ size<span class="op">-</span>a size<span class="op">-</span>b <span class="op">:=</span> one <span class="op">+</span> size<span class="op">-</span>a <span class="op">+</span> size<span class="op">-</span>b)</span>
+<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>        (\ _ <span class="op">:=</span> one)</span>
+<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb102-7"><a href="#cb102-7" aria-hidden="true" tabindex="-1"></a><span class="fu">flip</span> tree <span class="op">:=</span></span>
+<span id="cb102-8"><a href="#cb102-8" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Make a mirror image of the tree.</span></span>
+<span id="cb102-9"><a href="#cb102-9" aria-hidden="true" tabindex="-1"></a>    tree</span>
+<span id="cb102-10"><a href="#cb102-10" aria-hidden="true" tabindex="-1"></a>        (\ left right <span class="op">:=</span> node right left)</span>
+<span id="cb102-11"><a href="#cb102-11" aria-hidden="true" tabindex="-1"></a>        leaf</span>
+<span id="cb102-12"><a href="#cb102-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb102-13"><a href="#cb102-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb102-14"><a href="#cb102-14" aria-hidden="true" tabindex="-1"></a>to<span class="op">-</span>list (tree<span class="op">:</span> <span class="dt">Tree</span> <span class="dt">A</span>)<span class="op">:</span> <span class="dt">List</span> <span class="dt">A</span> <span class="op">:=</span></span>
+<span id="cb102-15"><a href="#cb102-15" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Transform the tree into a list of leaf values</span></span>
+<span id="cb102-16"><a href="#cb102-16" aria-hidden="true" tabindex="-1"></a>    tree</span>
+<span id="cb102-17"><a href="#cb102-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">concat</span></span>
+<span id="cb102-18"><a href="#cb102-18" aria-hidden="true" tabindex="-1"></a>        (\ el <span class="op">:=</span> cons el nil)</span></code></pre></div>
+<p><strong>Exercise</strong>: Define a binary tree in lambda calculus
+where all information is stored in the nodes and the leaves are empty.
+Implement the functions <code>count-nodes</code>, <code>flip</code> and
+<code>to-list</code> for this kind of tree.</p>
+<p>I hope that by looking at these examples it should be easy to
+represent any data type which can be represented in a functional
+language.</p>
+<p>This ends this introduction into programming with lambda calculus. I
+hope you enjoyed it.</p>
+<h1 class="unnumbered" id="bibliography">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent"
+data-entry-spacing="0" role="list">
+<div id="ref-church1936" class="csl-entry" role="listitem">
+Church, Alonzo. 1936. <span>“An Unsolvable Problem of Elementary Number
+Theory.”</span> <em>Journal of Mathematics</em> 58: 354–63.
+</div>
+</div>
+</body>
+</html>
