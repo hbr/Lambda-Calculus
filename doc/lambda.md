@@ -1,3 +1,13 @@
+# Identity Function
+
+    identity x := x
+
+    -- or in the long form
+    identity :=
+        \ x := x
+
+
+
 # Boolean Values
 
 A boolean is represented by a function taking two arguments. The boolean value
@@ -111,4 +121,45 @@ Addition would be defined as
     h pred res m :=
         successor res
 
+
+However in lambda calculus we have neither control flow nor recursive calls. We
+only have function application and lambda abstraction.
+
+We have no problems representing the function `g` and `h` needed to calculate
+addition in lambda calculus. Let's see if we can define a function `prim-rec g
+h` taking the two function `g` and `h` and returning the result of the
+corresponding primitive recursive function.
+
+In lambda calculus we can iterate a function `f` `n` times with the church numeral
+representing the number `n` and a start value. We can represent the primitive
+recursion by iteration.
+
+Each iteration step takes the result of the previous step and the church numeral
+which has done the previous iterations. I.e. the first step shall return the
+lambda value
+
+    pair (g x) church0
+
+then we need a step function transforming the pair of the `i`th iteration into
+the pair for the `(i+1)`th iteration
+
+    step x p :=
+        pair
+            (h (second p) (first p) x)
+            (successor (second p))
+
+At the end of the iteration we just extract the first component which is the
+result of the operation.
+
+The whole function reads like
+
+    prim-rec g h n x :=
+        first (n (step x) start)
+        where
+            start :=
+                pair (g x) church0
+            step x p :=
+                pair
+                    (h (second p) (first p) x)
+                    (successor (second p))
 
