@@ -85,6 +85,10 @@ arguments.
         bool1 true bool2
 
 
+    not (b: Boolean): Boolean :=
+        b false true
+
+
 
 # Pairs
 
@@ -293,7 +297,7 @@ that lambda calculus is much more powerful than primitive recursion.
     :=
         second (n step start) where
             start :=
-                zero, s)
+                (zero, s)
             step p :=
                 p (\ pred accu :=
                         (successor pred, f pred accu))
@@ -340,6 +344,16 @@ that lambda calculus is much more powerful than primitive recursion.
     (/) (a b: Natural): Natural :=
             -- 'q' is the result of 'a / b', if it is the smallest
             -- number below 'a' with the property 'a < (q + 1) * b'
+            -- In case 'b = 0', the algorithm returns 'a', because
+            -- the property is unsatisfiable.
         least-below
             a
             (\ q := a < successor q * b)
+
+
+    (|) (a b: Natural): Boolean :=
+            -- 'a' divides 'b' i.e. 'a | b' is valid, if 'a' is not zero
+            -- and b / a * a = b
+        not (isZero a)
+        and
+        equal (b / a * a) b
