@@ -1,6 +1,5 @@
-[Table of Contents](toc.md)
-
 <!--
+[Table of Contents](toc.md)
 
 - Definitions
 
@@ -425,7 +424,7 @@ false (x: A) (y: A): A  := y
 
 We use capital letters to express any type. Here the definitions tell us, that
 we can use the functions `true` and `false` on any two arguments provided that
-the have the same *type*. Both functions then return a value of exactly that
+they have the same *type*. Both functions then return a value of exactly that
 type.
 
 But what type do the terms `true` and `false` have? They have the type
@@ -492,7 +491,7 @@ language.
 ## Terminating and Non Terminating Computations
 
 Up to now all lambda terms we have used have *terminated* in the sense that we
-reached a state, where no more reducible expression is in the term.
+reached a state, where no more reducible expressions are in the term.
 
 Is this always the case? Unfortunately not. We see in the following how to
 construct potentially endless loops in lambda calculus.
@@ -552,7 +551,7 @@ M M
 
 I.e. the term `M M` is neither strongly nor weakly normalizing. It is diverging.
 
-The term `M M` is not useful at all. It is just a silly term to demonstrate on
+The term `M M` is not useful at all. It is just a silly term to demonstrate
 what can go wrong, because an infinite loop is certainly not desirable.
 
 But we can construct another term which is only potentially non terminating.
