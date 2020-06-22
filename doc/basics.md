@@ -59,7 +59,7 @@ term ::=    x               -- variable
         |   term term       -- application
 ```
 
-We read the term `\ x := e` aloud as _lambda x with body e_. The backslash
+We pronounce the term `\ x := e` _lambda x body e_. The backslash
 should remind us of the greek letter $\lambda$.
 
 The most interesting term is the function term.
@@ -88,7 +88,7 @@ occurrences of the variable `x` have been replaced by `a`. A reduction is the
 most elementary *computation step* in lambda calculus.
 
 
-We read the substitution `e[x:=a]` aloud as _e with a for x_.
+We pronounce the substitution `e[x:=a]` _e with a for x_.
 
 Example: Application of the identity function
 ```

@@ -1,0 +1,18 @@
+---
+
+title: Programming with Lambda Calculus
+
+author: Helmut Brandl
+
+keywords: [Lambda Calculus]
+
+
+abstract: |
+
+    An introduction into lambda calculus emphasizing the use of lambda calculus
+    as a programming language.
+
+
+bibliography: 'bibliography.bib'
+
+---
