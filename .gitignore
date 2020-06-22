@@ -6,6 +6,8 @@
 *.dvi
 *.out
 *.rel
+*.bbl
+*.blg
 *.pdf
 *~
 _region_*
