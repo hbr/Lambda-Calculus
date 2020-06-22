@@ -55,32 +55,42 @@ In lambda calculus everything is a function. A *lambda term* is either a
 variable, a function application or a function abstraction.
 ```
 term ::=    x               -- variable
+        |   \ x := term     -- function
         |   term term       -- application
-        |   \ x := term     -- function abstraction
 ```
 
+We read the term `\ x := e` aloud as _lambda x with body e_. The backslash
+should remind us of the greek letter $\lambda$.
 
-The most interesting term is the function abstraction.
+The most interesting term is the function term.
 ```
 \ x := term
-  ^    ^-- defining term (might contain variable x)
+  ^    ^-- body (might contain variable x)
   |
   \------  bound variable
 ```
 
-A term of the form `(\x := e) a` is called a reducible expression (short
-redex). As the name says, this expression can be reduced.
+The bound variable is meaningful only within the body. We can change the name of
+the bound variable arbitrarily as long as we change it consistently within the
+body.
+
+What can we do with a function? We can apply it to an argument and
+get `(\ x := e) a`.  This term is called a reducible expression (short
+redex). As the name says, this expression can be reduced or we can compute the
+result of the function applied to the argument.
 
 ```
 (\x := e) a ~> e[x:=a]
 ```
 
-where `~>` stands for *reduces to* and `e[x:=a]` is the expression `e` where all
+where `~>` reads _reduces to_ and `e[x:=a]` is the expression `e` where all
 occurrences of the variable `x` have been replaced by `a`. A reduction is the
 most elementary *computation step* in lambda calculus.
 
 
-Example: Identity function
+We read the substitution `e[x:=a]` aloud as _e with a for x_.
+
+Example: Application of the identity function
 ```
 (\x := x) a ~> x[x:=a] = a
 ```
@@ -144,7 +154,7 @@ x[x:=e]             =       e                   -- same variable
 
 y[x:=e]             =       y                   -- different variables
 
-(a b)[x:=e]         =       a[x:=e]  b[x:=e]    -- independent substition
+(a b)[x:=e]         =       a[x:=e]  b[x:=e]    -- independent substitution
 
 (\y := t)[x:=e]     =       \x := t[x:=e]       -- pull into abstraction
         -- y must not occur in e !!             -- hygiene condition
@@ -226,7 +236,7 @@ KI  :=  \ x y := y
 We have chosen the names `K` and `KI` to be inline with the literature on lambda
 calculus which uses the names *K combinator* and *KI combinator*.
 
-These two defintions give just names to the coresponding lambda terms. The
+These two definitions give just names to the coresponding lambda terms. The
 names are only for humans. The lambda calculus does not know of any names which
 we give to combinators. I.e. whenever we see `K` in a lambda term we always
 mean the term `\ x y := x`.
@@ -239,8 +249,13 @@ K x y := x
 KI x y := y
 ```
 
+and read it aloud as _K x y with body x_. We just replaced the backslash by a
+name. Therefore we call `\ x y := x` and anonymous or unnamed function and `K x
+y := x` a named function.
+
 But note that we always mean the same thing. `K x y := x` is the same as `K := \
 x y := x`. The first form just uses syntactic sugar.
+
 
 
 
