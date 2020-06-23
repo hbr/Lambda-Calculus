@@ -9,6 +9,7 @@
 *.bbl
 *.blg
 *.pdf
+*.html
 *~
 _region_*
 gh-pages/
