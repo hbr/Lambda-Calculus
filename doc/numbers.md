@@ -147,43 +147,125 @@ isOdd n :=
 
 ## Recursion
 
+Up to now all functions on church numerals have used iterations. This technique
+has its limits. Assume you want to write the predecessor function which returns
+zero for zero (since zero has no predecessor) and the actual predecessor for any
+other number. Trying iteration our function looks like
+```
+predecessor n :=
+    n (\ x := ?) zero
+```
+
+The start value is clear. According to the definition it has to be `zero`. But
+how to design the step function? The task of the step function is to map the
+predecessor of the predecessor into the predecessor of the current number. In
+nearly all cases adding one does the job. But it fails for the number one, since
+the predecesssor of `zero` is `zero` we would compute `one` as the predecessor
+of `one` which is wrong.
+
+Alonzo Church, the inventor of the lambda calculus had been puzzled to find a
+proper definition to encode the predecessor function. A difficult situation when
+you want to define a calculus where all computable functions can be encoded and
+the calculus fails on such a simple task as to compute the predecessor of a
+natural number.
+
+One of his phd students, the mathematician Stephen Kleene (pronounced Klay-nee)
+came up with a solution which not only let us encode the predecessor function,
+but also a lot of other complex functions.
+
+The problem with iteration: The step function has only access to the function
+result of the function called on the predecessor argument, but not to the value
+of the predecessor itself. The iteration *consumes* the numbers. This is clear
+if we look at the type signatures of the start value `s` and the iteration
+function `f`.
+
+```
+s: A
+
+f: A -> A
+```
+
+`s` has a value of some type `A` and the iteration function `f` maps step by
+step the value into its final result value. What we want is the following
+types:
+
+```
+s: A
+
+f: Natural -> A -> A
+```
+
+We want the step function `f` having access to the predecessor value and the
+predecessor result and compute a new result.
+
+We can reach this goal if we do the iteration with the pair `(predecessor value,
+predecessor result)` and finally extract the second component from the pair.
+
+For the predecessor function trying to compute the predecessor of a number n we
+would expect the following sequence of pairs
+
+```
+    (0, 0)
+    (1, 0)
+    (2, 1)
+    ....
+    (n, n-1)
+```
+or more generally
+```
+    (0, result for 0)
+    (1, result for 1)
+    (2, result for 2)
+    ....
+    (n, result for n)
+```
+where at the end we extract the second component from the pair.
 
 
+The following function does exactly that
 
 ```haskell
-nat-rec n f s :=
+nat-rec (n: Natural)
+        (f: Natural -> A -> A)
+        (s: A):
+        A
+:=
     second (n step start) where
         start :=
             (zero, start)
         step p :=
-            p (\ pred accu :=
-                    (pred + one, f pred accu))
+            p (\ pred res :=
+                    (pred + one, f pred res))
 ```
+Note how the `step` function has two components. The first component just
+increments the iteration counter and the second component uses the function `f`
+to compute from the iteration counter and the result of the previous iteration
+the result of the current iteration.
 
-
+Having such a generic recursor, the encoding of the predecessor function is just
+a piece of cake.
 ```
 predecessor n :=
     nat-rec n (\ pred _ := pred) zero
 
 ```
 
-
+Based on `predecessor` we can encode the predicate `isOne`
 ```
 isOne n :=
     isZero (predecessor n)
 ```
-
-
+and the difference between two natural numbers
 ```
 (-) n m :=
     m predeccessor n
 ```
 
+
+Coding of comparison functions is now easy.
 ```
 (<=) n m :=
     isZero (n - m)
-    and
-    isZero (m - n)
 ```
 
 
@@ -198,11 +280,22 @@ equal n m :=
 ```
 
 
+Even the factorial function computing $1\times 2\times 3\times ...\times n$ is
+now possible which uses the recursive definition
+$$
+\begin{array}{lll}
+0! &=& 1
+\\
+n! &=& n * (n-1)! \quad\text{for } 0 < n
+\end{array}
+$$
+
 ```
 factorial n :=
     nat-rec
         n
         (\ pred res := (pred + one) * res)
+        one
 ```
 
 
