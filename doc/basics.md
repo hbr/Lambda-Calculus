@@ -249,7 +249,7 @@ K x y := x
 KI x y := y
 ```
 
-and read it aloud as _K x y with body x_. We just replaced the backslash by a
+which we pronounce _K x y with body x_. We just replaced the backslash by a
 name. Therefore we call `\ x y := x` and anonymous or unnamed function and `K x
 y := x` a named function.
 

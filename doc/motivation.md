@@ -1,11 +1,11 @@
-# Motivation
+# Motivation{#sec:motivation}
 
 Lambda calculus is a fascinating topic for the following reasons.
 
 1. It is simple. It just consists of variables, functions and function
    applications.
 
-2. Despite of its simplicity it is possible to express any computable function
+2. Despite of being simple it is possible to express any computable function
    in the calculus.
 
    This is the reason why Alonzo Church [-@church1936] invented the lambda
