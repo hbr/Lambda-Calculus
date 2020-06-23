@@ -22,3 +22,18 @@ Lambda calculus is a fascinating topic for the following reasons.
 4. We can learn a lot about computation. In lambda calculus we can express
    iteration, recursion, arbitrary data structures by using only variables,
    functions and function applications.
+
+
+In the following I do not expect any prior knowledge. The reader should have
+some experience with programming.
+
+All concepts are introduced step by step.
+
+Many texts on lambda calculus use a lot of math. The goal usually is not to do
+programming in lambda calculus, only to demonstrate its computational power.
+
+In this text we use lambda calculus as a programming language. We build first
+simple functions and step by step compose the simple functions to more complex
+functions. At the end, the same goal is achieved: Demonstrate the expressive
+power of lambda calculus. But I hope that leaving out too complicated math makes
+the topic more accessible.
