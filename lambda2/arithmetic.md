@@ -1,4 +1,4 @@
-# Numbers
+# Arithmetic
 
 ## Church Numerals
 
@@ -302,6 +302,10 @@ factorial n :=
 
 
 
+
+
+
+
 ## Bounded Search, Division and Prime Numbers
 
 
@@ -382,4 +386,63 @@ prime-exponent i n :=
             not (divides
                     ((nth-prime i) ^ (x + one))
                     n))
+```
+
+
+
+
+## Unbounded Search
+
+```
+U x y := y (x x y)
+
+
+U U f   ~>  f (U U f)
+
+
+U U f a ~>  f (U U f) a
+              \-----/
+                 |
+              continuation
+
+```
+
+
+
+```
+                 /   i,              if p i
+                |
+step k i    ~>  |
+                |
+                 \   k (i + 1),      if not (p i)
+```
+
+
+```
+step k i :=
+    p i i (k (i plus one))
+```
+
+
+```
+U U step i
+
+~>  step (U U step) i
+
+    ~>  i                       -- if p i
+
+    ~>  (U U step) (i + one)    -- if not (p i)
+```
+
+
+
+```haskell
+search-least (p: Natural -> Boolean): Natural :=
+    U U step zero where
+        U x y :=
+            y (x x y)
+        step k i :=
+                -- invariant: all numbers below `i` do not
+                -- satisfy `p i`.
+            p i i (k (i plus one)
 ```

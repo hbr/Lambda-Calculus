@@ -35,5 +35,5 @@ programming in lambda calculus, only to demonstrate its computational power.
 In this text we use lambda calculus as a programming language. We build first
 simple functions and step by step compose the simple functions to more complex
 functions. At the end, the same goal is achieved: Demonstrate the expressive
-power of lambda calculus. But I hope that leaving out too complicated math makes
+power of lambda calculus. But I hope that leaving out math notation makes
 the topic more accessible.

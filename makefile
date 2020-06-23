@@ -11,10 +11,10 @@ lambda1-bibtex:
 
 lambda2:
 	pandoc -s -o lambda.pdf \
-		doc/motivation.md \
-		doc/basics.md  \
-		doc/numbers.md \
-		--metadata-file doc/meta.yaml \
+		lambda2/motivation.md \
+		lambda2/basics.md  \
+		lambda2/arithmetic.md \
+		--metadata-file lambda2/meta.yaml \
 		--filter=pandoc-crossref \
 		--filter=pandoc-citeproc
 
@@ -22,19 +22,19 @@ lambda2-html:
 	pandoc -s --toc --webtex \
 		--toc-depth=2    \
 		-o lambda.html   \
-		doc/style.css    \
-		doc/motivation.md \
-		doc/basics.md  \
-		doc/numbers.md \
-		--metadata-file doc/meta.yaml \
+		lambda2/style.css    \
+		lambda2/motivation.md \
+		lambda2/basics.md  \
+		lambda2/arithmetic.md \
+		--metadata-file lambda2/meta.yaml \
 		--filter=pandoc-crossref \
 		--filter=pandoc-citeproc
 
 lambda2-tex:
 	pandoc -s -o lambda.tex \
-		doc/motivation.md \
-		doc/basics.md  \
-		doc/numbers.md \
-		--metadata-file doc/meta.yaml \
+		lambda2/motivation.md \
+		lambda2/basics.md  \
+		lambda2/arithmetic.md \
+		--metadata-file lambda2/meta.yaml \
 		--filter=pandoc-crossref \
 		--filter=pandoc-citeproc
