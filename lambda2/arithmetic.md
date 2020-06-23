@@ -306,16 +306,55 @@ factorial n :=
 
 
 
-## Bounded Search, Division and Prime Numbers
+## Searching with Predicates
 
+
+
+### Bounded Search
+
+
+It is a standard task to find a number `i` which satisfies a certain predicate
+`p`. We want to write a function which finds the smallest number below a certain
+bound which satisfies the predicate. In case that no number below the bound
+satisfies the number, the function should return the bound.
+
+The result cannot be computed by simple iteration, we need the recursor
+`nat-rec`. The recursor gives to the step function always the iteration counter
+`pred` of the previous step and the result `res` of the previous step.
+
+We want the recursor to maintain the invariant that all numbers below the
+previous result do not satisfy the predicate i.e. to maintain
+
+    for all i: i < res => not (p i)
+
+It is easy to find a start value for `res` which satisfies the invariant. Just
+use `zero`, because there is no number below 0 and therefore all numbers below 0
+do not satisfy `p`.
+
+As long as `res` does not satify `p`, we increment `res` by one.
+
+As soon as we encounter the first value of `res` which satisfies `p res` we have
+encountered the smallest number and therefore we do not change the value of
+`res` anymore.
+
+With this preparation, it is easy to write the function `least-below` and
+convince ourself that the implementation is correct.
 
 ```haskell
 least-below (n: Natural) (p: Natural -> Boolean): Natural :=
         -- Least number 'i' below 'n' satisfying 'p i'
         -- or 'n' if there is no such number.
     nat-rec n f zero where
-        f pred res := p res res (res + one)
+        f pred res :=
+                -- maintain the invariant: all numbers below
+                -- 'res' do not satisfy 'p'.
+            p res res (res + one)
 ```
+
+If we find a number below the bound which satisfies a certain predicate, we know
+that at least one number below the bound exists, which satisfies the predicate.
+The existential bounded quantifier can be implemented by looking at the result of
+`least-below` and comparing it with the bound.
 
 ```haskell
 exist-below (n: Natural) (p: Natural -> Boolean): Boolean :=
@@ -323,6 +362,10 @@ exist-below (n: Natural) (p: Natural -> Boolean): Boolean :=
     least-below n p < n
 ```
 
+
+If there exists no number below a bound which does not satisfy a certain
+predicate, than all numbers below the bound satisfy the predicate. Therefore
+implementation of the universal bounded quantifier is easy as well.
 
 ```haskell
 all-below (n: Natural) (p: Natural -> Boolean): Boolean :=
@@ -334,6 +377,45 @@ all-below (n: Natural) (p: Natural -> Boolean): Boolean :=
 ```
 
 
+### Division
+
+With these helper functions based on predicates we can implement division
+functions and functions computing prime numbers.
+
+
+The value of `a` divided by `b` i.e. `a / b` is the unique solution `x` of the
+inequalities
+
+    b * x <= a
+
+    a < b * (x + 1)
+
+Division by zero is undefined. In the case `b = 0` the second inequality is
+cannot be satisfied. In that case we want the expression `a / b` to return `a`
+in order to have a total function.
+
+We can use `least-below` with upper bound `a` to find the smallest number `x`
+which satisfies the second inequality. In case that no such numbers exist, we
+get as expected the upper bound `a`. But are we sure that the first inequality
+is satisfied?
+
+From the reasoning above we know, that the function `least-below` maintains the
+invariant for all numbers strictly below `x`
+
+    not (a < b * (x + 1))
+
+which is equivalent to
+
+    b * (x + 1) <= a
+
+which in turn implies
+
+    b * x <= a
+
+Therefore the first inequality is maintained by the function `least-below`.
+
+I.e. the following implementation is correct.
+
 ```
 (/) a b :=
     least-below
@@ -342,30 +424,73 @@ all-below (n: Natural) (p: Natural -> Boolean): Boolean :=
             a < b * (x + one))
 ```
 
+
+The function `divides a b` shall decide, if `a` divides `b` exactly i.e. if
+there exist a solution `x` satisfying
+
+    x * a = b
+
+The number `b / a` is a good candidate for the solution `x`, because according
+to its definition it satisfies
+
+    b / a * a <= b
+
+So we just compute `b / a * a` and compare it with `b`.
+
 ```
 divides a b :=
-    not (isZero a)
-    and
     equal (b / a * a) b
 ```
 
+
+
+
+
+
+### Prime Numbers
+
+Prime numbers are very important in number theory and cryptography. In this
+section we show the implementation of some important prime number functions.
+
+A prime number is a natural number greater than 1 which which is only divisible
+by 1 and itself.
+
+If we reformulate the definition a little bit, we can implement it and get a
+prime number tester in lambda calculus.
+
 ```
 isPrime n :=
-    not (isZero n) and not (isOne n)
+    one < n
     and
     all-below
         n
         (\ x :=
-            isZero x or isOne x or
+            x <= one
+            or
             not (divides x n))
 ```
 
-If $z$ is a prime number then there is another prime number between $z+1$ and
-$z! + 1$.
-$$
-    p_0 p_1 \ldots p_i + 1
-$$
 
+If we want to compute the `n`th prime number, we have to think a little bit.
+
+We know that `two` is the first prime number.
+
+If we have the `i`th prime number `pi`, we get the next prime number by finding
+the smallest number `x` strictly above `pi` which satisfies `isPrime x`. In
+order to use the function `least-below` we need an upper bound for the search.
+
+Let's find an upper bound for the next prime number above `pi`. We form the
+product `z = p0 * p1 * ... * pi` of all prime numbers below `pi` including `pi`.
+Certainly none of these prime numbers divides `z + 1` because each division
+leaves the remainder 1. Therefore `z + 1` is either a prime number or there
+exists a prime number different from the prime numbers in the product dividing
+`z + 1`. Therefore `z + 2` is a strict upper bound for the next prime number.
+
+Next we observe that `z <= factorial pi` is valid, because the factorial is the
+product of more numbers than `z`. Therefore `factorial pi + 2` is a strict upper
+bound for the next prime number above `pi`.
+
+Now the implementation is straightforward.
 ```haskell
 nth-prime n :=
     n f two where
@@ -376,6 +501,39 @@ nth-prime n :=
                 (\ x := p_i < x and isPrime x)
 ```
 
+>   Note that the above reasoning to find an upper bound for the next prime
+>   number is the reasoning which has been used by Euclid to
+>   prove that there are infinitely many prime numbers.
+
+
+
+From number theory we know that every natural number above zero has a unique
+prime number factorisation. I.e. each positive number `n` can be written as the
+infinite product
+
+    n = p0 ^ e0 * p1 ^ e1 * p2 ^ e2 * ...
+
+where `pi` is the `i`th prime number and `ei` is the corresponding exponent. For
+`n = 1` all exponents are 0.
+
+We want to have a function which computes for all numbers `n` the exponent `ei`
+of the `i`th prime number.
+
+For each pair `(pi,ei)`
+
+    divides (pi ^ k) n
+
+is valid for all `k <= ei` and
+
+    divides (pi ^ (ei + 1)) n
+
+is invalid.
+
+Therefore we can find the exponent by a search for the least number which does
+not satisfy the last inequality.
+
+The upper bound for the search is easy to find. Since all prime numbers are
+greater than 1, all exponents are lower than `n`.
 
 ```haskell
 prime-exponent i n :=
