@@ -1,4 +1,12 @@
-.PHONY: lambda2 lambda2-tex
+.PHONY: lambda1 lambda1-bibtex \
+	lambda2 lambda2-tex
+
+
+lambda1: lambda1-bibtex
+	cd lambda1; pdflatex main_untyped_lambda.tex
+
+lambda1-bibtex:
+	cd lambda1; bibtex main_untyped_lambda
 
 
 lambda2:
