@@ -37,11 +37,13 @@ numerals.
 one := successor zero
 
 two := successor one
+
+...
 ```
 
 
 
-Let's check, if the definition really behaves expected.
+Let's check, if the definition really behaves as expected.
 
 ```haskell
 one
@@ -163,13 +165,13 @@ nearly all cases adding one does the job. But it fails for the number one, since
 the predecesssor of `zero` is `zero` we would compute `one` as the predecessor
 of `one` which is wrong.
 
-Alonzo Church, the inventor of the lambda calculus had been puzzled to find a
-proper definition to encode the predecessor function. A difficult situation when
+Alonzo Church, the inventor of the lambda calculus, had been puzzled to find a
+proper definition of the predecessor function. A difficult situation when
 you want to define a calculus where all computable functions can be encoded and
 the calculus fails on such a simple task as to compute the predecessor of a
 natural number.
 
-One of his phd students, the mathematician Stephen Kleene (pronounced Klay-nee)
+One of his phd students, the mathematician Stephen Kleene (pronounced Klay-nee),
 came up with a solution which not only let us encode the predecessor function,
 but also a lot of other complex functions.
 
