@@ -364,7 +364,7 @@ exist-below (n: Natural) (p: Natural -> Boolean): Boolean :=
 
 
 If there exists no number below a bound which does not satisfy a certain
-predicate, than all numbers below the bound satisfy the predicate. Therefore
+predicate, then all numbers below the bound satisfy the predicate. Therefore
 implementation of the universal bounded quantifier is easy as well.
 
 ```haskell
@@ -452,7 +452,7 @@ divides a b :=
 Prime numbers are very important in number theory and cryptography. In this
 section we show the implementation of some important prime number functions.
 
-A prime number is a natural number greater than 1 which which is only divisible
+A prime number is a natural number greater than 1 which is only divisible
 by 1 and itself.
 
 If we reformulate the definition a little bit, we can implement it and get a
@@ -546,61 +546,148 @@ prime-exponent i n :=
                     n))
 ```
 
+The prime factorization for the number 0 is not defined. However the function
+`prime-exponent i zero` returns `zero`. This is no problem. We have just
+assigned an arbitrary result to the function for arguments, where it is
+mathematically undefined. For all other arguments the function returns the
+correct exponent.
+
+
+
+
+
 
 
 
 ## Unbounded Search
 
+
+If we have a predicate `p: Natural -> Boolean` and know that there exists a
+number which satifies the predicate, then we can find the least number by an
+unbounded search. In traditional programming languages we would use a while-loop
+which has continuation condition `not (p i)` and which increments in the body of
+the loop the number by one.
+
+
+In lambda calculus we don't have while loops. Therefore we have to find a way to
+do the search with functions.
+
+We would like to write the function in the following form
+
+```haskell
+search-least (p: Natural -> Boolean): Natural :=
+    iterate step zero where
+        step := ?
+        iterate := ?
 ```
-U x y := y (x x y)
+which iterates a step function as long as needed starting with `zero` and
+maintaining the invariant, that all numbers below the current number do not
+satisfy the predicate.
 
 
-U U f   ~>  f (U U f)
-
-
-U U f a ~>  f (U U f) a
-              \-----/
-                 |
-              continuation
-
+The function `step` needs as an argument the current number to check. We could
+try the following.
+```
+step i :=
+    p i i ?
 ```
 
+If the term `p i` returns true, then `p i i ?` returns the value `i` which
+satisfies the predicate. But we don't know, what to return in case that `i` does
+not satisfy the predicate. If we had recursive functions in lambda calculus
+we would just replace the question mark with `step (i + one)`. Unfortunately
+this is not a valid lambda term.
 
-
-```
-                 /   i,              if p i
-                |
-step k i    ~>  |
-                |
-                 \   k (i + 1),      if not (p i)
-```
-
+But we can give the step function another argument, which is a continuation
+(traditionally called `k`) knowing how to do the rest of the computation.
 
 ```
 step k i :=
-    p i i (k (i plus one))
+    p i i (k (i + one))
 ```
 
+Now the rest of the difficulty remains on the unkwnown term `iterate`. We just
+know that this term has to do some kind of *self replication* to implement the
+loop. In the chapter *Basics of Lambda Caluculus* we have already encountered a
+combinator `U` which does some kind of replication.
 
 ```
-U U step i
-
-~>  step (U U step) i
-
-    ~>  i                       -- if p i
-
-    ~>  (U U step) (i + one)    -- if not (p i)
+U x y := y (x x y)
 ```
 
+The combinator `U` expects two arguments and returns a term which contains both
+arguments twice. It is interesting to see what happes, if we evaluate `U U
+step`. We get
 
+```
+U U step    ~>  step (U U step)
+```
+
+I.e. `U U step` calls `step` with itself as first argument. Let's try `U U` at
+the position of `iterator`. We get
+```
+U U step zero   ~>  step (U U step) zero
+```
+
+In case that `p zero` is `true`, the function returns `zero` which is the correct
+result.
+
+In case that `p zero` evaluates to `false`, the function returns `U U step one`
+which we can evaluate again
+```
+U U step one    ~>  step (U U step) one
+```
+
+We see, that we have implemented the iteration which stops, as soon as a number
+is encountered which satisfies the predicate. The complete function reads
 
 ```haskell
 search-least (p: Natural -> Boolean): Natural :=
     U U step zero where
-        U x y :=
-            y (x x y)
         step k i :=
                 -- invariant: all numbers below `i` do not
                 -- satisfy `p i`.
             p i i (k (i plus one)
+        U x y :=
+            y (x x y)
 ```
+
+It might be necessary to read this section twice or more to understand the
+tricky mechanism to implement the unbounded search. But it is possible.
+
+However I admire the genious, who invented it. I would have never found such a
+cleverly constructed lambda term by myself.
+
+Some remarks:
+
++ All functions constructed before this section on unbounded search are strongly
+  normalizing (provided that their arguments are of the proper kind). The
+  function `search-least` is only weakly normalizing (provided that a number
+  exists which satisfies the predicate, otherwise it is diverging).
+
+  I.e. there are only some reduction sequences, which terminate with the desired
+  result. But there are other reductions sequences which are infinite. The
+  subterm `U U step` has an infinite reduction sequence, because it reduces to
+  `step (U U step)` which contains itself as a subterm.
+
+  However there are reduction strategies, which find for all weakly normalizing
+  terms a reduction path which terminates.
+
++ As long as you remain in constructive mathematics, you don't need unbounded
+  search. Unbounded search needs a guarantee, that a number satisfying the
+  predicate exists. In constructive mathematics an existence proof requires a
+  construction of an object which satisfies the condition. But if you have a
+  construction of such an object, you can use it as an upper bound and use
+  `least-below` to find the smallest number satisfying the predicate.
+
+
++ They availability of unbounded search makes lambda calculus as expressive as
+  general recursive functions. The class of general recursive functions consists
+  of the constant zero, the successor function, all projections (`K` and `KI`
+  cover the special case with two arguments, but the generalization to more
+  argumentes is obvious) and are closed under primitive recursion (`nat-rec`)
+  and minimization (*unbounded search*).
+
+  There are some definitions of computable functions. Fortunately it can be
+  proved that they are all equivalent i.e. they define the same class of
+  functions.
