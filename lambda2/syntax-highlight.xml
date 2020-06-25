@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<language
+    name="alba"
+    version="1"
+    kateversion="2.4"
+    section="Sources"
+    extensions="*.ali;*.al">
+
+    <highlighting>
+
+      <list name="alba-keywords">
+        <item>class</item>
+        <item>where</item>
+      </list>
+
+      <contexts>
+        <context
+            attribute="Normal Text"
+            lineEndContext="#pop"
+            name="Normal Text">
+
+            <Detect2Chars
+                attribute="Comment"
+                context="comments"
+                char="{" char1="-" />
+
+            <Detect2Chars
+                attribute="Comment"
+                context="comment"
+                char="-" char1="-" />
+
+            <StringDetect
+                attribute="Comment"
+                context="documentation"
+                String="{-|" />
+                <keyword
+                    attribute="Keyword"
+                    context="#stay"
+                    String="alba-keywords" />
+        </context>
+
+        <context attribute="String" lineEndContext="#stay" name="string" >
+          <DetectChar attribute="String" context="#pop" char="&quot;" />
+        </context>
+      </contexts>
+
+      <itemDatas>
+        <itemData name="Normal Text" defStyleNum="dsNormal" />
+        <itemData name="Keyword" defStyleNum="dsKeyword" />
+        <itemData name="String" defStyleNum="dsString" />
+      </itemDatas>
+
+    </highlighting>
+
+
+    <general>
+      <comments>
+        <comment name="singleLine" start="--"/>
+        <comment name="multiLine" start="{-" end="-}" />
+      </comments>
+
+      <keywords casesensitive="1"/>
+
+      <folding indentationsensitive="1"/>
+    </general>
+</language>
