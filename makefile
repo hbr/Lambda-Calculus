@@ -15,7 +15,6 @@ lambda2:
 		lambda2/basics.md  \
 		lambda2/arithmetic.md \
 		lambda2/datatype.md \
-		lambda2/references.md \
 		--metadata-file lambda2/meta.yaml \
 		--filter=pandoc-crossref \
 		--filter=pandoc-citeproc
@@ -29,7 +28,6 @@ lambda2-html:
 		lambda2/basics.md  \
 		lambda2/arithmetic.md \
 		lambda2/datatype.md \
-		lambda2/references.md \
 		--metadata-file lambda2/meta.yaml \
 		--filter=pandoc-crossref \
 		--filter=pandoc-citeproc
@@ -40,7 +38,6 @@ lambda2-tex:
 		lambda2/basics.md  \
 		lambda2/arithmetic.md \
 		lambda2/datatype.md \
-		lambda2/references.md \
 		--metadata-file lambda2/meta.yaml \
 		--filter=pandoc-crossref \
 		--filter=pandoc-citeproc
