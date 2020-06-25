@@ -37,3 +37,10 @@ simple functions and step by step compose the simple functions to more complex
 functions. At the end, the same goal is achieved: Demonstrate the expressive
 power of lambda calculus. But I hope that leaving out math notation makes
 the topic more accessible.
+
+
+### Comments, Questions, Remarks, Discussion
+
+Feel free to post any question, comment, remark or discusion as a
+github issue on
+[https://github.com/hbr/Lambda-Calculus/issues](https://github.com/hbr/Lambda-Calculus/issues)

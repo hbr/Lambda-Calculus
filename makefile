@@ -41,3 +41,10 @@ lambda2-tex:
 		--metadata-file lambda2/meta.yaml \
 		--filter=pandoc-crossref \
 		--filter=pandoc-citeproc
+
+gh-pages: lambda1 lambda2 lambda2-html
+	cp	index.html \
+		lambda.html \
+		lambda.pdf \
+		untyped_lambda.pdf \
+		gh-pages/
