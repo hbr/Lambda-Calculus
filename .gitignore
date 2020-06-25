@@ -10,6 +10,7 @@
 *.blg
 *.pdf
 *.html
+!index.html
 *~
 _region_*
 gh-pages/
