@@ -77,7 +77,7 @@ associated with it.
 ```
 
 The numbers are just a silly example for an arbitrary generator set. Usually the
-set of generators are finite.
+set of generators is finite.
 
 But anyhow. The possible expressions don't have any intrinsic meaning. Speaking
 in terms of abstract algebra we have defined a *signature*.  A *signature* is a
@@ -88,7 +88,7 @@ The signature just defines a collection of wellformed expressions in that
 algebra.
 
 
-In order to give a meaining (i.e. a semantic) to the expressions, we have to
+In order to give a meaning (i.e. semantics) to the expressions, we have to
 define a function which *evaluates* the expression to a value of some type `R`
 (standing for the result type).
 
@@ -443,10 +443,16 @@ to-list (tree: Tree A): List A :=
 ```
 
 
+**Exercise**: Define a binary tree in lambda calculus where all information is
+stored in the nodes and the leaves are empty. Implement the
+functions `count-nodes`, `flip` and `to-list` for this kind of tree.
+
+
+
 I hope that by looking at these examples it should be easy to represent any data
 type which can be represented in a functional language.
 
-This ends this short introduction into programming with lambda calculus. I hope
+This ends this introduction into programming with lambda calculus. I hope
 you enjoyed it.
 
 

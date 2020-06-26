@@ -3,7 +3,9 @@
 
 
 lambda1: lambda1-bibtex
-	cd lambda1; pdflatex main_untyped_lambda.tex
+	cd lambda1; \
+	(pdflatex main_untyped_lambda.tex; \
+	cp main_untyped_lambda.pdf ../untyped_lambda.pdf)
 
 lambda1-bibtex:
 	cd lambda1; bibtex main_untyped_lambda
