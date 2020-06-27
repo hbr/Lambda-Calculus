@@ -296,10 +296,21 @@ $$
 factorial n :=
     nat-rec
         n
-        (\ pred res := (pred + one) * res)
+        (\ pred res := res * (pred + one))
         one
 ```
 
+It might not be immediately obvious, that `factorial` really does the right
+thing. In order to be sure, the following table shows the computation steps for
+different arguments.
+
+ argument       computation
+----------      -------------
+    0           1
+    1           1 * 1
+    2           1 * 1 * 2
+    3           1 * 1 * 2 * 3
+----------      -------------
 
 
 
