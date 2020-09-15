@@ -458,10 +458,10 @@ $z!'$. We can use this fact to define $\Pr$ recursively.
 $$
 \Pr :=
 \begin{cases}
-  \Pr c_0    &:= c2 \\
+  \Pr c_0    &:= c_2 \\
   \Pr c_{n'} &:=
   \big(\lambda z.\,
-  \mu^{\succ z!}(\lambda y.\, \Pr y \land z < y)\big)
+  \mu^{\succ\ z!}(\lambda y.\, \Pr y \land z < y)\big)
   (\Pr c_n)
 \end{cases}
 $$
