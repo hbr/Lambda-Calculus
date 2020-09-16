@@ -252,12 +252,7 @@ predecessor n :=
 
 ```
 
-Based on `predecessor` we can encode the predicate `isOne`
-```
-isOne n :=
-    isZero (predecessor n)
-```
-and the difference between two natural numbers
+Based on `predecessor` we can encode the difference between two natural numbers
 ```
 (-) n m :=
     m predeccessor n

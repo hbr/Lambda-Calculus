@@ -10,43 +10,13 @@ lambda1: lambda1-bibtex
 lambda1-bibtex:
 	cd lambda1; bibtex main_untyped_lambda
 
-
 lambda2:
-	pandoc -s -o lambda.pdf \
-		lambda2/motivation.md \
-		lambda2/basics.md  \
-		lambda2/arithmetic.md \
-		lambda2/datatype.md \
-		--metadata-file lambda2/meta.yaml \
-		--filter=pandoc-crossref \
-		--filter=pandoc-citeproc
+	make -C lambda2 lambda.html; \
+	make -C lambda2 lambda.pdf
 
-lambda2-html:
-	pandoc -s --toc --webtex \
-		--toc-depth=2    \
-		-o lambda.html   \
-		lambda2/style.css    \
-		lambda2/motivation.md \
-		lambda2/basics.md  \
-		lambda2/arithmetic.md \
-		lambda2/datatype.md \
-		--metadata-file lambda2/meta.yaml \
-		--filter=pandoc-crossref \
-		--filter=pandoc-citeproc
-
-lambda2-tex:
-	pandoc -s -o lambda.tex \
-		lambda2/motivation.md \
-		lambda2/basics.md  \
-		lambda2/arithmetic.md \
-		lambda2/datatype.md \
-		--metadata-file lambda2/meta.yaml \
-		--filter=pandoc-crossref \
-		--filter=pandoc-citeproc
-
-gh-pages: lambda1 lambda2 lambda2-html
+gh-pages: lambda1 lambda2
 	cp	index.html \
-		lambda.html \
-		lambda.pdf \
-		untyped_lambda.pdf \
+		lambda2/lambda.html \
+		lambda2/lambda.pdf  \
+		untyped_lambda.pdf  \
 		gh-pages/

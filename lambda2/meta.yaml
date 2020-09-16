@@ -13,7 +13,7 @@ abstract: |
     as a programming language.
 
 
-bibliography: 'bibliography.bib'
+bibliography: '../bibliography.bib'
 
 reference-section-title: References
 

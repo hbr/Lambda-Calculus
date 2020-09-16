@@ -1,14 +1,14 @@
 # Data Types
 
-Data types are an important means to structure computations. We thing in data
+Data types are an important means to structure computations. We think of data
 types like `Boolean`, `Natural`, `List`, `Tree`, etc. In the previous chapters
-we manage to repesent the types `Boolean` and `Natural` in lambda calculus.
+represented the types `Boolean` and `Natural` in lambda calculus.
 
 Since lambda calculus has only functions, we have to represent objects of a
 certain type as functions. We represented the type `Boolean` as a function
 taking two arguments and returning one of the them depending on its boolean
 value. We represented natural numbers as functions taking two arguments. The
-first argument is a function and the second a start value. The natural number
+first argument is a function and the second a start value. A natural number
 iterates the function `n` times on the start value.
 
 It is possible to define any datatype in lambda calculus. In textbooks on lambda
@@ -313,7 +313,7 @@ define a list recursor which internally not only has access to the result of the
 previous iteration, but also to the previous lists. I.e. the folding function
 has the type `A -> List A -> R -> R`.
 
-Internally the recursor uses a pairs `(tail list, previous result)` starting
+Internally the recursor uses pairs `(tail list, previous result)` starting
 with `(nil, s)` and throwing away the tail list at the end of the iteration.
 
 ```haskell

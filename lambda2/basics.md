@@ -156,7 +156,7 @@ y[x:=e]             =       y                   -- different variables
 
 (a b)[x:=e]         =       a[x:=e]  b[x:=e]    -- independent substitution
 
-(\y := t)[x:=e]     =       \x := t[x:=e]       -- pull into abstraction
+(\y := t)[x:=e]     =       \y := t[x:=e]       -- pull into abstraction
         -- y must not occur in e !!             -- hygiene condition
 
 ```
