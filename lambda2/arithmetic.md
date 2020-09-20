@@ -197,11 +197,12 @@ s: A
 f: Natural -> A -> A
 ```
 
-We want the step function `f` having access to the predecessor value and the
-predecessor result and compute a new result.
+We want the step function `f` having access to an iteration counter and the
+result of the overall function for this iteration counter. The function `f` then
+computes the result of the next iteration.
 
-We can reach this goal if we do the iteration with the pair `(predecessor value,
-predecessor result)` and finally extract the second component from the pair.
+We can reach this goal if we do the iteration with the pair `(iteration
+counter, result) and finally extract the second component of the pair.
 
 For the predecessor function trying to compute the predecessor of a number n we
 would expect the following sequence of pairs
@@ -215,13 +216,13 @@ would expect the following sequence of pairs
 ```
 or more generally
 ```
-    (0, result for 0)
-    (1, result for 1)
-    (2, result for 2)
+    (0, result for iteration 0)
+    (1, result for iteration 1)
+    (2, result for iteration 2)
     ....
-    (n, result for n)
+    (n, result for iteration n)
 ```
-where at the end we extract the second component from the pair.
+where at the end we extract the second component of the pair.
 
 
 The following function does exactly that
@@ -232,12 +233,10 @@ nat-rec (n: Natural)
         (s: A):
         A
 :=
-    second (n step start) where
-        start :=
-            (zero, start)
+    second (n step (zero, s)) where
         step p :=
-            p (\ pred res :=
-                    (pred + one, f pred res))
+            p (\ i res :=
+                    (i + one, f i res))
 ```
 Note how the `step` function has two components. The first component just
 increments the iteration counter and the second component uses the function `f`
@@ -248,11 +247,18 @@ Having such a generic recursor, the encoding of the predecessor function is just
 a piece of cake.
 ```
 predecessor n :=
-    nat-rec n (\ pred _ := pred) zero
+    nat-rec n (\ i _ := i) zero
 
 ```
+`predezessor zero` is `zero` because of the start value `zero`. `predecessor
+one` is `zero` because the iteration counter is `zero`. `predecessor n`
+receives at the last iteration the iteration counter `n - 1` which is exactly
+the required result. The iteration function `f` just used the iteration counter
+to compute the next result and ignores the result of the previous iteration.
 
-Based on `predecessor` we can encode the difference between two natural numbers
+
+Based on the function `predecessor` we can encode the difference between two
+natural numbers
 ```
 (-) n m :=
     m predeccessor n
@@ -291,11 +297,11 @@ $$
 factorial n :=
     nat-rec
         n
-        (\ pred res := res * (pred + one))
+        (\ i res := res * (i + one))
         one
 ```
 
-It might not be immediately obvious, that `factorial` really does the right
+It might not be immediately obvious that `factorial` really does the right
 thing. In order to be sure, the following table shows the computation steps for
 different arguments.
 
@@ -326,18 +332,18 @@ satisfies the number, the function should return the bound.
 
 The result cannot be computed by simple iteration, we need the recursor
 `nat-rec`. The recursor gives to the step function always the iteration counter
-`pred` of the previous step and the result `res` of the previous step.
+`i` of the previous step and the result `res` of the previous step.
 
 We want the recursor to maintain the invariant that all numbers below the
 previous result do not satisfy the predicate i.e. to maintain
 
-    for all i: i < res => not (p i)
+    for all j: j < res => not (p j)
 
 It is easy to find a start value for `res` which satisfies the invariant. Just
 use `zero`, because there is no number below 0 and therefore all numbers below 0
 do not satisfy `p`.
 
-As long as `res` does not satify `p`, we increment `res` by one.
+As long as `res` does not satisfy `p`, we increment `res` by one.
 
 As soon as we encounter the first value of `res` which satisfies `p res` we have
 encountered the smallest number and therefore we do not change the value of
@@ -350,17 +356,22 @@ convince ourself that the implementation is correct.
 least-below (n: Natural) (p: Natural -> Boolean): Natural :=
         -- Least number 'i' below 'n' satisfying 'p i'
         -- or 'n' if there is no such number.
-    nat-rec n f zero where
-        f pred res :=
-                -- maintain the invariant: all numbers below
-                -- 'res' do not satisfy 'p'.
-            p res res (res + one)
+    n (\ res := p res res (res + one)) zero
+        -- maintain the invariant: all numbers below
+        -- 'res' do not satisfy 'p'.
 ```
+The expression `p res` checks if `res` satisfies the predicate. If the answer is
+`true`, then the value `res` is kept for the next iteration. If the answer is
+`false`, then the value of `res` is incremented. If no number below `n`
+satisfies the predicate `p`, then the value `zero` is incremented `n` times,
+i.e. `n` is returned as the final result.
+
+Next we want to implement an existential quantifier with an upper bound.
 
 If we find a number below the bound which satisfies a certain predicate, we know
 that at least one number below the bound exists, which satisfies the predicate.
-The existential bounded quantifier can be implemented by looking at the result of
-`least-below` and comparing it with the bound.
+The existential quantifier with an upper bound can be implemented by looking at
+the result of `least-below` and comparing it with the bound.
 
 ```haskell
 exist-below (n: Natural) (p: Natural -> Boolean): Boolean :=
@@ -371,7 +382,7 @@ exist-below (n: Natural) (p: Natural -> Boolean): Boolean :=
 
 If there exists no number below a bound which does not satisfy a certain
 predicate, then all numbers below the bound satisfy the predicate. Therefore
-implementation of the universal bounded quantifier is easy as well.
+implementation of the universal quantifier with an upper bound is easy as well.
 
 ```haskell
 all-below (n: Natural) (p: Natural -> Boolean): Boolean :=
@@ -413,6 +424,10 @@ invariant for all numbers strictly below `x`
 which is equivalent to
 
     b * (x + 1) <= a
+
+and
+
+    b * x + b <= a
 
 which in turn implies
 
@@ -536,7 +551,7 @@ is valid for all `k <= ei` and
 is invalid.
 
 Therefore we can find the exponent by a search for the least number which does
-not satisfy the last inequality.
+not satisfy the last proposition.
 
 The upper bound for the search is easy to find. Since all prime numbers are
 greater than 1, all exponents are lower than `n`.
@@ -571,8 +586,8 @@ correct exponent.
 If we have a predicate `p: Natural -> Boolean` and know that there exists a
 number which satifies the predicate, then we can find the least number by an
 unbounded search. In traditional programming languages we would use a while-loop
-which has continuation condition `not (p i)` and which increments in the body of
-the loop the number by one.
+which has the continuation condition `not (p i)` and which increments in the
+body of the loop the number by one until the continuation condition is violated.
 
 
 In lambda calculus we don't have while loops. Therefore we have to find a way to
@@ -599,7 +614,7 @@ step i :=
 ```
 
 If the term `p i` returns true, then `p i i ?` returns the value `i` which
-satisfies the predicate. But we don't know, what to return in case that `i` does
+satisfies the predicate. But we don't know what to return in case that `i` does
 not satisfy the predicate. If we had recursive functions in lambda calculus
 we would just replace the question mark with `step (i + one)`. Unfortunately
 this is not a valid lambda term.
@@ -687,13 +702,20 @@ Some remarks:
   `least-below` to find the smallest number satisfying the predicate.
 
 
-+ They availability of unbounded search makes lambda calculus as expressive as
++ The availability of unbounded search makes lambda calculus as expressive as
   general recursive functions. The class of general recursive functions consists
   of the constant zero, the successor function, all projections (`K` and `KI`
   cover the special case with two arguments, but the generalization to more
   argumentes is obvious) and are closed under primitive recursion (`nat-rec`)
   and minimization (*unbounded search*).
 
-  There are some definitions of computable functions. Fortunately it can be
-  proved that they are all equivalent i.e. they define the same class of
-  functions.
+  There are many definitions of computable functions. E.g.
+
+    - Recursive functions
+
+    - Turing machines
+
+    - Lambda calculus
+
+  Fortunately it can be proved that they are all equivalent i.e. they define the
+  same class of functions.

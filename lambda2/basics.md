@@ -250,7 +250,7 @@ KI x y := y
 ```
 
 which we pronounce _K x y with body x_. We just replaced the backslash by a
-name. Therefore we call `\ x y := x` and anonymous or unnamed function and `K x
+name. Therefore we call `\ x y := x` an anonymous or unnamed function and `K x
 y := x` a named function.
 
 But note that we always mean the same thing. `K x y := x` is the same as `K := \
@@ -277,7 +277,7 @@ K a
 
 =   (\ x y := x) a
 
-=   (\ x := \ y := x) a
+=   (\ x := (\ y := x)) a
 
 ~>  (\ y := x)[x:=a]
 
@@ -316,10 +316,9 @@ true x y  := x
 false x y := y
 ```
 
-Note that `true` and `K`  and `false` and `KI` are defined by using the same
-lambda term. We use different names to express different intentions. But again:
-This is just for us. From the viewpoint of the lambda calculus the terms are
-equivalent.
+Note that `true` and `K`  and `false` and `KI` are defined by the same lambda
+term. We use different names to express different intentions. But again: This is
+just for us. From the viewpoint of the lambda calculus the terms are equivalent.
 
 It is not too difficult to define boolean functions. Negation can be defined as
 
@@ -428,7 +427,7 @@ the two arguments which follow. Usually our intention is to express a choice
 between two things of the same kind, and not a choice between a string and a
 number.
 
-The lambda calculus does not care what arguments you provide. but we can use
+The lambda calculus does not care what arguments you provide. But we can use
 types to express our intentions.
 
 ```
@@ -508,13 +507,13 @@ language.
 Up to now all lambda terms we have used have *terminated* in the sense that we
 reached a state, where no more reducible expressions are in the term.
 
-Is this always the case? Unfortunately not. We see in the following how to
+Is this always the case? Unfortunately not. In the following we show how to
 construct potentially endless loops in lambda calculus.
 
 
 ### Normal Forms
 
-We call a lambda term in normal form if it contains no more redexes.
+We call a lambda term to be in normal form if it contains no more redexes.
 
 
 A term not in normal form can contain one or more redexes. A computation step is
@@ -596,8 +595,8 @@ a manner that it might in some states ignore its argument i.e. which might
 generate some *exit condition* from the loop.
 
 In this introductory chapter we don't look deeper into this possibility. We just
-wanted to demonstrate that we can program *loops* in lambda calculus which might
-be infinite.
+wanted to demonstrate that we can program *loops* in lambda calculus which are
+potentially infinite.
 
 
 
