@@ -102,8 +102,8 @@ paradox*.
 
 Definition:
 
-> A village has the *barber* property if there is a barber in the village which
-  shaves of men in the village which do not shave themself.
+> A village has the *barber* property if there is a barber in the village who
+  shaves all the men in the village who do not shave themselves.
 
 Theorem:
 
@@ -112,17 +112,17 @@ Theorem:
 Proof:
 
 Let's assume by way of contradiction that such a village exists. Then there is
-a barber who shaves every men in the village which does not shave himself.
+a barber who shaves every man in the village who does not shave himself.
 
 Now there are two possibilities:
 
 1. The barber shaves himself: This is not possible because the barber can only
-   shave men which do not shave themself. Therefore the assumption that the
+   shave men who do not shave themselves. Therefore the assumption that the
    barber shaves himself leads to a contradiction.
 
 2. The barber does not shave himself: This is not possible because the barber
-   shaves all men which do not shave themself. Therefore the assumption that the
-   barber does not shave himself leads to a contradiction as well.
+   shaves all the men who do not shave themselves. Therefore the assumption that
+   the barber does not shave himself leads to a contradiction as well.
 
 The assumption that such a village exists leads to a contradicion. Therefore we
 have to conclude that a village with the barber property cannot exist.
@@ -131,7 +131,7 @@ have to conclude that a village with the barber property cannot exist.
 Note that some kind of self reference is essential in all paradoxes. In order to
 use this technique to show that some predicates are undecidable in lambda
 calculus we have to introduce some self referential lambda terms. I.e. we need
-some lambda terms and some encoded version of the lambda term.
+some lambda terms and encoded versions of them.
 
 In order to do this, we need some techniques. After having the machinery the
 actual proof is not complicated.
@@ -260,7 +260,7 @@ that `t` reduces to `u` in one step or in more steps. In this paper there is no
 need to distinguish between one step and multistep reduction. In other contexts
 it might be necessary to use different symbols.
 
-In order make our notation to look more like definitions in a programming
+In order to make our notation look more like definitions in a programming
 language we can write the definitions of `true` and `false` as
 
 ~~~
@@ -400,7 +400,7 @@ extract the second component of the pair.
 
 These arithmetic functions are sufficient for the rest of the text.
 
-The paper [Programming with Lambda Calculus][lambda-intro] shows a lot more
+The paper [Programming with Lambda Calculus][lambda-intro] shows many more
 functions which can be implemented in lambda calculus. All computable functions
 can be implemented on lambda calculus.
 
@@ -411,7 +411,7 @@ can be implemented on lambda calculus.
 Encoding of Lambda Terms
 ========================
 
-It is not possible to write a lambda term which can inspect its arguments i.e.
+It is not possible to write a lambda term which can inspect its own arguments i.e.
 find something about the structure of its arguments. E.g. a lambda term
 `isVariable` where `isVariable a` returns `true`, if `a` is a variable and
 otherwise `false`, is not possible.
@@ -601,8 +601,8 @@ The first argument is the Church numeral for the numbers 0, 1, or 2 depending
 whether the lambda term is a variable, an application or an abstraction. This
 shows that the encoding is not onto. The Church numerals for the numbers 3, 4,
 ... are never used in the top level compress functions. I.e. there are Church
-numeral which do not encode a lambda term. But this is not a problem, because we
-only require that the encoding is one-to-one, i.e. that there are never two
+numerals which do not encode a lambda term. But this is not a problem, because
+we only require that the encoding is one-to-one, i.e. that there are never two
 lambda terms which have the same encoding.
 
 We still have to define the function `wrap` which given the encoding of a lambda
