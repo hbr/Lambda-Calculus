@@ -1,4 +1,4 @@
-This is a paper written in latex about untyped lambda calculus.
+This repo constains some texts about lambda calculus and the texts are presented
+on the web page
 
-[PDF file](https://hbr.github.io/tex_untyped_lambda/untyped_lambda.pdf)
-of the last published version.
+- [Lambda-Calculus](https://hbr.github.io/Lambda-Calculus/index.html)
