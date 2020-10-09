@@ -13,7 +13,7 @@
 
 
 
-**[Up][up]**
+**[Up][up] [Home][home]**
 
 
 Introduction
@@ -895,5 +895,6 @@ like `q` exists leads to a contradiction and therefore must be false.
 
 <!-- Links -->
 
-[up]: index.html
+[home]: https://hbr.github.io
+[up]: ../index.html
 [lambda-intro]: ../lambda2/lambda.html
