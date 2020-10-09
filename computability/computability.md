@@ -712,7 +712,7 @@ which is in the set and a lambda term `m1` which is not in the set.
 
 Definition: Closed set
 
-> We say a set `A` of lambda terms is *close* if it contains with each lambda
+> We say a set `A` of lambda terms is *closed* if it contains with each lambda
 > term `a` all lambda terms which are alpha or beta equivalent to the term.
 
 
@@ -798,7 +798,7 @@ contradiction.
 
 This completes the proof of the theorem.
 
-Note how the application of a term `g` to its own description `g` and the
+Note how the application of a term `g` to its own description `<g>` and the
 definition of `B` are essential to prove the contradiction.
 
 
