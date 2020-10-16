@@ -363,6 +363,8 @@ For each kind, we can define a canonical model
         canonical-model B,  if A is not a kind
 ~~~
 
+
+
 The canonical model of `*` is the set strongly normalizing terms. The canonical
 model of `all (x: A): B` depends on whether `A` is a syntactical kind or not. In
 the first case it is a function which ignores its argument and returns the
@@ -395,5 +397,369 @@ have a canonical model which satisfies it.
 Models for Constructors
 -----------------------
 
+From a model for a valid context we can derive a model for all valid type
+constructors in that context.
+
+A term `T` in context `Gamma` is a type constructor, if its type is a kind i.e.
+if `Gamma |- T : K` is valid for some kind `K`.
+
+Assume that `m` is a model of context `Gamma` i.e. that `m |= Gamma` is valid.
+Then `m` assigns a model to each variable of the context which is a type
+constructor i.e. whose type is a kind.
+
+We can extend the model `m` of the context `Gamma` to all terms `T` which are
+valid type constructors in that context or are `<>`. I.e. we define a function
+`m T` which maps all type constructors `T` in that context to a model of that
+type constructor.
+
+We define the function inductively on the structure of `T`.
 
 
+
+
+#### `T` is a Sort`
+
+
+The model of a sort is the set of strongly normalizing terms.
+
+
+~~~
+    m *  := SN
+    m <> := SN
+~~~
+
+
+
+#### `T` is a Variable
+
+
+The model of a type constructor variable is exactly the model which `m` assigns
+to that variable.
+
+
+
+#### `T` is a Product
+
+Now we come to the model of a product `all (x: A): B`. In order to be a type
+constructor its type must be a kind. This means that `Gamma |- (all (x: A): B) :
+*` must be valid, because the type of a product is always a sort and `*` is the
+only sort which is a kind.
+
+According to the typing rules this implies that `Gamma, (x: A) |- B : *` as well
+i.e. `B` is a proper type which is a special case of a type constructor with no
+arguments.
+
+However for `A` both judgements `A: *` and `A: <>` are possible i.e. `A` can be
+a type (constructor) or a kind.
+
+In the first case `x` is not a type constructor variable and therefore the model
+`m` is valid for `Gamma` and `Gamma, (x:A)`. In that case we define
+
+~~~
+    m (all (x: A): B) :=
+        [m A -> m B]
+
+        if A is a proper type
+~~~
+
+Since `m` extends naturally to `A` and `B` we define the model of the product to
+be the lambda function space between the model of `A` and the model of `B`.
+
+In the second case `x` is a type constructor variable and therefore the model
+`m` is not valid for `Gamma, (x: A)` because it does not assign a model to `x`.
+
+Since `A` is a kind, there is a model set `MS := ModelSet A` from which we can
+choose an arbitrary element `mx` and append the pair `(x, mx)` to the end of `m`
+to get a model for `Gamma, (x: A)`.
+
+We know that such `mx` exists, because a model set is never empty. Unfortunately
+it is not unique.
+
+Now we can use the fact that models of types are saturated sets and are
+therefore closed under arbitrary intersections. So we define the model of `B` in
+the context `Gamma, (x:A)` as
+
+~~~
+    m (B, x, A) :=
+        intersection { (m, (x,mx)) B | mx in ModelSet A }
+
+        if A is a kind
+~~~
+
+where `m, (x,mx)` is the model `m` with the pair `(x,mx)` appended at the end.
+
+Having this definition we can define
+
+~~~
+    m (all (x: A): B) :=
+        [m A -> m (B, x, A)]
+
+        if A is a kind
+~~~
+
+
+#### `T` is an Abstraction
+
+An that case `T` has the form `\ (x: A) := e` and
+
+~~~
+    Gamma |- (\ (x: A) := e): (all (x: A): B)
+~~~
+
+must be valid where `B` is a kind (because the product must be a kind).
+
+The fact that `B` is a kind implies that `e` must be a type constructor in the
+context `Gamma, (x:A)`.
+
+~~~
+    m (\ (x: A) := e) :=
+        m e
+
+        if 'A' is a proper type
+~~~
+
+~~~
+    m (\ (x: A) := e) :=
+        function mapping 'mx' from 'ModelSet A' to '(m, (x,mx)) e'
+
+        if 'A' is a kind
+~~~
+
+
+#### `T` is an Application
+
+??????
+
+
+
+
+
+
+Proof of Normalization
+----------------------
+
+Definition: *`Gamma |= t : T` is defined as: For all `(sub, mlist)` such
+that `(sub,mlist) |= Gamma` implies `sub t in model mlist T` and `sub
+T in SN`.*
+
+
+
+
+Soundness Theorem: *`Gamma |- t : T` implies `Gamma |= t : T`*
+
+
+Proof by induction of `Gamma |- t : T`:
+
+
+
+#### Axiom
+
+We look into the case `[] |- * : <>`.
+
+Since the context is empty, the substitution `sub` and the model list `mlist`
+are empty as well.
+
+We have to prove `sub * in model mlist <>` and `sub <> in SN` which is
+equivalent to
+
+~~~
+    * in SN
+
+    <> in SN
+~~~
+
+which are trivially valid.
+
+
+#### Variable
+
+We look into the case `Gamma, (x:A) |- x : A` under the premise `Gamma |- A :
+s` for some sort `s` and fresh variable `x`.
+
+We have to prove
+
+~~~
+    sub x in model mlist A
+
+    sub A in SN
+
+    for all (sub,mlist) |= Gamma, (x:A)
+~~~
+
+The first condition is trivially satisfied by the definition of `(sub,mlist)
+|= Gamma, (x:A)` which is equivalent to the first condition.
+
+The second condition can be derived from the induction hypothesis.
+
+We first note that `x` cannot occur in `A`. Therefore `sub A in SN` is
+equivalent to `sub' A in SN` where `sub'  is `sub` with the entry for `x`
+removed.
+
+Secondly we have `(sub',mlist') |= Gamma` where `mlist'` is `mlist` with the
+potential entry for `x` removed. Since `model mlist' s = SN` for any sort `s` we
+conclude `sub' A in SN` from the induction hypothesis.
+
+
+
+#### Weaken
+
+We look into the case `Gamma, (x:A) |- t : T` under the premises `Gamma |- t :
+T` and `Gamma |- A : s`.
+
+We have to prove
+
+~~~
+    sub t in model mlist T
+
+    sub T in SN
+
+    for all (sub,mlist) |= Gamma, (x:A)
+~~~
+
+Let `(sub',mlist')` be `(sub,mlist)` with the entry for `x` removed. This pair
+certainly satisfies `Gamma`.
+
+Both conditions can be derived immediately from the induction hypothesis.
+
+
+#### Product
+
+We look into the case
+
+~~~
+    Gamma |- A : s1
+    Gamma, (x:A) |- B : s2
+    ----------------------
+    Gamma |- (all (x: A): B): s2
+~~~
+
+and have to prove
+
+~~~
+    sub (all (x: A): B) in model mlist s2
+
+    sub s2 in SN
+
+    for all (sub,mlist) |= Gamma
+~~~
+
+The second condition is trivially satisfied, because sorts are in normal form
+and therefore in `SN`.
+
+For the first condition note that `model mlist s2 = SN` for all sorts by
+definition.
+
+Furthermore we have
+
+~~~
+
+    sub (all (x: A): B)  =  all (x: sub A): sub B
+~~~
+
+which is strongly normalizing if and only if `sub A` and `sub B` are strongly
+normalizing.
+
+Since `(sub, mlist) |= Gamma` we can conclude the strong normalization of `sub
+A` immediately from the first induction hypothesis.
+
+In case that `A` is not a kind, then `(sub,mlist) |= Gamma, (x:A)` is valid as
+well and we can conclude that `sub B` is strongly normalizing immediately from
+the second induction hypothesis.
+
+In case that `A` is a kind, which means that `x` is a type constructor variable
+we can find a `(sub, mlist + (x,mx)) |= Gamma, (x:A)` for some `mx in ModelSet
+A` which is guaranteed to exist, because model sets are always non empty. Then
+we can conclude the strong normalization of `sub B` from the second induction
+hypothesis.
+
+
+
+
+
+#### Application
+
+For the case
+
+~~~
+    Gamma |- f : (all (x: A): B)
+    Gamma |- a : A
+    ----------------------------
+    Gamma |- f a : B[x:=a]
+~~~
+
+we have to prove
+
+~~~
+    sub (f a) in model mlist B[x:=a]
+
+    sub B[x:=a] in SN
+
+    for all (sub,mlist) |= Gamma
+~~~
+
+From the induction hypotheses we get
+
+~~~
+    sub f in [model mlist A -> model mlist (B, x, A)]
+
+    sub a in model mlist A
+~~~
+
+Since `sub (f a) = (sub f) (sub a)` we can conclude
+
+~~~
+    sub (f a) in model mlist (B, x, A)
+~~~
+
+
+SUBSTITUTION PROPERTY ???
+
+
+
+#### Abstraction
+
+For the case
+
+~~~
+    Gamma |- A : s1
+    Gamma |- (all (x: A): B): s2
+    Gamma, (x:A) |- e : B
+    -----------------------------------------
+    Gamma |- (\ (x: A) := e): (all (x: A): B)
+~~~
+
+we have to prove
+
+~~~
+    sub (\ (x: A) := e) in model mlist (all (x: A): B)
+
+    for all (sub,mlist) |= Gamma
+~~~
+
+Note that by definition of `model` we have
+
+~~~
+    model mlist (all (x: A): B) = [model mlist A -> model mlist (B, x, A)]
+~~~
+
+In order to prove the claim we have to show
+
+~~~
+    sub (\ (x: A) := e) a in model mlist (B, x, A)
+
+    for all a in model mlist A
+~~~
+
+
+
+
+
+#### Conversion
+
+~~~
+    Gamma |- t : T
+    Gamma |- U : s
+    (T ~> U) or (U ~> T)
+    --------------------
+    Gamma |- t : U
+~~~
