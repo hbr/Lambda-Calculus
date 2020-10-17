@@ -721,8 +721,7 @@ SUBSTITUTION PROPERTY ???
 For the case
 
 ~~~
-    Gamma |- A : s1
-    Gamma |- (all (x: A): B): s2
+    Gamma |- A : s
     Gamma, (x:A) |- e : B
     -----------------------------------------
     Gamma |- (\ (x: A) := e): (all (x: A): B)
@@ -749,6 +748,71 @@ In order to prove the claim we have to show
 
     for all a in model mlist A
 ~~~
+
+Since `model mlist (B, x, A)` is a saturated set, it is key expansion closed.
+Therefore it is sufficient to prove
+
+~~~
+    (sub + (x,a)) e in model mlist (B, x, A)
+
+    sub A in SN
+~~~
+
+by using the equality / key reduction
+
+~~~
+    sub (\ (x: A) := e) a
+
+    =   (\ (x: sub A) := sub e) a
+
+    ~>  (sub e)[x:=a]
+
+    =   (sub + (x,a) e
+~~~
+
+The claim `sub A in SN` follows directly from the induction hypothesis of `Gamma
+|- A : s1`.
+
+
+For the claim `(sub + (x,a)) e in model mlist (B, x, A)` we have to distinguish
+the case that `A` is a proper type and `A` is a kind and use the induction
+hypothesis of `Gamma, (x:A) |- e : B`.
+
+Case `A` is a proper type:
+
+Since `a in model mlist A` is valid we get `(sub + (x,a), mlist |= Gamma,
+(x:A)`.
+
+The induction hypothesis leads to `(sub + (x,a) e in model mlist B` and if `A`
+is a proper type, then `model mlist B` is equal to `model mlist (B, x, A)` and
+we are done.
+
+
+Case `A` is a kind:
+
+Here we get
+
+~~~
+    (sub + (x,a), mlist + (x,mx)) |= Gamma, (x:A)
+
+    for all mx in ModelSet A
+~~~
+
+and the induction hypothesis leads to
+
+~~~
+    (sub + (x,a) e in model (mlist + (x,mx)) B
+
+    for all mx in ModelSet A
+~~~
+
+i.e. `(sub + (x,a) e` is in the intersection of all `model (mlist + (x,mx) B`
+and by definition it is therefore by definition in `model mlist (B, x, A)` and
+we are done.
+
+
+
+
 
 
 
