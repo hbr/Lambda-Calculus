@@ -559,16 +559,16 @@ We look into the case `[] |- * : <>`.
 Since the context is empty, the substitution `sub` and the model list `mlist`
 are empty as well.
 
-We have to prove `sub * in model mlist <>` and `sub <> in SN` which is
-equivalent to
+We have to prove `sub * in model mlist <>` which is equivalent to
 
 ~~~
     * in SN
-
-    <> in SN
 ~~~
 
-which are trivially valid.
+and trivially valid.
+
+
+
 
 
 #### Variable
@@ -581,23 +581,13 @@ We have to prove
 ~~~
     sub x in model mlist A
 
-    sub A in SN
-
     for all (sub,mlist) |= Gamma, (x:A)
 ~~~
 
 The first condition is trivially satisfied by the definition of `(sub,mlist)
-|= Gamma, (x:A)` which is equivalent to the first condition.
+|= Gamma, (x:A)` which is equivalent to the claim.
 
-The second condition can be derived from the induction hypothesis.
 
-We first note that `x` cannot occur in `A`. Therefore `sub A in SN` is
-equivalent to `sub' A in SN` where `sub'  is `sub` with the entry for `x`
-removed.
-
-Secondly we have `(sub',mlist') |= Gamma` where `mlist'` is `mlist` with the
-potential entry for `x` removed. Since `model mlist' s = SN` for any sort `s` we
-conclude `sub' A in SN` from the induction hypothesis.
 
 
 
@@ -611,15 +601,16 @@ We have to prove
 ~~~
     sub t in model mlist T
 
-    sub T in SN
-
     for all (sub,mlist) |= Gamma, (x:A)
 ~~~
 
 Let `(sub',mlist')` be `(sub,mlist)` with the entry for `x` removed. This pair
 certainly satisfies `Gamma`.
 
-Both conditions can be derived immediately from the induction hypothesis.
+The goal follows mmediately from the induction hypothesis.
+
+
+
 
 
 #### Product
@@ -638,21 +629,14 @@ and have to prove
 ~~~
     sub (all (x: A): B) in model mlist s2
 
-    sub s2 in SN
-
     for all (sub,mlist) |= Gamma
 ~~~
 
-The second condition is trivially satisfied, because sorts are in normal form
-and therefore in `SN`.
-
-For the first condition note that `model mlist s2 = SN` for all sorts by
-definition.
+Note that `model mlist s2 = SN` for all sorts by definition.
 
 Furthermore we have
 
 ~~~
-
     sub (all (x: A): B)  =  all (x: sub A): sub B
 ~~~
 
@@ -691,8 +675,6 @@ we have to prove
 
 ~~~
     sub (f a) in model mlist B[x:=a]
-
-    sub B[x:=a] in SN
 
     for all (sub,mlist) |= Gamma
 ~~~
