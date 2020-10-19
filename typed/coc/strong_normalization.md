@@ -66,6 +66,7 @@ means that in context `Gamma` the term `t` has type `T`.
 ~~~
     Abstraction:
 
+    Gamma |- A: s
     Gamma, (x:A) |- e : B
     -----------------------------------------
     Gamma |- (\ (x: A) := e): (all (x: A): B)
@@ -540,7 +541,7 @@ We prove only the more difficult case that `C` is a kind.
 ~~~
 
 
-#### `B` is an application
+#### `B` is an Application
 
 Let `B` = f b`. Since `B` is a constructor we know that `f` must be a
 constructor as well.
@@ -568,6 +569,90 @@ We prove only the more difficult case that `b` is a constructor.
 
             definition of 'model'
 ~~~
+
+
+
+
+
+Models and Reduction
+--------------------
+
+Theorem: *A reduction inside a constructor does not change its model.*
+
+~~~
+    Gamma |- a: K           'K' is a kind, 'a' is a constructor
+    mlist |= Gamma
+    a ~> b
+    -----------------------------
+    model mlist a = model mlist b
+~~~
+
+Proof by induction on `a ~> b`.
+
+
+
+#### Reduction of a Toplevel Redex
+
+Let `a = (\ (y: C) := e) c`. Since `a` is a constructor, `e` is a constructor as
+well. We have
+
+~~~
+    (\ (y: C) :=e) c    ~>  e[y:=c]
+~~~
+
+
+We prove only the more complicated case that `C` is a kind.
+
+~~~
+    model mlist ((\ (y: C) := e) c)
+
+    = (model mlist (\ (y: C) := e)) (model mlist c)
+            definition of 'model'
+
+    = ((m: ModelSet C) |-> model (mlist + (y,m)) e) (model mlist c)
+            definition of 'model'
+
+    = model (mlist + (y,model mlist c)) e
+            applying the function
+
+    = model mlist e[y:=c]
+            theorem of 'Models and Substitution'
+~~~
+
+
+#### Reduction of the Function Term of an Application
+
+We have
+
+~~~
+    f a     ~>  g a
+
+    where f ~> g
+~~~
+
+We prove only the case that `a` is a constructor, because it is the more
+complicated case.
+
+~~~
+    model mlist (f a)
+
+    = (model mlist f) (model mlist a)
+            definition of 'model'
+
+    = (model mlist g) (model mlist a)
+            induction hypothesis for 'f ~> g'
+
+    = model mlist (g a)
+            definition of 'model'
+~~~
+
+
+#### Remaining Cases
+
+The proofs of the remaining cases follow the same pattern. We first expand the
+definition of `model`. Then we can apply the induction hypothesis of one of the
+subterms. Finally we can use the definition of `model` and are done.
+
 
 
 
