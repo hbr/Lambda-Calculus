@@ -415,7 +415,7 @@ Models for Constructors
         model mlist e                           A is no kind
 
     model mlist (\ (x: A) := e) :=
-        \ (m in ModelSet A) := model (mlist + (x,m)) e
+        (m in ModelSet A) |-> model (mlist + (x,m)) e
                                                 A is a kind
 5. Application
     model mlist (f a) :=
@@ -440,15 +440,134 @@ Models and Substitution
 
 Proof: Induction on the structure of `B`:
 
+We prove only the case that `a` is a constructor because it is the more
+complicated case.
+
+
+
+#### `B` is a Sort
+
+This case is trivial, because `s[x:=a] = s` for any sort `s` and the model of a
+sort is always `SN`.
+
+
+#### `B` is a Variable
+
+*Case `B = y` and `x` and `y` are different:*
+
 ~~~
-    B is a sort, trivial because
+    model mlist y[x:=a]
 
-    s[x:=a] = s
+    = model mlist y                         'x' and 'y' are different
+
+    = mlist y                               definition of 'model'
+
+    = (mlist + (x, model mlist a)) y        'x' and 'y' are different
+
+    = model (mlist + (x, model mlist a)) y  definition of 'model'
 ~~~
 
-The model of a sort is always `SN` and substitutions do not change a sort.
+
+*Case `B = x`:*
+
+~~~
+    model mlist x[x:=a]
+
+    = model mlist a
+
+    = (mlist + (x, model mlist a)) x        definition of 'mlist'
+
+    = model (mlist + (x, model mlist a)) x  definition of 'model'
+~~~
 
 
+#### `B` is a Product
+
+Let `B = all (y: C): D`. We prove only the more difficult case that `C` is a
+kind.
+
+~~~
+    model mlist (all (y: C): D)[x:=a]
+
+    = model mlist (all (y: C[x:=a]): D[x:=a])
+
+    = [model mlist C[x:=a] ->
+        intersection
+            (m in ModelSet C[x:=a])
+            (model (mlist + (y,m)) D[x:=a]]
+
+                definition of 'model'
+
+    = [model (mlist + (x, model mlist a)) C
+        intersection
+            (m in ModelSet C)
+            (model (mlist + (y,m) + (x, model mlist a)) D
+
+                induction hypotheses for 'C' and 'D' and the
+                invariance of model sets under substitution
+
+    = model (mlist + (x, model mlist a)) (all (y: C): D)
+
+                definition of 'model'
+~~~
+
+
+
+#### `B` is an Abstraction
+
+Let `B = (\ (y: C) := e)`. Since `B` is a constructor we know that `e` is a
+constructur as well.
+
+We prove only the more difficult case that `C` is a kind.
+
+~~~
+    model mlist (\ (y: C) := e)[x:=a]
+
+    = model mlist (\ (y: C[x:=a]) := e[x:=a])
+
+    = (m in ModelSet C[x:=a]) |-> model (mlist + (y,m)) e[x:=a]
+
+            definition of 'model'
+
+    = (m in ModelSet C) |-> model (mlist + (y,m) + (x, model mlist a)) e
+
+            induction hypothesis for 'e' and the invariance of
+            'ModelSet' under substitution
+
+    = model (mlist + (x, model mlist a)) (\ (y: C) := e)
+
+            definition of model
+~~~
+
+
+#### `B` is an application
+
+Let `B` = f b`. Since `B` is a constructor we know that `f` must be a
+constructor as well.
+
+We prove only the more difficult case that `b` is a constructor.
+
+
+~~~
+    model mlist (f b)[x:=a]
+
+
+    = model mlist (f[x:=a] b[x:=a])
+
+
+    = (model mlist f[x:=a]) (model mlist b[x:=a])
+
+            definiton of 'model'
+
+    = (model (mlist + (x, model mlist a)) f)
+        (model (mlist + (x, model mlist a)) b)
+
+            induction hypotheses for 'f' and 'b'
+
+    = model (mlist (x, model mlist a)) (f b)
+
+            definition of 'model'
+~~~
 
 
 
