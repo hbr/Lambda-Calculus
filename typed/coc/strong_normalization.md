@@ -392,6 +392,65 @@ Since there is a canonical model for each syntactic kind, all valid contexts
 have a canonical model which satisfies it.
 
 
+Models for Constructors
+-----------------------
+
+~~~
+1. Sort:
+    model mlist s   :=  SN
+
+2. Variable:
+    model mlist x   := mlist x
+
+3. Product
+    model mlist (all (x: A): B) :=
+        [model mlist A -> model mlist B]        A is no kind
+
+    model mlist (all (x: A): B) :=
+        [model mlist A
+         -> intersection (m in ModelSet A) (model (mlist + (x,m)) B]
+                                                A is a kind
+4. Abstraction
+    model mlist (\ (x: A) := e) :=
+        model mlist e                           A is no kind
+
+    model mlist (\ (x: A) := e) :=
+        \ (m in ModelSet A) := model (mlist + (x,m)) e
+                                                A is a kind
+5. Application
+    model mlist (f a) :=
+        model mlist f                           a is an object
+
+    model mlist (f a) :=
+        (model mlist f) (model mlist a)         a is a constructor
+~~~
+
+
+
+
+Models and Substitution
+------------------------
+
+~~~
+    model mlist B[x:=a] = model mlist B         a is an object
+
+    model mlist B[x:=a]
+    = model (mlist + (x, model mlist a)) B      a is a constructor
+~~~
+
+Proof: Induction on the structure of `B`:
+
+~~~
+    B is a sort, trivial because
+
+    s[x:=a] = s
+~~~
+
+The model of a sort is always `SN` and substitutions do not change a sort.
+
+
+
+
 
 
 Models for Constructors
@@ -529,6 +588,142 @@ context `Gamma, (x:A)`.
 #### `T` is an Application
 
 ??????
+
+
+
+MISSING:
+
+- `model` preserves substitution
+
+- `model` preserves reduction
+
+Theorem: *The function `model` preserves typesafe substitution with objects,
+i.e.*
+
+~~~
+    Gamma |- A: *
+    Gamma |- K: <>
+    Gamma |- a : A
+    Gamma, (x:A) |- B : K
+    mlist |= Gamma
+    -------------------------------------
+    model mlist B  =  model mlist B[x:=a]
+~~~
+
+Proof by induction on the structure of `B`:
+
+
+#### `B` is a Sort
+
+This is not possible, because the only valid typing judgement with sorts is `* :
+<>` and `<>` is not a kind.
+
+
+
+#### `B` is a Variable
+
+
+If `B` is a variable and `B` is a constructor, then it has to be different from
+`x`, because `x` is an object and not a constructor. Therefore the terms `B` and `B[x:=a]` are the same.
+
+
+
+
+#### `B` is a Product
+
+Let `B` be `all (y: C): D`. In that case `K` can only be `*` which implies `D:
+*`.
+
+We have to prove the goal
+
+~~~
+    model mlist (all (y: C): D)
+
+    = model mlist (all (y: C[x:=a]): D[x:=a])
+~~~
+
+
+We distinguish the cases that `C` is a proper type and `C` is a
+kind.
+
+
+*Case `C` is a proper type:*
+
+
+~~~
+    model mlist (all (y: C): D))
+
+    = [model mlist C -> model mlist D]
+                                definition of 'model'
+
+    = [model mlist C[x:=a] -> model mlist D[x:=a]]
+                                induction hypotheses
+
+    = model mlist (all (y: C[x:=a]): D[x:=a])
+                                definition of 'model'
+~~~
+
+
+*Case `C` is a kind:*
+
+We prove this case the same manner as before. First we expand the definition of
+`model`, then we apply the induction hypotheses and then we use the definition
+of `model` in backward direction.
+
+~~~
+    model mlist (all (y: C): D)
+
+    = [model mlist C -> intersection (model (mlist + (y,my)) D)]
+                where 'my in ModelSet C'
+
+    = [model mlist C[x:=a]
+      -> intersection (model (mlist + (y,my)) D[x:a])]
+                where 'my in ModelSet C'
+
+    = model mlist (all (y: C[x:=a]): D[x:0a])
+~~~
+
+
+
+
+
+#### `B` is an Abstraction
+
+*Case `C` is a proper type:*
+
+~~~
+    model mlist (\ (y: C):= e)
+
+    = model mlist e                 definition of 'model'
+
+    = model mlist e[x:=a]           induction hypothesis
+
+    = model mlist (\ (y: C) := e)   definiton of 'model'
+~~~
+
+*Case `C` is a kind:*
+
+~~~
+    model mlist (\ (y: C):= e)
+
+    = (\ (m: ModelSet C) := model (mlist + (y,m)) e)
+                                    definition of 'model'
+
+    = (\ (m: ModelSet C) := model (mlist + (y,m)) e[x:=a])
+                                    induction hypothesis
+
+    = model mlist (\ (y: C) := e[x:=a])
+
+
+    MISSING: 'ModelSet' respects substitution!!!
+~~~
+
+
+
+#### `B` is an Application
+
+Let `B` be `C D`.
+
 
 
 
