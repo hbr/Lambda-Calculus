@@ -1,8 +1,12 @@
-.PHONY: sn
+.PHONY: all basics typing sn
 
 
 # Variables
 top = ../..
+
+basics_title = "Typed Lambda Calculus"
+
+typing_relation_title = "The Typing Relation"
 
 strong_normalization_title =  \
     "Strong Normalization in the Calulus of Constructions"
@@ -10,6 +14,13 @@ strong_normalization_title =  \
 
 
 # Rules
+
+all: basics typing sn
+
+basics: basics.html
+
+typing: typing_relation.html
+
 sn: strong_normalization.html
 
 
