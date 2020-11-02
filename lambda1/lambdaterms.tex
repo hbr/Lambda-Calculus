@@ -69,7 +69,7 @@ abbreviated as $\lambda x y \ldots\, . t$.
 \paragraph{Free and Bound Variables}
 
 In the abstraction $$ \lambda x. t$$ the variable $x$ is a bound variable. It
-is not vlsible to the outside world. This is the same convention as used in
+is not visible to the outside world. This is the same convention as used in
 programming languages which allow the definition of procedures. The formal
 arguments names of the procedure/function arguments are just visible to the
 definition of the procedure/function and not to the outside world.
@@ -530,9 +530,9 @@ Proof by induction on $a \tobetastar b$.
     $\begin{bmatrix}
       a   & \tobetastar      &  b     & \tobeta            &   e   \\
            & \Downarrow_1 &         & \Downarrow_2 &        \\
-      ac & \tobetastar      & bd    & \tobeta            &   ae \\
+      ac & \tobetastar      & bd    & \tobeta            &   ed \\
            &                        & \Downarrow_3 &         &        \\
-      ac &                         & \tobetastar   &           &   ae
+      ac &                         & \tobetastar   &           &   ed
     \end{bmatrix}$.\\
     $\Downarrow_1$ by induction hypothesis.
     $\Downarrow_2$ by rule 2 of $\beta$-reduction.

@@ -344,7 +344,7 @@ Again a graphical representation of the rules:
 % -----------------------------------------
 \begin{theorem}
   All closures are increasing $r \subseteq r^c$, monotonic
-  $r \subseteq s \imp r^c \subseteq s^c$ and idempotent $r^{cc} = r$ (where
+  $r \subseteq s \imp r^c \subseteq s^c$ and idempotent $r^{cc} = r^c$ (where
   the superscript $c$ stands for $+$, $*$ or $\sim$).
   \begin{proof}  We give a proof for the reflexive transitive closure. The
     proofs for the other closures are similar.
@@ -642,7 +642,7 @@ uniquely into a statement of predicate logic.
       Induction hypothesis
       $\begin{matrix}
         a    & \to_r^\sim      & b                      \\
-              & \searrow_r^* & \downarrow_*  \\
+              & \searrow_r^* & \downarrow_r^*  \\
         & & \exists d
       \end{matrix}$.\\
       Proof
