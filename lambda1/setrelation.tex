@@ -344,7 +344,7 @@ Again a graphical representation of the rules:
 % -----------------------------------------
 \begin{theorem}
   All closures are increasing $r \subseteq r^c$, monotonic
-  $r \subseteq s \imp r^c \subseteq s^c$ and idempotent $r^{cc} = r$ (where
+  $r \subseteq s \imp r^c \subseteq s^c$ and idempotent $r^{cc} = r^c$ (where
   the superscript $c$ stands for $+$, $*$ or $\sim$).
   \begin{proof}  We give a proof for the reflexive transitive closure. The
     proofs for the other closures are similar.
@@ -441,7 +441,7 @@ as $r$ i.e. $r^c = s^c$. Proof:
   and $]$ around the rule above the line indicate that the variables not used
   outside the bracketed rule are universally quantified in the inner
   rule. I.e. in order to establish $a \in T_r$ we have to prove
-  $\forall b \mathbin. \neglow a \to_r b$ or
+  $\forall b \mathbin. \neglow (a \to_r b)$ or
   $\forall b\mathbin. a \to_r b \imp \perp$.
 %
   Note that the scope of the universal quantification of the variable $a$
@@ -642,7 +642,7 @@ uniquely into a statement of predicate logic.
       Induction hypothesis
       $\begin{matrix}
         a    & \to_r^\sim      & b                      \\
-              & \searrow_r^* & \downarrow_*  \\
+              & \searrow_r^* & \downarrow_r^*  \\
         & & \exists d
       \end{matrix}$.\\
       Proof
