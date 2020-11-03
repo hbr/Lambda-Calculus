@@ -647,11 +647,11 @@ uniquely into a statement of predicate logic.
       \end{matrix}$.\\
       Proof
       $\begin{matrix}
-        a & \reqv\to & b & \gets_r & c\\
-        & \searrow_r^* & \downarrow_r^*  & & \downarrow_r^*\\
-        & & \exists d & \to_r^* & \exists e
+        a              & \reqv\to       & b            & \gets_r & c \\
+        & \searrow_r^* & \downarrow_r^* & \swarrow_r^* \\
+        &              & \exists d
       \end{matrix}$.
-      $d$ exists by induction hypothesis, $e$ exists by confluence.
+      $d$ exists by induction hypothesis.
     \end{enumerate}
   \end{proof}
 \end{theorem}
