@@ -624,7 +624,7 @@ uniquely into a statement of predicate logic.
       \end{matrix}$.\\
       Proof
       $\begin{matrix}
-        a & \reqv\to & b & \to_r & c\\
+        a & \reqv\to_r & b & \to_r & c\\
         & \searrow_r^* & \downarrow_r^*  & & \downarrow_r^*\\
         & & \exists d & \to_r^* & \exists e
       \end{matrix}$.
@@ -647,7 +647,7 @@ uniquely into a statement of predicate logic.
       \end{matrix}$.\\
       Proof
       $\begin{matrix}
-        a              & \reqv\to       & b            & \gets_r & c \\
+        a              & \reqv\to_r       & b            & \gets_r & c \\
         & \searrow_r^* & \downarrow_r^* & \swarrow_r^* \\
         &              & \exists d
       \end{matrix}$.
@@ -666,9 +666,9 @@ uniquely into a statement of predicate logic.
     Suppose there are two terminal elements $b$ and $c$ with paths starting
     from the object $a$.
     By definition of confluence there must be a $d$ such that
-    $\begin{matrix} a & \tostar & b \\
-      \downarrow_* & & \downarrow_* \\
-      c & \tostar & d
+    $\begin{matrix} a & \to_r^* & b \\
+      \downarrow_r^* & & \downarrow_r^* \\
+      c & \to_r^* & d
     \end{matrix}$ is valid. Since $b$ and $c$ are terminal objects by
     theorem~\ref{trivialpaths} there are only trivial outgoing paths from $b$
     and $c$ which implies that $b = c = d$ must be valid.
