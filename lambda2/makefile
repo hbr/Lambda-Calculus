@@ -12,7 +12,7 @@ lambda.html: $(source-files) meta.yaml
 		$(source-files)  \
 		--metadata-file meta.yaml \
 		--filter=pandoc-crossref  \
-		--filter=pandoc-citeproc
+		--citeproc
 
 
 lambda.pdf: $(source-files) meta.yaml
@@ -22,6 +22,6 @@ lambda.pdf: $(source-files) meta.yaml
 		$(source-files)  \
 		--metadata-file meta.yaml \
 		--filter=pandoc-crossref  \
-		--filter=pandoc-citeproc
+		--citeproc
 
 

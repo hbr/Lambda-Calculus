@@ -487,9 +487,9 @@ K (x: A) (y: B): A  := x
 
 KI (x: A) (y: B): B := y
 
-first (p: Pair A B): A := K p
+first (p: Pair A B): A := p K
 
-second (p: Pair A B): B := KI p
+second (p: Pair A B): B := p KI
 ```
 
 If we use type annotations, then we have to type a little bit more. However the

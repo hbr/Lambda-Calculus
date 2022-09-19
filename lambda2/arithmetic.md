@@ -637,29 +637,23 @@ U x y := y (x x y)
 ```
 
 The combinator `U` expects two arguments and returns a term which contains both
-arguments twice. It is interesting to see what happes, if we evaluate `U U
-step`. We get
+arguments twice. It is interesting to see what happens, if we evaluate `U U
+step i`. We get
 
 ```
-U U step    ~>  step (U U step)
+U U step i    ~>  step (U U step) i
 ```
 
-I.e. `U U step` calls `step` with itself as first argument. Let's try `U U` at
-the position of `iterator`. We get
-```
-U U step zero   ~>  step (U U step) zero
-```
+I.e. `U U step i` calls `step` with `U U step` as first argument and `i` as
+second argument. Now `step` is in the function position and has control of what
+to do next. The function `step` evaluates `p i`. If the result is `true` then it
+returns `i` and the iteration terminates. If `p i` evaluates to `false` then it
+returns `(U U step) (i + one)` and the iteration can continue.
 
-In case that `p zero` is `true`, the function returns `zero` which is the correct
-result.
+The iteration is started with `U U step zero` i.e. we can use `U U` as
+`iterate` and we are ready.
 
-In case that `p zero` evaluates to `false`, the function returns `U U step one`
-which we can evaluate again
-```
-U U step one    ~>  step (U U step) one
-```
-
-We see, that we have implemented the iteration which stops, as soon as a number
+We see, that we have implemented an iteration which stops, as soon as a number
 is encountered which satisfies the predicate. The complete function reads
 
 ```haskell
@@ -668,7 +662,7 @@ search-least (p: Natural -> Boolean): Natural :=
         step k i :=
                 -- invariant: all numbers below `i` do not
                 -- satisfy `p i`.
-            p i i (k (i plus one)
+            p i i (k (i + one)
         U x y :=
             y (x x y)
 ```
