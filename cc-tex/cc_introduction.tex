@@ -1,0 +1,342 @@
+\section{Introduction}
+\label{sec:Introduction}
+
+
+\begin{comment}
+
+    Skeleton
+    ---------------
+
+    Computation: Can be carried out mechanically
+
+        like
+            Adding, multiplying numbers in the decimal system
+            Gausian elimination to solve linear equations
+            Newton's method to solve nonlinear equation f(x) = 0
+
+        Newton 1642-1727
+
+        Historically up to the moon landing (1960s) a computer had been a person
+        who can compute. Initially: Electronic computers
+
+
+    Hilbert's program: Mathematics must be decidable. Entscheidungsproblem.
+    Decision procedures.
+
+    Need to define exactly what computable/decidable means.
+
+
+    Problem for programming:
+
+        Silly terms can be formulated: Feed a boolean value to a function which
+        expects a number.
+
+        Non terminating computations (\ x := xx) (\ x := xx)
+
+    Today's typed programming languages solve the first problem: The actual
+    arguments used in a function call always conform to the expected types.
+
+
+    Logic: Curry Howard isomorphism: Propositions are types, computations are
+    proofs. Alonzo Church wanted to use typed lambda calculus as a model for
+    logic.
+
+    Proofs must be finite. Termination becomes crucial. E.g. function f: ∀ x. P
+    x. Definition f x := f x is circular as a logic and in terms of computation
+    is is not terminating.
+
+    Girard's system Fω has significant computational power and be used as a
+    model for 2nd order logic.
+
+    Adding types: Computational objects and types. Types are for the compiler
+    and erased in the runtime.
+
+    Adding types to lambda calculus:
+
+        Simply typed lambda calculus: Types have no structure, just variables.
+        Nearly no computational power.
+
+        Polymorphic types (System F): Adding List X, Array X, Pair X Y. Type
+        functions mapping types to types.
+
+        Polymorphic functions (System Fω): reverse List X. Functions mapping
+        types and objects to objects.
+
+        Dependent types for logic: Expressing type ∀x. P x. An object of this
+        type is a function which maps an object x to a proof of P x.
+        Computational objects appearing in types.
+
+    Calculus of constructions: Expressive in terms of functions it can express
+    and in terms of logical statements it can express. Sweet spot in the desigs
+    space of typed lambda calculi.
+\end{comment}
+
+
+
+
+\paragraph{Computation}
+%--------------------------------
+What is a computer? What comes into your mind if you think of computers? Your
+laptop, your smartphone? A supercomputer? ... Would you say that a human being
+is a computer?
+
+Looking 100 years back, computers had not yet been invented. At least not modern
+electronic computers. However computers existed. A computer was a man or a woman
+who can carry out computations. The term \emph{computer} in the meaning of
+\emph{one who computes} had been in use from the early 17th century. The NASA
+and its predecessor NACA hired men and women to carry out computations.
+
+A \emph{computer} had no authority. He/She had to carry out computations
+following some fixed rules.
+
+Carring out computations according to fixed rules had been present in the whole
+history of mankind for more than 2000 years. Think of adding and multiplying
+numbers, using Gaussian elimination to solve a system of linear equations, using
+Newton's method to find the root of a nonlinear function etc.
+
+The notion of computing i.e. carrying out some steps according to fixed rules
+had been intuitively clear. Whenever somebody said that he had found a method to
+calculate something and had written down a recipe to do it, everyone could check
+the method by trying to carry out the computation according to the written
+rules. If there are no ambiguities, then the method can be regarded as a general
+recipe or an \emph{algorithm}.
+
+
+
+\paragraph{Computability}
+%--------------------------------
+In the early 20th century the question came up: \emph{What is
+computable?} David Hilbert, the famous german mathematician, challenged
+the world with his statement that everything which can be formalized in
+mathematics must be decidable/computable.  That there is nothing
+\emph{undecidable} or \emph{uncomputable}. If a computation or decision
+procedure had not yet been found, then we have to try harder until we find the
+general method.
+
+Looking at the question \emph{Is there something uncomputable / undecidable?} an
+intuitive understanding of computation is no longer sufficient. A precise formal
+definition of computation becomes necessary. Nearly at the same time, three
+famous mathematicians came up with formal definitions of computability which
+could be proved to be equivalent:
+
+\begin{itemize}
+\item Kurt Gödel's \emph{recursive functions}
+
+\item Alan Turing's \emph{automatic machine} (today called \emph{Turing
+machine})
+
+\item Alonzo Church's \emph{lambda calculus}
+\end{itemize}
+
+It can be shown that in this space of computable functions there are problems
+which cannot be decided. E.g. the halting problem is undecidable. There is no
+function which takes a valid program and its imput as input and returns true if
+the program terminates on the input and false if the program does not terminate
+on the input.
+
+Having a clear and formal definition of computability, many problems have been
+proved to be unsolvable by computation.
+
+In this paper we look only into lambda calculus, because lambda calculus is not
+only a universal model of computation like the other two, there is much more in
+it.
+
+Let's see what this \emph{more} is. There is something unsatisfactory in lambda
+calculus which led to significant improvements.
+
+\paragraph{Typing}
+Since lambda calculus or more specifically the untyped lambda calculus is a
+universal model of computation, it is possible to do all possible computations
+at least theoretically in lambda calculus. Define boolean values and functions,
+define natural numbers and functions on natural numbers, define pairs of values,
+list of values, trees of values and all functions on this data. There is no
+limit.
+
+However it is possible to express terms which are completely useless.
+
+\begin{itemize}
+
+\item You can feed a string to a function which expects a natural number as
+argument.
+
+\item You can write expressions which implement a non terminating computation.
+
+\end{itemize}
+
+Modern programming languages solve the first problem by adding a type to each
+argument of a function and a type to the result of a function. The second
+problem is usually not addressed in modern programming languages. In nearly all
+mainstream programming languages infinite loops are possible.
+
+
+
+
+
+\paragraph{Computation and Logic}
+%--------------------------------
+Alonzo Church added types to his lambda calculus. But his main intention was not
+to avoid silly expressions. He wanted typed lambda calculus to be a model for
+logic. This laid the basis for the Curry-Howard isomorphism. The Curry-Howard
+isomorphism connects two seemingly unrelated formalisms: computations and proof
+systems.
+
+The types in computations are connected to propositions in logic via the
+Curry-Howard isomorphism. The terms of a certain type are proofs of the
+corresponding proposition. A proof of an implication $A \imp B$ is a function
+(i.e. a computation) mapping a proof of $A$ i.e. a term of type $A$ to a
+proof of $B$ i.e. a term of type $B$. The identity function is a proof of $A
+\imp A$.
+
+A proof of $A \land (A \imp B) \imp B$ the \emph{modus ponens rule} is nearly
+trivial in this computation analogy. It is a function taking two arguments. It
+takes an object $a$ of type $A$ and a function $f$ of type $A \imp B$ and it
+returns an object of type $B$ by just applying $f$ to $a$.
+
+However if we want lambda calculus to be a model for logic and proof systems,
+then \emph{termination} becomes crucial. Proofs must be finite. An infinite
+proof makes no sense. Nobody can check the correctness of an infinite proof.
+
+In the computational world the definition of a function directly in terms of
+itself e.g.  $f(x: A): B := f(x)$ is welltyped but useless. Calling $f$ with an
+object $a$ of type $A$ ends up in an infinite recursion.
+
+The counterpart of this nonterminating function $f$ in logic is a proof of $A
+\imp B$ which uses a proof of $A \imp B$. This \emph{circular} logic is not
+allowed. Proofs which use circular logic are not wellformed. Anything can be
+proved by using circular logic.
+
+
+
+
+\paragraph{Typed Lambda Calculi}
+%--------------------------------
+The untyped lambda calculus can be extended to many forms of typed lambda
+calculus which serve both as model of computation and a model of logic i.e.
+they avoid silly terms and they guarantee termination.
+
+We come from untyped lambda calculus to typed lambda calculus by adding type
+annotations. Type annotations are necessary only to check that terms are
+welltyped. After type checking, types can be thrown away. This is called
+\emph{type erasure}. We distinguish between computational objects and types
+(i.e. non computational objects).
+
+In this paper we treat the \emph{Calculus of Constructions} as a typed
+lambda calculus which is a good model of computation and logic at the same time.
+The way from untyped lambda calculus to the calculus of constructions can be
+seen as having four steps:
+
+\begin{enumerate}
+
+\item \emph{Simply typed lambda calculus}: The types have no structure. A type
+is a type variable. We have type variables $\set{U, V, W, \ldots}$ and arbitrary
+functions formed over the type variables $\{$ $U \to U$, $U \to V$, $U \to (V \to
+W)$, $\ldots$ $\}$. The computational power of simply typed lambda calculus is fairly
+limited. But it is already a model for the implicational fragment of natural
+deduction.
+
+\item \emph{Polymorphic types (System $F$)}: We have not only type variables and
+functions over the type variables. We have type functions like lists, arrays,
+pairs etc. A list is a function which maps a type $X$ into a list of $X$s i.e.
+$L X$ is a list of $X$s. A pair takes two types as arguments and returns the
+type of pairs where the first component has the first type and the second
+component has the second type.
+
+System $F$ adds functions to the type domain. However the  functions reversing a
+list of integers and reversing a list of strings are two different functions. It
+is not yet possible to write a generic function which reverses a list of an
+arbitrary element type.
+
+\item \emph{Polymorphic functions (System $F_\omega$)}: This calculus adds
+functions which can receive type and computational arguments and return a
+computational value. Now it is possible to write a generic function for list
+reversal. Such a function receives as a first argument the element type an as a
+second argument the list to reverse and it returns the reversed list.
+
+The function which reverses a list is a computational object. However its first
+argument is a type i.e. a non computational object. It can be erased and is not
+necessary for doing the actual computation. It is just an annotation in order to
+carry out the type checking.
+
+System $F_\omega$ has very good computational power and is a good model of proof
+systems.
+
+\item \emph{Dependent types (calculus of constructions)}: We need another
+dimension to express interesting logical propositions. We want to express the
+proposition that a certain number is a prime number. Propositions are types in
+the Curry-Howard isomorphism, therefore this proposition is a type. However a
+number is certainly a computational object. In order to express the predicate
+\emph{is prime} we need functions which map a number to a proposition i.e. a
+type.
+
+Now we can express the proposition which states that all objects $x$ of a
+certain type $A$ have a certain property $P$ i.e. the proposition $\forall
+(x:A). P x$. $P x$ is a type which depends on the computational object $x$.
+Therefore it is called a dependent type.
+
+A proof of the proposition $\forall (x: A). P x$ is a function which takes an
+object $x$ of type $A$ and returns an object of type $P x$. In the calculus of
+construction we express the proposition $\forall (x: A). P x$ as the type $\Pi
+x^A. P x$.
+\end{enumerate}
+
+
+The calculus of constructions has enormous computational power and is very
+expressive as a logic and proof system. Therefore it is a sweet spot in the
+design space of typed lambda calculi.
+
+
+
+\paragraph{This Paper}
+%-------------------------
+%
+In this paper we introduce the calculus of constructions.
+
+\begin{itemize}
+
+\item Section \emph{Basic Mathematics}~\ref{sec:BasicMathematics} describes the
+basic mathematics needed to understand the following chapters. It is important
+to understand the used logic notation and the form of induction proofs. In type
+theory induction proofs on inductively defined sets and relations are used
+excessively. Therefore a special layout has been chosen to present such proofs
+and figure out the induction hypotheses clearly.
+
+\item In section \emph{The Calculus}~\ref{sec:Calculus} the calculus of
+constructions is explained. It defines the terms of the calculus, the contexts
+to give types to free variables, the basic computation steps and term
+equivalence.
+
+
+\item Section \emph{Confluence}~\ref{sec:Confluence} proves an important
+property of the calculus: Uniqueness of results. The computation steps in the
+calculus are nondeterministic. At each state of the computation which is not a
+final state different steps might be possible. The property of confluence
+guarantees that all computation paths starting from a term can be joined and
+that the final result (if it exists) is unique.
+
+\item Section \emph{Typing}~\ref{sec:Typing} introduces the typing relation and
+proves important properties about this relation. The typing relation defines the
+welltyped terms. Terms in the calculus formed according to section \emph{The
+Calculus}~\ref{sec:Calculus} are wellformed, but not necessarily welltyped. In
+order to be welltyped they have to be valid terms in the typing relation.
+
+
+\item Section \emph{Proof of Strong Normalization}~\ref{sec:NormalizationProof}:
+This section contains the proof that all welltyped terms in the calculus of
+constructions are strongly normalizing. I.e. Every welltyped term reduces in a
+finite number of computation steps to a normal form which is the result of the
+computation.
+
+The proof of strong normalization is rather involved and requires a lot of
+machinery to go through. All needed concepts and theorems are explained in
+detail. Therefore this chapter is the longest in the paper.
+
+Strong normalization implies consistency when regarded
+as a model of a proof system for logic. Consistency in logic means that it is
+free of contradictions. A type system is consistent as a logic if there are
+types which are uninhabited in the empty context. In the Curry-Howard
+isomorphism an uninhabited type corresponds to a proposition which is
+impossible to prove.
+
+The proof of consistency is the last subsection in this chapter.
+
+\end{itemize}

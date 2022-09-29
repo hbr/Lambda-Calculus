@@ -1,0 +1,119 @@
+\def\Any{{\cal U}}
+\def\Prop{{\cal P}}
+%\def\Any{\Box}
+%\def\Prop{*}
+
+\def\banana#1{(\!|#1|\!)}
+
+\def\baseterms{{\cal B}}
+\def\baseterms{{\cal B}}
+
+\def\constructors{{\cal C}}
+
+\def\dbrackleft{{[\![}}
+\def\dbrackright{{]\!]}}
+\def\dbrack#1{{\dbrackleft #1 \dbrackright}}
+
+\def\betaeq{\stackrel{\beta}{\sim}}
+
+\def\BT{\text{BT}}   % strongly normalizing terms
+
+
+\def\FV{\text{FV}}
+
+\def\imp{\Rightarrow}
+
+\def\Kinds{\mathbb{K}}
+
+\def\Nat{{\mathbb{N}}}
+
+\def\NF{\text{NF}}   % set of terms in normal form
+
+
+
+\def\SN{\text{SN}}   % strongly normalizing terms
+
+\def\SAT{\text{SAT}}
+\def\set#1{{\{#1\}}}
+
+\def\tolambda{\stackrel{\lambda}{\to}}
+
+\def\torel#1{\stackrel{#1}{\to}}
+\def\fromrel#1{\stackrel{#1}{\leftarrow}}
+
+\def\terminter#1#2{{\banana{#1}_{#2}}}
+\def\typeinter#1#2{{\dbrack{#1}_{#2}}}
+
+\def\vdashmin{\vdash_\mu}
+\def\vec#1{{\mathbf #1}}
+
+
+
+
+
+\def\reduce{\torel{\beta}}
+\def\reducestar{\torel{\beta^*}}
+\def\reducedown{\downarrow_\beta}
+\def\reducedownstar{\downarrow_{\beta^*}}
+\def\preduce{\torel{\beta_p}}
+\def\preducestar{\torel{\beta_p^*}}
+\def\keyreduce{\stackrel{\beta_{\text{k}}}{\to}}
+
+
+\def\derives#1#2#3{#1 \vdash #2: #3}
+\def\derivesmin#1#2#3{#1 \vdashmin #2: #3}
+
+
+\def\ruleh#1#2{\begin{array}{c} #1 \\ \hline #2\end{array}}
+\def\rulev#1#2{\begin{array}{l} #1 \\ \hline #2\end{array}}
+\def\allbracket#1#2{
+    \forall #1. \left[ #2 \right]
+}
+\def\ruleall#1#2#3{
+    \allbracket {#1} {\rulev{#2}{#3}}
+}
+\def\ruleallh#1#2#3{
+    \allbracket {#1} {\ruleh{#2}{#3}}
+}
+
+\def\diamond#1#2#3#4#5#6{
+    \begin{array}{ccc}
+        #1 & \torel{#5} & #2
+        \\
+        \downarrow_{#6} & & \downarrow_{#6}
+        \\
+        #3 & \torel{#5} & \exists #4
+    \end{array}
+}
+
+\def\snproof#1#2#3#4{
+    \begin{array}{l|l}
+        \ruleall{#2}{#1 \reduce #2}{#2 \in \SN}
+        & #3
+        \\
+        \hline
+        #1 \in \SN
+        & #4
+    \end{array}
+}
+
+\def\recbrace#1{
+    \left\{
+    \begin{array}{llll}
+        #1
+    \end{array}
+    \right.
+}
+\def\recfun#1#2{
+    #1 := \recbrace {#2}
+}
+
+
+
+% Theorems
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section] % envname, text, number base
+\newtheorem{theorem}[definition]{Theorem}    % envname, parent counter, text
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{example}[definition]{Example}

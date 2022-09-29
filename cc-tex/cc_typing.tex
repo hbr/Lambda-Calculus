@@ -1,0 +1,1991 @@
+\section{Typing}
+\label{sec:Typing}
+
+
+This section describes welltyped terms and basic properties of welltyped terms.
+It is based on Henk Barendregt's paper \emph{Lambda Calculi with
+Types}~\cite{barendregt1993}.
+
+What is needed to state that a term $t$ is welltyped? First we have to notice
+that the term $t$ might contain free variables. As opposed to bound variables,
+free variables don't have a type expressed within a term. Therefore we need a
+context $\Gamma$ which assigns types to the free variables in the term $t$.
+Furthermore we need a type $T$. We write the statement \emph{The term $t$ has
+type $T$ in the context $\Gamma$ as}
+$$
+    \Gamma \vdash t : T
+$$
+
+We need a typing relation which is a subset of
+$$
+    \text{Contexts} \times \text{Terms} \times \text{Terms}
+$$
+
+In this section we define the typing relation inductively.
+
+Since terms are either sorts, variables, products, abstractions or applications,
+the typing relation has one introduction rule for each possible form of a term
+which states how to introduce a welltyped term of that form.
+
+Furthermore there are two structural rules which state
+\begin{itemize}
+    \item If we add a welltyped variable to a context, then every welltyped term
+        in the context is welltyped in the augmented context in which it has the
+        same type.
+
+    \item If a term $t$ has type $T$ and the type $U$ is beta equivalent to $T$
+        and a welltyped type, then the term $t$ has type $U$ in the same
+        context.
+\end{itemize}
+
+The last rule states that beta equivalent types are really equivalent in their
+role as types. This allows to do computations (i.e. beta reductions) in types
+without changing the meaning of a type.
+
+
+Besides the definition of the typing relation the main part of this section is
+to prove important properties of welltyped terms. The most important nontrivial
+theorems/lemmas are:
+\begin{enumerate}
+    \item Generation Lemmata: If a term $t$ is welltyped (i.e. it has a type $T$
+        in a certain context $\Gamma$), then there is an equivalent type of a
+        certain form for each possible form the term (sort, variable, product,
+        abstraction, application). E.g. each welltyped abstraction $\lambda x^A.
+        e$ has a type of the form $\Pi x^A. B$ which is beta equivalent to $T$.
+
+        The generation lemmata describe important properties which are used in
+        the proofs on many other theorems.
+
+    \item Type of types: If $T$ is the type of a welltyped term in a certain
+        context, then $T$ is either the sort $\Any$ or $T$ is welltyped in the
+        same context and its type is a sort (i.e. either $\Prop$ or $\Any$).
+
+        This theorem justifies the introduction of sorts as \emph{types of
+        types}.
+
+    \item Subject reduction: Reduction (i.e. computation) does not change
+        the type of a term. Or in other words: If a term has a certain type and
+        we compute the term, then we really get an object of that type. I.e.
+        computation does what it promises to do.
+
+        Subject reduction is valid in all typed programming languages. If you
+        define a function with a certain result type, then the actual execution
+        of that function returns an object of that type (provided that the
+        computation terminates).
+
+    \item Uniqueness of types: If a term is welltyped in a certain context, then
+        all its possible types are beta equivalent. I.e. each welltyped term has
+        a unique type modulo beta equivalence. I.e. we can regard the
+        equivalence class as the unique type of a term.
+
+        Together with subject reduction this theorem guarantees that beta
+        equivalent welltyped terms have the same unique type modulo beta
+        equivalence.
+\end{enumerate}
+
+In the last subsection of this section we introduce \emph{kinds}. Since we have
+the two sorts $\Prop$ and $\Any$ and sorts are the types of types, there are two
+types of types. Types of type $\Prop$ and types of type $\Any$. The types of
+type $\Any$ are called \emph{kinds}. \emph{Kinds} have the special property that
+they are recognizable by pure syntactic analysis of the term which represents
+the type.
+
+Semantically \emph{kinds} are the types of $n$-ary type functions where $n = 0$
+is allowed as a corner case. Therefore if we know that the type of a term is a
+kind, then we know that the term will return a type, if applied to sufficient
+arguments (of the correct type of course).
+
+The kinds play an important role in the proof of strong normalization i.e. in
+the proof of consistency of the calculus of constructions.
+
+
+
+
+
+
+\subsection{Typing Relation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definition}
+The ternary \emph{typing relation} $\Gamma \vdash t: T$ which says that in
+the context $\Gamma$ then term $t$ has type $T$ is defined inductively by
+the rules
+\begin{enumerate}
+    \item Introduction rules:
+    \begin{enumerate}
+        \item Axiom:
+            $$
+            [] \vdash \Prop : \Any
+            $$
+
+        \item Variable:
+            $$
+            \rulev {
+                \Gamma \vdash A: s
+                \\
+                x \notin \Gamma
+            }
+            {
+                \Gamma, x^A \vdash x: A
+            }
+            $$
+
+        \item Product:
+            $$
+            \rulev {
+                \Gamma \vdash A: s_1
+                \\
+                \Gamma, x^A \vdash B: s_2
+            }
+            {
+                \Gamma \vdash \Pi x^A.B : s_2
+            }
+            $$
+
+        \item Abstraction:
+            $$
+            \rulev {
+                \Gamma \vdash \Pi x^A. B: s
+                \\
+                \Gamma, x^A \vdash e: B
+            }
+            {
+                \Gamma \vdash (\lambda x^A. e): \Pi x^A. B
+            }
+            $$
+
+        \item Application:
+            $$
+            \rulev {
+                \Gamma \vdash f: \Pi x^A. B
+                \\
+                \Gamma \vdash a: A
+            }
+            {
+                \Gamma \vdash f a: B[x:=a]
+            }
+            $$
+    \end{enumerate}
+
+
+    \item Structural rules:
+        \begin{enumerate}
+            \item Weaken:
+                $$
+                \rulev {
+                    \Gamma \vdash t: T
+                    \\
+                    \Gamma \vdash A: s
+                    \\
+                    x \notin \Gamma
+                }
+                {
+                    \Gamma, x^A \vdash t: T
+                }
+                $$
+
+            \item Type equivalence:
+                $$
+                \rulev {
+                    \Gamma \vdash t: T
+                    \\
+                    \Gamma \vdash U: s
+                    \\
+                    T \betaeq U
+                }
+                {
+                    \Gamma \vdash t: U
+                }
+                $$
+
+        \end{enumerate}
+    \end{enumerate}
+\end{definition}
+
+
+Remarks:
+\begin{itemize}
+    \item There is no introduction rule for $\Any$. Therefore there can never be
+        a valid type of $\Any$ i.e. the term $\Any$ is not welltyped. Its only
+        purpose is to be the type of some types like $\Prop$ and it can only
+        appear in the type position of a typing judgement $\Gamma \vdash t : T$.
+
+    \item The variable introduction rule requires a welltyped type $A$ for the
+        introduced variable (i.e. $A: s$ for some sort $s$). Since $\Any$ is not
+        welltyped, it is impossible for a variable to have type $\Any$.
+
+    \item The product type $\Pi x^A. B$ is the type of functions mapping objects
+        of type $A$ to objects of type $B$ where the result type $B$ might
+        contain the variable $x$. The introduction rule for products requires
+        that both $A$ and $B$ are welltyped types. Therefore neither of them can
+        be $\Any$. Therefore a function cannot receive arguments of type $\Any$
+        nor return results of type $\Any$.
+
+        It is possible to compute with types but it is impossible to compute
+        with sorts (or kinds in general) as arguments and results. This is an
+        important difference to the \emph{extended calculus of constructions}
+        which allows variables of type $\Any_i$ because $\Any_i$ has type
+        $\Any_{i+1}$. The extended calculus of constructions can compute with
+        kinds, the calculus of constructions not.
+\end{itemize}
+
+
+
+\subsection{Basic Definitions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definition}
+    \label{BasicTypingDefinitions} Basic Definitions:
+
+    \begin{enumerate}
+    \item $\Gamma \vdash t : T : U$ is defined as $\Gamma \vdash t : T$ and
+        $\Gamma \vdash T : U$.
+
+    \item $\Gamma \vdash \Delta$ for the contexts $\Gamma$ and $\Delta$ is
+        defined as $\forall x^A \in \Delta \imp \Gamma \vdash x : A$.
+
+    \item $\Gamma$ is a \emph{valid context} if $\Gamma \vdash t : T$ is valid
+        for some terms $t$ and $T$.
+
+    \item A term $t$ is welltyped in a context $\Gamma$ if $\Gamma \vdash t : T$
+        is valid for some term $T$.
+
+    \item A term $t$ is welltyped if there is a context in which it is
+        welltyped.
+
+    \item A term is valid in a context if it is either welltyped in the context
+        or it is $\Any$.
+
+    \item A term is valid if there is a context in which it is valid.
+
+    \item A term $T$ is a valid type of sort $s$ in a context $\Gamma$ if
+        $\Gamma \vdash T : s$ is valid.
+
+    \item A term is a valid type of some sort if it is a valid type of this sort
+        in some context.
+
+    \item A term is a proposition or a proper type if it is a valid type of sort
+        $\Prop$.
+
+    \item A term is a kind if it is a valid type of sort $\Any$.
+    \end{enumerate}
+\end{definition}
+
+
+\subsection{Start Lemma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}
+    \label{StartLemma}
+    For any valid context $\Gamma$ the following two typing judgements are
+    valid:
+    $$
+    \begin{array}{l}
+        \Gamma \vdash \Prop: \Any
+        \\
+        x^A \in \Gamma \imp \Gamma \vdash x :A
+    \end{array}
+    $$
+
+    \begin{proof}
+        A context $\Gamma$ is valid by definition if $\Gamma \vdash t: T$ is
+        valid for some terms $t$ and $T$. We prove
+        $$
+        \begin{array}{l}
+            \Gamma \vdash \Prop : \Any
+            \\
+            \land
+            \\
+            \forall x^A \in \Gamma \imp \Gamma \vdash x: A
+        \end{array}
+        $$
+        by induction on $\Gamma \vdash t : T$.
+
+        For all rules except the axiom, the variable rule and the weakening rule
+        the goal is an immediate consequence of the induction hypothesis for the
+        same context.  The axiom, the variable and the weakening rule are
+        treated separately.
+
+        \begin{enumerate}
+        \item Axiom $[] \vdash \Prop: \Any$: The first part is trivially valid.
+            The second part is vacuously valid, because the empty context does
+                not have any variables.
+
+        \item Variable:
+            $$
+            \begin{array}{l|l}
+                \Gamma \vdash B: s
+                &
+                \Gamma \vdash \Prop : \Any
+                \land
+                (\forall x^A \in \Gamma \imp \Gamma \vdash x : A)
+                \\
+                y \notin \Gamma
+                \\
+                \hline
+                \Gamma, y^B \vdash y: B
+                &
+                \Gamma, x^B \vdash \Prop:\Any
+                \land
+                (\forall x^A \in (\Gamma, x^B) \imp \Gamma, y^B \vdash x : A)
+            \end{array}
+            $$
+
+            The first part of the goal in the lower right corner is a
+                consequence of the induction hypothesis and the weaking rule.
+
+            For the second part we have to distinguish two cases:
+            \begin{itemize}
+            \item $x^A \in \Gamma$: In that case the second part of the goal is
+                a consequence of the second part of the induction hypothesis and
+                    the weakening rule.
+            \item $x^A = y^B$: In that case the second part of the goal is
+                identical with the lower left corner.
+            \end{itemize}
+
+        \item Weakening:
+            $$
+            \begin{array}{l|l}
+                \Gamma \vdash t : T
+                \\
+                \Gamma \vdash B: s
+                &
+                \Gamma \vdash \Prop : \Any
+                \land
+                (\forall x^A \in \Gamma \imp \Gamma \vdash x : A)
+                \\
+                y \notin \Gamma
+                \\
+                \hline
+                \Gamma, y^B \vdash t: B
+                &
+                \Gamma, x^B \vdash \Prop:\Any
+                \land
+                (\forall x^A \in (\Gamma, x^B) \imp \Gamma, y^B \vdash x : A)
+            \end{array}
+            $$
+
+            The reasoning is nearly the same as with the variable case. Except
+            the second part of the goal for $x^A = y^B$ is proved by the
+            variable introduction rule by using $\Gamma \vdash B : s$ and $y
+            \notin \Gamma$.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+\subsection{Thinning Lemma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}
+    \label{ThinningLemma}
+    \emph{Thinning Lemma}: Let $\Delta$ be a valid context with $\Gamma
+    \subseteq \Delta$. Then
+    $$
+    \rulev{
+        \Gamma \vdash t : T
+    }
+    {
+        \Delta \vdash t : T
+    }
+    $$
+    \begin{proof}
+        By induction on $\Gamma \vdash t : T$.
+
+        \begin{enumerate}
+        \item Sort:
+            $$ [] \vdash \Prop : \Any$$
+
+            Since $\Delta$ is a valid context we get $\Delta \vdash \Prop :
+                \Any$ by the start lemma~\ref{StartLemma}.
+
+        \item Variable:
+            $$
+            \begin{array}{l|l}
+            \Gamma \vdash A : s
+            \\
+            x \notin \Gamma
+            \\
+            \hline
+            \Gamma, x^A \vdash x : A
+            &
+            \forall \Delta
+                . \left[\rulev{
+                    \Delta \text{ valid}
+                    \\
+                    \Gamma,x^A \subseteq \Delta
+                }{
+                    \Delta \vdash x: A
+                }\right]
+            \end{array}
+            $$
+
+            In order to prove the goal in the lower right corner we assume a
+                valid context $\Delta$ which is a superset of $\Gamma,x^A$.
+                Because of that it has an entry $x^A$. By the start
+                lemma~\ref{StartLemma} we infer the goal.
+
+        \item Product:
+            $$
+            \begin{array}{l|l}
+            \Gamma \vdash A : s_1
+            &
+            \forall \Delta
+                . \left[\rulev{
+                    \Delta \text{ valid}
+                    \\
+                    \Gamma \subseteq \Delta
+                }{
+                    \Delta \vdash A: s_1
+                }\right]
+            \\
+            \Gamma,x^A \vdash B: s_2
+            &
+            \forall \Delta'
+                . \left[\rulev{
+                    \Delta' \text{ valid}
+                    \\
+                    \Gamma,x^A \subseteq \Delta'
+                }{
+                    \Delta' \vdash B: s_2
+                }\right]
+            \\
+            \hline
+            \Gamma \vdash \Pi x^A. B: s_2
+            &
+            \forall \Delta
+                . \left[\rulev{
+                    \Delta \text{ valid}
+                    \\
+                    \Gamma \subseteq \Delta
+                }{
+                    \Delta \vdash \Pi x^A. B: s_2
+                }\right]
+            \end{array}
+            $$
+
+
+            In order to prove the goal in the lower right corner we assume a
+            valid context $\Delta$ which is a superset of $\Gamma$ and derive
+            the following facts:
+            \begin{enumerate}
+            \item $\Delta \vdash A: s_1$: This is an immediate consequence of
+                the first induction hypothesis.
+
+            \item $\Delta,x^A \vdash B : s_2$: We can assume $x \notin \Delta$.
+                Otherwise we rename the variable such that the condition is
+                    satisfied. The context $\Delta,x^A$ is a valid context
+                    because of $\Delta\vdash A: s_1$ and the variable
+                    introduction rule. By the second induction hypothesis we get
+                    the subgoal.
+
+            \item $\Delta\vdash \Pi x^A. B: s_2$: This fact can be derived from
+                the previous two subgoals and the product introduction rule.
+            \end{enumerate}
+            The last fact proves the goal.
+
+        \item Abstraction:
+
+            Similar reasoning as in \emph{product}
+
+        \item Application:
+
+            $$
+            \begin{array}{l|l}
+                \Gamma \vdash f: \Pi x^A. B
+                &
+                \forall \Delta
+                    . \left[\rulev{
+                        \Delta \text{ valid}
+                        \\
+                        \Gamma \subseteq \Delta
+                    }{
+                        \Delta \vdash f: \Pi x^A. B
+                    }\right]
+                \\
+                \Gamma \vdash a: A
+                &
+                \forall \Delta
+                    . \left[\rulev{
+                        \Delta \text{ valid}
+                        \\
+                        \Gamma \subseteq \Delta
+                    }{
+                        \Delta \vdash a: A
+                    }\right]
+                \\
+                \hline
+                \Gamma \vdash f a: B[x:=a]
+                &
+                \forall \Delta
+                    . \left[\rulev{
+                        \Delta \text{ valid}
+                        \\
+                        \Gamma \subseteq \Delta
+                    }{
+                        \Delta \vdash f a : B[x:=a]
+                    }\right]
+            \end{array}
+            $$
+
+            We assume a valid context $\Delta$ which is a superset of $\Gamma$.
+            By the two induction hypotheses and the application introduction
+            rule we infer the goal.
+
+        \item Weaken:
+
+            $$
+            \begin{array}{l|l}
+                \Gamma \vdash t : T
+                &
+                \forall \Delta
+                    . \left[\rulev{
+                        \Delta \text{ valid}
+                        \\
+                        \Gamma \subseteq \Delta
+                    }{
+                        \Delta \vdash t : T
+                    }\right]
+                \\
+                \Gamma \vdash A : s
+                \\
+                x \notin \Gamma
+                \\
+                \hline
+                \Gamma,x^A \vdash t : T
+                &
+                \forall \Delta
+                    . \left[\rulev{
+                        \Delta \text{ valid}
+                        \\
+                        \Gamma, x^A \subseteq \Delta
+                    }{
+                        \Delta \vdash t : T
+                    }\right]
+            \end{array}
+            $$
+
+            Let's assume a valid context $\Delta$ which is a superset of
+            $\Gamma,x^A$. This implies that it is a superset of $\Gamma$ as
+            well. The goal follows immediately from the first induction
+            hypothesis.
+
+        \item Type reduction:
+
+            $$
+            \begin{array}{l|l}
+                \Gamma \vdash t : T
+                &
+                \forall \Delta
+                    . \left[\rulev{
+                        \Delta \text{ valid}
+                        \\
+                        \Gamma \subseteq \Delta
+                    }{
+                        \Delta \vdash t : T
+                    }\right]
+                \\
+                \Gamma \vdash U : s
+                &
+                \forall \Delta
+                    . \left[\rulev{
+                        \Delta \text{ valid}
+                        \\
+                        \Gamma \subseteq \Delta
+                    }{
+                        \Delta \vdash U : s
+                    }\right]
+                \\
+                T \betaeq U
+                \\
+                \hline
+                \Gamma \vdash t : U
+                &
+                \forall \Delta
+                    . \left[\rulev{
+                        \Delta \text{ valid}
+                        \\
+                        \Gamma \subseteq \Delta
+                    }{
+                        \Delta \vdash t : U
+                    }\right]
+            \end{array}
+            $$
+
+            Let's assume a valid context $\Delta$ which is a superset of
+            $\Gamma$. From the two induction hypotheses we get $\Delta \vdash t
+            : T$ and $\Delta \vdash U : s$. We conclude the final goal by
+            applying the type equivalence rule.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+
+\subsection{Generation Lemmata}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}
+    \label{GenerationLemmata}
+    The following generation lemmata are valid:
+    \begin{enumerate}
+    \item Sort:
+        $$
+        \rulev{
+            \Gamma \vdash s : T
+        }
+        {
+            s = \Prop \land T \betaeq \Any
+        }
+        $$
+
+    \item Variable:
+        $$
+        \rulev{
+            \Gamma \vdash x : T
+        }
+        {
+            \exists A,s .
+            \left[
+            \begin{array}{l}
+                \Gamma \vdash A : s
+                \\
+                x^A \in \Gamma
+                \\
+                A \betaeq T
+            \end{array}
+            \right]
+        }
+        $$
+
+    \item Product:
+        $$
+        \rulev{
+            \Gamma \vdash \Pi x^A.B : T
+        }
+        {
+            \exists s_1, s_2.
+            \left[
+            \begin{array}{l}
+                \Gamma \vdash A: s_1
+                \\
+                \Gamma, x^A \vdash B: s_2
+                \\
+                s_2 \betaeq T
+            \end{array}
+            \right]
+        }
+        $$
+
+    \item Abstraction:
+        $$
+        \rulev{
+            \Gamma \vdash \lambda x^A. e : T
+        }
+        {
+            \exists B, s.
+            \left[
+            \begin{array}{l}
+                \Gamma \vdash \Pi x^A. B: s
+                \\
+                \Gamma, x^A \vdash e: B
+                \\
+                \Pi x^A. B  \betaeq T
+            \end{array}
+            \right]
+        }
+        $$
+
+    \item Application:
+        $$
+        \rulev{
+            \Gamma \vdash f a: T
+        }
+        {
+            \exists A, B.
+            \left[
+            \begin{array}{l}
+                \Gamma \vdash f : \Pi x^A. B
+                \\
+                \Gamma \vdash a : A
+                \\
+                B[x:=a]  \betaeq T
+            \end{array}
+            \right]
+        }
+        $$
+    \end{enumerate}
+
+    \begin{proof}
+        The premise in all lemmata is the validity of $\Gamma \vdash t : T$
+        where $t$ is either a sort, a variable, a product, an abstraction or an
+        application. The goal in all lemmata is that some other terms exist and
+        the type $T$ is beta equivalent (or identical) to some other type. All
+        lemmata can be proved by induction on $\Gamma \vdash t : T$.
+
+        Note that the betaequivalence $ X \betaeq T$ in all lemmata is
+        essential. Otherwise the proof for the type equivalence rule cannot be
+        passed.
+
+        \begin{enumerate}
+        \item Introduction rules: For all generation lemmata only one
+            introduction rule is syntactically possible. The corresponding
+                introduction rule proves the goal trivially. As an example we
+                prove the generation lemma for products.
+
+                Only the introduction rule for products is syntactically
+                possible.
+                $$
+                \begin{array}{l|l}
+                    \Gamma \vdash A: s_1
+                    \\
+                    \Gamma, x^A \vdash B: s_2
+                    \\
+                    \hline
+                    \Gamma \vdash \Pi x^A. B : s_2
+                    &
+                    \exists s_a, s_b.
+                    \left[
+                    \begin{array}{l}
+                        \Gamma \vdash A : s_a
+                        \\
+                        \Gamma, x^A \vdash B : s_b
+                        \\
+                        s_2 \betaeq s_b
+                    \end{array}
+                    \right]
+                \end{array}
+                $$
+
+                The goal in the lower right corner is proved by using $s_a =
+                    s_1$ and $s_b = s_2$.
+
+        \item Structural rules: For each of the generation lemmata and
+            structural rule the prove is straightforward. Here we prove the
+                generation lemma for products as an example.
+
+            \begin{enumerate}
+            \item Weaken:
+                $$
+                \begin{array}{l|l}
+                    \Gamma \vdash \Pi x^A. B : T
+                    &
+                    \exists s_1, s_2.
+                    \left[
+                    \begin{array}{l}
+                        \Gamma \vdash A : s_1
+                        \\
+                        \Gamma, x^A \vdash B : s_2
+                        \\
+                        T \betaeq s_2
+                    \end{array}
+                    \right]
+                    \\
+                    \Gamma \vdash C: s
+                    \\
+                    z \notin \Gamma
+                    \\
+                    \hline
+                    \Gamma, z^C \vdash \Pi x^A. B: T
+                    &
+                    \exists s_a, s_b.
+                    \left[
+                    \begin{array}{l}
+                        \Gamma, z^C \vdash A : s_a
+                        \\
+                        \Gamma, z^C, x^A \vdash B : s_b
+                        \\
+                        T \betaeq s_b
+                    \end{array}
+                    \right]
+                \end{array}
+                $$
+
+                By the induction hypothesis there are some $s_1$ and $s_2$ which
+                satisfy the conditions in the square brackets. In order to prove
+                    the goal in the lower right corner and use $s_a = s_1$ and
+                    $s_b = s_2$ and have to prove the following three subgoals:
+                \begin{enumerate}
+                \item $\Gamma, y^C \vdash A : s_1$: Since $\Gamma,y^C$ is a
+                    valid context with $\Gamma \subseteq \Gamma,y^C$ we can
+                        prove the subgoal by the thinning
+                        lemma~\ref{ThinningLemma}.
+
+                \item $\Gamma, z^C, x^A \vdash B : s_2 $: The previous subgoal
+                    and the variable introduction rule ensures that
+                        $\Gamma,y^C,x^A$ is a valid context with $\Gamma,x^A
+                        \subseteq \Gamma,y^C,x^A$. By the thinning
+                        lemma~\ref{ThinningLemma} and the induction hypothesis
+                        we prove the current subgoal.
+
+                \item $T \betaeq s_2$: This subgoal is identical to the third
+                        proposition in the induction hypothesis.
+                \end{enumerate}
+
+            \item Type equivalence:
+                $$
+                \begin{array}{l|l}
+                    \Gamma \vdash \Pi x^A. B : T
+                    &
+                    \exists s_1, s_2.
+                    \left[
+                    \begin{array}{l}
+                        \Gamma \vdash A : s_1
+                        \\
+                        \Gamma, x^A \vdash B : s_2
+                        \\
+                        T \betaeq s_b
+                    \end{array}
+                    \right]
+                    \\
+                    \Gamma \vdash U : s
+                    \\
+                    T \betaeq U
+                    \\
+                    \hline
+                    \Gamma \vdash \Pi x^A. B : U
+                    &
+                    \exists s_a, s_b.
+                    \left[
+                    \begin{array}{l}
+                        \Gamma \vdash A : s_a
+                        \\
+                        \Gamma, x^A \vdash B : s_b
+                        \\
+                        U \betaeq s_b
+                    \end{array}
+                    \right]
+                \end{array}
+                $$
+
+                By the induction hypothesis there exist some $s_1$ and $s_2$
+                which satisfy the propositions in the square brackets,
+                especially $T \betaeq s_2$. To prove the goal in the lower right
+                corner we use $s_a = s_1$ and $s_b = s_2$ and use the fact $T
+                \betaeq U$ and the transitivity of beta equivalence.
+
+            \end{enumerate}
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+\begin{corollary}
+    \label{ContextWelltyped}
+    \emph{All types in a valid context are welltyped}.
+
+    \begin{proof}
+        According to the start lemma~\ref{StartLemma} $\Gamma \vdash x : A$ is
+        valid for each $x^A \in \Gamma$. By the generation
+        lemma~\ref{GenerationLemmata} for variables there is a sort $s$ with
+        $\Gamma \vdash A : s$. Therefore $A$ is welltyped.
+    \end{proof}
+\end{corollary}
+
+
+
+\begin{corollary}
+    \label{AnyNotWelltyped}
+    \emph{The term $\Any$ is not welltyped}.
+
+    \begin{proof}
+        Let's assume it is welltyped. Then by definition there exists a context
+        $\Gamma$ and a term $T$ such that $\Gamma \vdash \Any : T$ is valid. By
+        the generation lemma~\ref{GenerationLemmata} for sorts we get $\Any =
+        \Prop$ which is not possible.
+    \end{proof}
+\end{corollary}
+
+
+
+
+\begin{corollary}
+    \label{ContextHasNoAny}
+    \emph{A valid context has no variable with the type $\Any$}.
+
+    \begin{proof}
+        By \ref{ContextWelltyped} all types in a context are welltyped and by
+        \ref{AnyNotWelltyped} the term $\Any$ is not welltyped. Therefore $\Any$
+        cannot be the type of a variable in a valid context.
+    \end{proof}
+\end{corollary}
+
+
+
+
+\begin{corollary}
+    \label{SubtermWelltyped}
+    \emph{All subterms of a welltyped term are welltyped}.
+
+    \begin{proof}
+        We prove this corollary by proving that any direct subterm of a
+        welltyped term is welltyped by induction on the structure of the
+        welltyped term.
+
+        For each possible form of a welltyped term the generation
+        lemma~\ref{GenerationLemmata} for this form states the existence
+        of a context and a type of each direct subterm, i.e. the direct subterms
+        are welltyped.
+
+        Repeating the argument proves that all indirect subterms of a welltyped
+        subterm are welltyped as well.
+    \end{proof}
+\end{corollary}
+
+
+
+
+
+\begin{corollary}
+    \label{AnyNoSubterm}
+    \emph{$\Any$ cannot be a subterm of a welltyped term}. This implies that
+    terms like $\lambda x^\Any. e$, $\lambda x^A. \Any$, $\Pi x^\Any. B$ or $\Pi
+    x^A. \Any$ cannot be welltyped, because they have $\Any$ as a subterm.
+
+    \begin{proof}
+        Assume that $\Any$ is a subterm of a welltyped term. Then by the
+        corollary~\ref{SubtermWelltyped} $\Any$ must be welltyped. This
+        contradicts corollary~\ref{AnyNotWelltyped}.
+    \end{proof}
+\end{corollary}
+
+
+
+\subsection{Substitution Lemma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{theorem}
+    \label{SubstitutionLemma}
+    Substitution (cut) theorem.
+    $$
+    \rulev{
+        \Gamma \vdash a: A
+        \\
+        \Gamma, x^A, \Delta \vdash t: T
+    }
+    {
+        \Gamma, \Delta[x:=a] \vdash t[x:=a]: T[x:=a]
+    }
+    $$
+
+    \begin{proof}
+        We assume
+        $\Gamma \vdash a: A$
+        and prove this theorem by induction on
+        $\Gamma, x^A, \Delta \vdash t: T$.
+
+        In order to express the proof more compactly we introduce the
+        abbreviation $t' := t[x:=a]$.
+
+        \begin{enumerate}
+            \item Axiom: This case is syntactically impossible, because the
+                context is not empty.
+
+            \item Variable: We have to prove the goal
+                $$
+                \begin{array}{l|l}
+                    \Gamma, x^A, \Delta \vdash B: s
+                    &
+                    \Gamma, \Delta' \vdash B': s
+                    \\
+                    \hline
+                    \Gamma, x^A, \Delta, y^B \vdash y: B
+                    &
+                    \Gamma, \Delta', y^{B'} \vdash y: B'
+                \end{array}
+                $$
+
+                The final goal in the lower right corner follows directly from
+                the induction hypothesis and the variable introduction rule.
+
+            \item Product:
+                $$
+                \begin{array}{l|l}
+                    \Gamma, x^A, \Delta \vdash B: s_1
+                    &
+                    \Gamma, \Delta' \vdash B': s_1
+                    \\
+                    \Gamma, x^A, \Delta, y^B \vdash C: s_2
+                    &
+                    \Gamma, \Delta', y^{B'} \vdash C': s_2
+                    \\
+                    s_2 = \Prop \lor s_1 = s2
+                    \\
+                    \hline
+                    \Gamma, x^A, \Delta \vdash \Pi y^B. C : s_2
+                    &
+                    \Gamma, \Delta' \vdash \Pi y^{B'}. C': s_2
+                \end{array}
+                $$
+
+                The final goal follows from the induction hypotheses and the
+                product introduction rule.
+
+            \item Abstraction:
+                $$
+                \begin{array}{l|l}
+                    \Gamma, x^A, \Delta \vdash \Pi y^B. C: s
+                    &
+                    \Gamma, \Delta' \vdash \Pi y^{B'}. C': s
+                    \\
+                    \Gamma, x^A, \Delta, y^B \vdash e: C
+                    &
+                    \Gamma, \Delta', y^{B'} \vdash e': C'
+                    \\
+                    \hline
+                    \Gamma, x^A, \Delta \vdash \lambda y^B. e: \Pi y^B. C
+                    &
+                    \Gamma, \Delta' \vdash \lambda y^{B'}. e' : \Pi y^{B'}. C'
+                \end{array}
+                $$
+
+                Same reasoning as above.
+
+            \item Application:
+                $$
+                \begin{array}{l|l}
+                    \Gamma, x^A, \Delta \vdash f: \Pi y^B. C
+                    &
+                    \Gamma, \Delta' \vdash f' : \Pi y^{B'}. C'
+                    \\
+                    \Gamma, x^A, \Delta \vdash b: B
+                    &
+                    \Gamma, \Delta' \vdash b': B'
+                    \\
+                    \hline
+                    \Gamma, x^A, \Delta \vdash f b: C[y:=b]
+                    &
+                    \Gamma, \Delta' \vdash f' b': (C[y:=b])'
+                \end{array}
+                $$
+
+                From the induction hypotheses and the application introduction
+                rule we conclude
+                $$
+                    \Gamma, \Delta' \vdash f' b': C'[y:=b']
+                $$
+                and get the final goal by observing
+                $$
+                    C'[y:=b'] = (C[y:=b])'
+                $$
+                by using the double substition lemma~\ref{DoubleSubstitution}.
+
+            \item Structural rules:
+            \begin{enumerate}
+                \item Weakening:
+                $$
+                \begin{array}{l|l}
+                    \Gamma,x^A,\Delta \vdash t: T
+                    &
+                    \Gamma,\Delta' \vdash t' : T'
+                    \\
+                    \Gamma,x^A,\Delta \vdash B: s
+                    &
+                    \Gamma,\Delta' \vdash B' : s'
+                    \\
+                    \hline
+                    \Gamma,x^A,\Delta,y^B \vdash t : T
+                    &
+                    \Gamma,\Delta',y^{B'} \vdash t' : T'
+                \end{array}
+                $$
+                The goal in the lower right corner can be proved by the
+                    induction hypotheses and the weakening rule.
+
+                \item Type equivalence:
+                $$
+                \begin{array}{l|l}
+                    \Gamma,x^A,\Delta \vdash t : T
+                    &
+                    \Gamma,\Delta' \vdash t' : T'
+                    \\
+                    \Gamma,x^A,\Delta \vdash U : s
+                    &
+                    \Gamma,\Delta' \vdash U' : s'
+                    \\
+                    T \betaeq U
+                    \\
+                    \hline
+                    \Gamma,x^A,\Delta \vdash t : U
+                    &
+                    \Gamma,\Delta' \vdash t' : U'
+                \end{array}
+                $$
+                From the theorem~\ref{SubstituteEquivalence} we conclude that
+                    $T'$ and $U'$ are beta equivalent.
+                The goal in the lower right corner is an immediate consequence
+                of the induction hypotheses and the type equivalence rule.
+            \end{enumerate}
+
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+
+\subsection{Type of Types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\label{SecTypeOfTypes}
+
+
+\begin{theorem}
+    \label{TypeOfTypes}
+    \emph{A term in the type position of a context is either $\Any$ or it is a
+    valid type of some sort}.
+
+    $$
+    \rulev{
+        \Gamma \vdash t : T
+    }
+    {
+        T = \Any \lor \exists s. \Gamma \vdash T : s
+    }
+    $$
+
+    \begin{proof}
+        By induction on $\Gamma \vdash t : T$:
+        \begin{enumerate}
+        \item Sort: Trivial
+
+        \item Variable: Trivial by the premise of the variable introduction
+            rule.
+
+        \item Product: Easy, because there are only two sorts. If the sort is
+            $\Prop$ then by the start lemma~\ref{StartLemma} $\Gamma\vdash
+                \Prop: \Any$ is valid in any valid context. If the sort is
+                $\Any$ then the goal is trivial.
+
+        \item Abstraction:
+            $$
+            \begin{array}{l|l}
+                \Gamma \vdash \Pi x^A. B : s_0
+                \\
+                \Gamma,x^A \vdash e: B
+                \\
+                \hline
+                \Gamma \vdash \lambda x^A. e: \Pi x^A. B
+                &
+                \exists s. \Gamma \vdash \Pi x^A. B : s
+            \end{array}
+            $$
+
+            Take $s = s_0$.
+
+        \item Application:
+            $$
+            \begin{array}{l|l}
+                \Gamma \vdash f: \Pi x^A. B
+                & \exists s_0. \Gamma \vdash \Pi x^A. B: s_0
+                \\
+                \Gamma \vdash a: A
+                \\
+                \hline
+                \Gamma \vdash f a: B[x:=a]
+                &
+                \exists s. \Gamma \vdash B[x:=a]: s
+            \end{array}
+            $$
+            Remark: Since $\Any \ne \Pi x^A. B$ only the second alternative is
+                interesting.
+
+            From the induction hypothesis and the generation
+                lemma~\ref{GenerationLemmata} for products we conclude the
+                existence of a sort $s_2$ such that $\Gamma,x^A\vdash B: s_2$ is
+                valid.
+
+                By applying the substitution lemma~\ref{SubstitutionLemma} we
+                get $\Gamma \vdash B[x:=a] : s_2$ which proves the goal.
+
+
+        \item Weaken:
+            The goal is easy to prove by the induction hypothesis and the
+                weakening rule.
+
+        \item Type Equivalence:
+
+            The goal is a immediate consequence of one of the premises of the
+                type equivalence rule.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+
+
+
+\subsection{Subject Reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{theorem}
+    \label{SubjectReductionTheorem}
+    \emph{Subject reduction lemma} Reduction of a term does change its type.
+    $$
+    \rulev{
+        \Gamma \vdash t: T
+        \\
+        t \reduce u
+    }
+    {
+        \Gamma \vdash u: T
+    }
+    $$
+
+    {
+    \def\SRLeftPart#1#2#3#4{
+        \left(
+        \forall #1.
+        \ruleh{#2 \reduce #1}{#3 \vdash #1: #4}
+        \right)
+    }
+    \def\SRRightPart#1#2#3#4{
+        \left(
+        \forall #1.
+        \ruleh{#2 \reduce #1}{#1 \vdash #3: #4}
+        \right)
+    }
+
+    \begin{proof} In order to prove the subject reduction lemma we prove the
+        more general lemma
+        $$
+        \ruleh{
+            \Gamma \vdash t: T
+        }
+        {
+            \SRLeftPart u t \Gamma T
+            \land
+            \SRRightPart \Delta \Gamma t T
+        }
+        $$
+        where $\Gamma \reduce \Delta$ means that $\Delta$ is $\Gamma$ with one
+        of the variable types replaced by a reduced type.
+
+        We prove the more general lemma by induction on $\Gamma \vdash t: T$.
+        \begin{enumerate}
+            \item Introduction rules:
+            \begin{enumerate}
+                \item Sort: If $\Gamma$ is empty and $t$ is a sort, then the
+                    goal is vacuously true because neither the empty context nor
+                    a sort can reduce to anything (they are in normal form).
+
+                \item Variable:
+                    $$
+                    \begin{array}{l|l}
+                        \Gamma \vdash A : s
+                        &
+                        \SRLeftPart B A \Gamma s
+                        \land
+                        \SRRightPart {\Delta_0} \Gamma A s
+                        \\
+                        \hline
+                        \Gamma, x^A \vdash x: A
+                        &
+                        \SRLeftPart u x {\Gamma,x^A} A
+                        \land
+                        \SRRightPart \Delta {\Gamma,x^A} x A
+                    \end{array}
+                    $$
+                    The left part of the goal in the lower right corner is
+                    vacously true because a variable is in normal form and there
+                    is no term to which it reduces.
+
+                    For the right part we assume $\Gamma,x^A \reduce \Delta$.
+                    There are two possibilities:
+                    \begin{enumerate}
+                        \item $\Delta = \Delta_0,x^A$ where $\Gamma \reduce
+                            \Delta_0$ for some $\Delta_0$:
+
+                        In that case we get $\Delta_0 \vdash A: s$ from the
+                            induction hypothesis which implies the goal
+                            $\Delta_0,x^A \vdash x: A$.
+
+                        \item $\Delta = \Gamma,x^B$ where $A \reduce B$:
+
+                        In that case we get $\Gamma \vdash B : s$ from the
+                            induction hypothesis which implies the goal
+                            $\Gamma,x^B: x \vdash B$.
+                    \end{enumerate}
+
+                \item Product:
+                $$
+                \begin{array}{l|l}
+                    \Gamma \vdash A: s_1
+                    &
+                    \SRLeftPart C A \Gamma {s_1}
+                    \lor
+                    \SRRightPart \Delta \Gamma A {s_1}
+                    \\
+                    \Gamma,x^A \vdash B: s_2
+                    &
+                    \SRLeftPart D B {\Gamma,x^A} {s_2}
+                    \lor
+                    \SRRightPart {\Delta'} {\Gamma,x^A} B {s_2}
+                    \\
+                    \hline
+                    \Gamma \vdash \Pi x^A. B : s_2
+                    &
+                    \SRLeftPart t {\Pi x^A.B} \Gamma {s_2}
+                    \land
+                    \SRRightPart \Delta \Gamma {\Pi x^A. B} {s_2}
+                \end{array}
+                $$
+                \begin{enumerate}
+                    \item Left part: We assume $\Pi x^A. B \reduce t$.
+
+                    Since products are preserved under reduction
+                        (lemma~\ref{ReductionProductAbstraction}) we have either
+                        $t = \Pi x^C. B$ where $A \reduce C$ for some $C$ or $t
+                        = \Pi x^A.D$ where $B \reduce D$ for some $D$.
+
+                    In both cases we can derive from the induction hypotheses
+                        either $\Gamma \vdash C: s_1$ or $\Gamma,x^A \vdash D:
+                        s_2$. Therefore $\Gamma \vdash \Pi x^C. B: s_2$ or $\Gamma
+                        \vdash \Pi x^A.D: s_2$ is valid trivially.
+
+                    \item Right part: Assume $\Gamma \reduce \Delta$. From the
+                        first induction hypothesis we get $\Delta \vdash A:
+                        s_1$. From the second induction hypothesis we get
+                        $\Delta, x^A \vdash B: s_2$ where we use $\Delta' =
+                        \Delta, x^A$. These facts imply $\Delta
+                        \vdash \Pi x^A. B : s_2$.
+                \end{enumerate}
+
+                \item Abstraction: Same reasoning as with product.
+
+                \item Application:
+                $$
+                \begin{array}{l|l}
+                    \Gamma \vdash f: \Pi x^A. B
+                    &
+                    \SRLeftPart g f \Gamma {\Pi x^A. B}
+                    \land
+                    \SRRightPart \Delta \Gamma f {\Pi x^A.B}
+                    \\
+                    \Gamma \vdash a: A
+                    &
+                    \SRLeftPart b a \Gamma A
+                    \land
+                    \SRRightPart \Delta \Gamma a A
+                    \\
+                    \hline
+                    \Gamma \vdash f a: B[x:=a]
+                    &
+                    \SRLeftPart t {f a} \Gamma {B[x:=a]}
+                    \land
+                    \SRRightPart \Delta \Gamma {f a} {B[x:=a]}
+                \end{array}
+                $$
+                \begin{enumerate}
+                    \item Left part: Assume $f a \reduce t$. We have three cases
+                        to consider.
+                    \begin{enumerate}
+                        \item $f a \reduce g a$ where $f \reduce g$:
+
+                            From the first induction hypothesis we get that $g$
+                            has the same type as $f$ and therefore $g a:
+                            B[x:=a]$ is valid.
+
+                        \item $f a \reduce f b$ where $a \reduce b$:
+
+                            From the second induction hypothesis we get
+                            $\Gamma \vdash b: A$ and therefore $\Gamma \vdash f
+                            a : B[x:=b]$.
+
+                            Since $B[x:=a]$ is a valid type and because of
+                            lemma~\ref{SubstituteReduction} we have $B[x:=a]
+                            \reduce B[x:=b]$ and therefore $B[x:=b] \le
+                            B[x:=a]$. The subtype rule let us derive
+                            $\Gamma \vdash f b: B[x:=a]$ which is identical to
+                            the final goal.
+
+                        \item $(\lambda x^A. e) a \reduce e[x:=a]$:
+
+                            In that case we have to prove
+                            $$
+                                \rulev{
+                                    \Gamma \vdash \lambda x^A. e: \Pi x^A.B
+                                    \\
+                                    \Gamma \vdash a: A
+                                }
+                                {
+                                    \Gamma \vdash e[x:=a]: B[x:=a]
+                                }
+                            $$
+
+                            We assume $\Gamma \vdash \lambda x^A. e: \Pi x^A.B$
+                            and $\Gamma \vdash a : A$ and prove the final goal.
+
+                            Since $\Pi x^A.B$ is not $\Any$ the type of types
+                            lemma~\ref{TypeOfTypes} states the existence of a
+                            sort $s$ such that $\Gamma \vdash \Pi x^A. B : s$ is
+                            valid and then by the generation
+                            lemma~\ref{GenerationLemmata} for products we get
+                            the existence of some $s_B$ such that $\Gamma, x^A
+                            \vdash B: s_B$ is valid which implies by the
+                            substitution lemma~\ref{SubstitutionLemma} $\Gamma
+                            \vdash B[x:=a]: s_B$.
+
+                            According to the generation
+                            lemma~\ref{GenerationLemmata} for abstractions there
+                            are some $B_0$ and $s_0$ with
+                            $$
+                            \begin{array}{l}
+                                \Gamma \vdash \Pi x^A. B_0 : s_0
+                                \\
+                                \Gamma,x^A \vdash e: B_0
+                                \\
+                                \Pi x^A.  B_0 \betaeq \Pi x^A.B
+                            \end{array}
+                            $$
+                            The second one together with $\Gamma\vdash a:A$ and
+                            the substitution lemma~\ref{SubstitutionLemma} gives
+                            us $\Gamma \vdash e[x:=a] : B_0[x:=a]$.
+
+                            The third one with the Church Rosser
+                            theorem~\ref{BetaEquivalentCommonReduct} give $B
+                            \betaeq B_0$ which by the
+                            theorem~\ref{SubstituteEquivalence}
+                            results in $B[x:=a] \betaeq B_0[x:=a]$.
+
+                            Finally we can convert $\Gamma \vdash e[x:=a] :
+                            B_0[x:=a]$, $\Gamma \vdash B[x:=a]: s_B$ and
+                            $B[x:=a] \betaeq B_0[x:=a]$ via the type equivalence
+                            rule into the final goal.
+                    \end{enumerate}
+
+                    \item Right part: Immediate consequence of the induction
+                        hypotheses.
+                \end{enumerate}
+            \end{enumerate}
+
+            \item Structural rules:
+            \begin{enumerate}
+                \item Weaken:
+                $$
+                \begin{array}{l|l}
+                \Gamma \vdash t : T
+                &
+                \SRLeftPart u t \Gamma T
+                \land
+                \SRRightPart {\Delta_0} \Gamma t T
+                \\
+                \Gamma \vdash A : s
+                &
+                \SRLeftPart B A \Gamma s
+                \land
+                \SRRightPart {\Delta_0} \Gamma A s
+                \\
+                x \notin \Gamma
+                \\
+                \hline
+                \Gamma, x^A \vdash t : T
+                &
+                \SRLeftPart u t {\Gamma, x^A} T
+                \land
+                \SRRightPart \Delta {\Gamma,x^A} t T
+                \end{array}
+                $$
+                \begin{enumerate}
+                    \item Left part: Assume $t \reduce u$. From the first
+                        induction hypothesis we get $\Gamma \vdash u : T$ which
+                        derives the final goal by applying the variable
+                        introduction rule.
+
+                    \item Right part:
+                        We assume $\Gamma,x^A \reduce \Delta$ and have to
+                        distinguish two cases.
+                        \begin{enumerate}
+                        \item
+                            $\Delta = (\Delta_0, x^A)
+                            \land \Gamma \reduce \Delta_0$:
+
+                            In that case we get $\Delta_0 \vdash t : T$ and
+                                $\Delta_0 \vdash A : s$ from the induction
+                                hypotheses which imply the final goal $\Delta_0,
+                                x^A \vdash t : T$ by application of the
+                                weakening rule.
+
+                        \item
+                            $\Delta = (\Gamma, x^B)
+                            \land A \reduce B$:
+
+                            In that case we get $\Gamma \vdash B : s$ from the
+                                second induction hypothesis which implies the
+                                final goal $\Gamma, x^B \vdash t : T$ by
+                                application of the weakening rule.
+                    \end{enumerate}
+                \end{enumerate}
+
+
+                \item Type equivalence:
+                $$
+                \begin{array}{l|l}
+                    \Gamma \vdash t : T
+                    &
+                    \SRLeftPart u t \Gamma T
+                    \land
+                    \SRRightPart \Delta \Gamma t T
+                    \\
+                    \Gamma \vdash U : s
+                    &
+                    \ldots
+                    \land
+                    \SRRightPart \Delta \Gamma U s
+                    \\
+                    T \betaeq U
+                    \\
+                    \hline
+                    \Gamma \vdash t : U
+                    &
+                    \SRLeftPart u t \Gamma U
+                    \land
+                    \SRRightPart \Delta \Gamma t U
+                \end{array}
+                $$
+                \begin{enumerate}
+                    \item Left part: Assume $t \reduce u$. We get $\Gamma \vdash
+                        u: T$ by the first induction hypothesis. The final goal
+                        $\Gamma \vdash u: U$ is obtained by applying the type
+                        equivalence rule.
+
+                    \item Right part: Assume $\Gamma \reduce \Delta$. From the
+                        first induction hypothesis we derive $\Delta \vdash t :
+                        T$ and from the second induction hypothesis we derive
+                        $\Delta \vdash U : s$. The final goal $\Delta \vdash t:
+                        U$ is obtained by applying the type equivalence rule.
+                \end{enumerate}
+            \end{enumerate}
+        \end{enumerate}
+    \end{proof}
+    }
+\end{theorem}
+
+
+
+
+\begin{corollary}
+    \label{NoReductionToAny}
+    \emph{No welltyped term can reduce to $\Any$}.
+    $$
+    \ruleh{
+        A \reducestar \Any
+        \\
+        \Gamma \vdash A: T
+    }
+    {
+        \perp
+    }
+    $$
+    \begin{proof}
+        Assume $\Gamma \vdash A : T$. By the subject reduction
+        theorem~\ref{SubjectReductionTheorem} (applied zero or more times) we
+        get $\Gamma \vdash \Any : T$ which contradicts the fact that $\Any$ is
+        not welltyped~\ref{AnyNotWelltyped}.
+    \end{proof}
+\end{corollary}
+
+
+
+
+
+\begin{corollary}
+    \label{NoEquivalentToAny}
+    \emph{No welltyped term can be beta equivalent to $\Any$}.
+    $$
+    \ruleh{
+        \Gamma \vdash A: T
+        \\
+        A \betaeq \Any
+    }
+    {
+        \perp
+    }
+    $$
+    \begin{proof}
+        Assume $\Gamma \vdash A: T$. Since $A$ and $\Any$ are beta equivalent,
+        by~\ref{BetaEquivalentCommonReduct} they must have a common reduct and
+        since $\Any$ cannot reduce to anything (it is in normal form) the common
+        reduct must be $\Any$.
+
+        Because of the previous theorem~\ref{NoReductionToAny} $A$ cannot
+        reduce to $\Any$ and we get the desired contradiction.
+    \end{proof}
+\end{corollary}
+
+
+
+
+
+\subsection{Type Uniqueness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{theorem}
+    \label{TypeUniqueness1}
+    \emph{All types of a term are beta equivalent}
+    $$
+    \rulev{
+        \Gamma \vdash t : T
+        \\
+        \Gamma \vdash t : U
+    }
+    {
+        T \betaeq U
+    }
+    $$
+
+    \begin{proof}
+        By induction on the structure of $t$ using the generation
+        lemmata~\ref{GenerationLemmata}. The generation lemma for each form of
+        $t$ guarantees the existence of a term $V$ for which $V \betaeq T$ and
+        $V \betaeq U$ is valid. By transitivity of beta equivalence $T \betaeq
+        U$ is implied.
+    \end{proof}
+\end{theorem}
+
+
+
+\begin{theorem}
+    \label{TypeUniqueness2}
+    \emph{All types of beta equivalent terms are beta equivalent}
+    $$
+    \rulev{
+        t \betaeq u
+        \\
+        \Gamma \vdash t : T
+        \\
+        \Gamma \vdash u : U
+    }
+    {
+        T \betaeq U
+    }
+    $$
+
+    \begin{proof}
+        $ t \betaeq u$ implies by the Church Rosser
+        Theorem~\ref{BetaEquivalentCommonReduct} the existence of a term $v$
+        such that $t \reducestar v$ and $u \reducestar v$ are valid.
+
+        By repeated application of the subject reduction theorem we get $\Gamma
+        \vdash v : T$ and $\Gamma \vdash v : U$.
+
+        This implies by the previous theorem~\ref{TypeUniqueness1} the validity
+        of $T \betaeq U$.
+    \end{proof}
+\end{theorem}
+
+
+\begin{corollary}
+    \label{TypeUniqueness3}
+    \emph{Two types $T$ and $U$ of beta equivalent terms $t$ and $u$ are either
+    both $\Any$ or they are types of the same sort}.
+    $$
+    \ruleh{
+        t \betaeq u
+        \\
+        \Gamma \vdash t : T
+        \\
+        \Gamma \vdash u : U
+    }
+    {
+        T = U = \Any
+        \lor
+        \exists s.
+        \left[
+        \begin{array}{l}
+            \Gamma \vdash T : s
+            \\
+            \Gamma \vdash U : s
+        \end{array}
+        \right]
+    }
+    $$
+
+    \begin{proof}
+        By~\ref{TypeUniqueness2} we get $T \betaeq U$ and by the type of types
+        theorem~\ref{TypeOfTypes} both are either $\Any$ or types of some sort.
+
+        The mixed cases are not possible since a welltyped term cannot be beta
+        equivalent to $\Any$ by~\ref{NoEquivalentToAny}.
+
+        It remains to prove that both being welltyped implies that they are
+        types of the same sort.
+
+        Since both $T$ and $U$ are beta equivalent, their sorts have to be beta
+        equivalent as well by~\ref{TypeUniqueness2}. The mixed case that one
+        sort is $\Prop$ and the other is $\Any$ is not possible, because $\Prop$
+        is welltyped (it has type $\Any$ in any valid context) and a welltyped
+        term cannot be beta equivalent to $\Any$ by~\ref{NoEquivalentToAny}.
+        Therefore both sorts are either $\Prop$ or $\Any$.
+    \end{proof}
+\end{corollary}
+
+
+
+
+\subsection{Kinds}
+
+In the section~\ref{SecTypeOfTypes} we saw that any term $T$ in the type
+position of a typing judgement $\Gamma \vdash t : T$ is either $\Any$ or is a
+welltyped term whose type is a sort. This justifies the statement that sorts are
+the types of types.
+
+However the calculus of constructions has dependent types i.e. there are type
+valued functions $F$ which when applied to arguments return a type i.e. $F T a $
+might be a type where $T$ represents a type and $a$ represents some other
+welltyped term e.g. a natural number. In that case $F$ has a type of the form
+$\Pi X^\Prop y^A.  \Prop$. We call such terms $F$ \emph{type functions} and
+their types \emph{kinds}. A \emph{kind} is a product where the final type is a
+sort. We include in our definition of \emph{kinds} products with arity zero i.e.
+sorts. Type functions with arity zero are types.
+
+\begin{definition}
+    The set of \emph{syntactical kinds} $\Kinds$ is defined as the set of terms
+    generated by the grammar
+    $$
+    K ::= s \;|\; \Pi x^A. K \;|\; \Pi x^K.K
+    $$
+    where $s$ ranges over sorts, $K$ ranges over kinds and $A$ ranges over
+    terms which are not kinds.
+
+    It is also possible to use the equivalent definition: The set $\Kinds$ is an
+    inductive set defined by the rules
+    \begin{enumerate}
+    \item
+        $$ s \in \Kinds $$
+    \item
+        $$
+        \rulev{
+            A \notin \Kinds
+            \\
+            K \in \Kinds
+        }
+        {
+            \Pi x^A. K \in \Kinds
+        }
+        $$
+    \item
+        $$
+        \rulev{
+            A \in \Kinds
+            \\
+            K \in \Kinds
+        }
+        {
+            \Pi x^A. K \in \Kinds
+        }
+        $$
+    \end{enumerate}
+\end{definition}
+
+
+\begin{theorem}
+    \label{TypeAnyImpliesKind}
+    \emph{Every term $K$ which has type $\Any$ is a syntactical kind}
+    $$
+    \rulev{
+        \Gamma \vdash K: \Any
+    }
+    {
+        K \in \Kinds
+    }
+    $$
+
+    \begin{proof}
+        By induction on $\Gamma \vdash K: \Any$.
+
+        \begin{enumerate}
+        \item Sort:
+            $$
+            [] \vdash \Prop: \Any
+            $$
+            Trival, because $\Prop \in \Kinds$.
+
+        \item Variable: The variable rule deriving $\Gamma, x^\Any \vdash x:
+            \Any$ is not applicable, because it would require $\Gamma \vdash
+                \Any : s$ which contradicts the first generation
+                lemma~\ref{GenerationLemmata}.
+
+        \item Product:
+            $$
+            \begin{array}{l|l}
+                \Gamma \vdash A: s
+                \\
+                \Gamma, x^A \vdash B: \Any
+                &
+                B \in \Kinds
+                \\
+                \hline
+                \Gamma \vdash \Pi x^A. B : \Any
+                &
+                \Pi x^A . B \in \Kinds
+            \end{array}
+            $$
+            The goal in the lower right corner is a consequence of the induction
+                hypothesis.
+
+        \item Abstraction:
+
+            The abstraction rule deriving $\Gamma \vdash \lambda x^A. e : \Pi
+                x^A. B$ is syntactically not possible, because $\Pi x^A.B \ne
+                \Any$.
+
+        \item Application:
+            In order to apply the rule
+            $$
+            \rulev{
+                \Gamma\vdash f: \Pi x^A. B
+                \\
+                \Gamma \vdash a: A
+            }
+            {
+                \Gamma \vdash f a : B[x:=a]
+            }
+            $$
+            the validity of $B[x:=a] = \Any$ would be necessary. This would
+                require either $B = \Any$ or $B = x \land a = \Any$ by
+                lemma~\ref{SubstitutionToSort} and both cases lead to a
+                contradiction.
+            \begin{itemize}
+            \item $B = \Any$: The generation lemma~\ref{GenerationLemmata} for a
+                product requires the existence of a sort $s$ with $\Gamma, x^A
+                    \vdash \Any : s$ which requires by the generation lemma for
+                    sorts that $\Any = \Prop$ which is not possible.
+
+            \item $B = x \land a = \Any$: The generation lemma for sorts would
+                require in that case $\Any = \Prop$ which is not possible.
+            \end{itemize}
+
+        \item Weaken: Trivial, because the goal is immediately implied by the
+            induction hypothesis.
+
+        \item Type equivalence:
+            $\Gamma \vdash K : \Any$ cannot be derived by the type equivalence
+            rule because the premise $\Gamma \vdash \Any : s$ is not satisfiable
+            ($\Any$ is not welltyped by~\ref{AnyNotWelltyped}).
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+\begin{corollary}
+    \label{TypePropImpliesNotKind}
+    \emph{Every type $T$ of sort $\Prop$ is not a kind}.
+    $$
+    \rulev{
+        \Gamma \vdash T : \Prop
+    }
+    {
+        T \notin \Kinds
+    }
+    $$
+    \begin{proof}
+        Assume $\Gamma \vdash T : \Prop$ and by way of contradiction $T \in
+        \Kinds$.
+
+        This implies by the previous theorem~\ref{KindImpliesTypeAny} $\Gamma
+        \vdash T : \Any$ and by theorem~\ref{TypeUniqueness1} $\Prop \betaeq
+        \Any$ which is contradictory.
+    \end{proof}
+\end{corollary}
+
+
+
+
+\begin{corollary}
+    \label{NotKindImpliesProp}
+    \emph{Every welltyped type which is not a kind has type $\Prop$}.
+    $$
+    \rulev{
+        T \notin \Kinds
+        \\
+        \Gamma \vdash T : s
+    }
+    {
+        \Gamma \vdash T : \Prop
+    }
+    $$
+    \begin{proof}
+        Assume $T \notin \Kinds$ and $\Gamma \vdash T : s$.
+
+        There are only two sorts, therefore either $s = \Prop$ or $s = \Any$
+        has to be valid. The first case proves the goal. The second case implies
+        by the theorem~\ref{TypeAnyImpliesKind} $T \in \Kinds$ which
+        contradicts the assumption $T\notin \Kinds$.
+    \end{proof}
+\end{corollary}
+
+
+
+
+\begin{theorem}
+    \label{KindImpliesTypeAny}
+    \emph{Every welltyped syntactical kind $K$ has type $\Any$.}
+    $$
+    \rulev{
+        K \in \Kinds
+        \\
+        \Gamma \vdash K : T
+    }
+    {
+        \Gamma \vdash K: \Any
+    }
+    $$
+    \begin{proof}
+        By induction on the structure of $K$
+        \begin{enumerate}
+        \item Sort $s$: The validity of $\Gamma \vdash s: T$ implies by the
+            generation lemma~\ref{GenerationLemmata} for sorts $s = \Prop$ and
+                $T \betaeq \Any$. By the type of types lemma~\ref{TypeOfTypes}
+                we know that $T$ is either $\Any$ or it is welltyped and by the
+                lemma~\ref{NoEquivalentToAny} we know that no welltyped term can
+                be beta equivalent to $\Any$. This implies $T = \Any$ and
+                therefore the goal.
+
+        \item $\Pi x^A. K$: We assume $\Gamma \vdash \Pi x^A.K : T$ and have to
+            prove $\Gamma \vdash \Pi x^A: K : \Any$. The generation
+                lemma~\ref{GenerationLemmata} for products guarantees the
+                existence of a sort $s$ with $\Gamma, x^A \vdash K: s$. This
+                together with the induction hypotheses implies $\Gamma, x^A
+                \vdash K: \Any$. By
+                the introduction rule for products we get $\Gamma \vdash \Pi
+                x^A. K : \Any$.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+
+\begin{theorem}
+    \label{KindImpliesTypeAny2}
+    \emph{Every syntactical kind in the type position of a typing judgement
+    either is $\Any$ or has type $\Any$}.
+    $$
+    \rulev{
+        K \in \Kinds
+        \\
+        \Gamma \vdash A: K
+    }
+    {
+        K = \Any \lor \Gamma \vdash K: \Any
+    }
+    $$
+    \begin{proof}
+        By~\ref{TypeOfTypes} either $K = \Any$ or $\Gamma \vdash K : s$ must be
+        valid for some sort $s$. In the first case the goal is trivial. In the
+        second case the goal can be inferred from
+        theorem~\ref{KindImpliesTypeAny}.
+    \end{proof}
+\end{theorem}

@@ -1,0 +1,58 @@
+\documentclass[12pt]{article}
+%\documentclass{article}
+
+\usepackage{amsmath,amsthm,amssymb,xcolor,graphicx,tikz}
+\usepackage{comment}
+\usepackage{cite}
+\usepackage[pdftex]{hyperref}
+\usetikzlibrary{positioning}
+
+\begin{document}
+
+\input{cc_macros}
+
+\title{
+    Typed Lambda Calculus / Calculus of Constructions
+}
+
+\author{
+    Helmut Brandl
+    \\
+    \scriptsize (firstname dot lastname at gmx dot net)
+    \\
+    \scriptsize Version 1.0
+}
+\date{}
+
+\maketitle
+
+% \href {https://github.com/hbr/Lambda-Calculus} {Link text}
+% \url {https://github.com/hbr/Lambda-Calculus}
+
+\abstract{
+    \input {cc_abstract}
+
+    For comments, questions, error reporting feel free to open an issue at
+    \url {https://github.com/hbr/Lambda-Calculus}
+}
+
+
+\tableofcontents
+
+\include {cc_introduction}
+
+\include {cc_mathematics}
+
+\include {cc_calculus}
+
+\include {cc_confluence}
+
+\include{cc_typing}
+
+\include{cc_snproof}
+
+\include{cc_references}
+
+
+
+\end{document}

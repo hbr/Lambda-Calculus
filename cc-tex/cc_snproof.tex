@@ -1,0 +1,2950 @@
+\section{Proof of Strong Normalization}
+\label{sec:NormalizationProof}
+
+In this section we prove the strong normalization of the calculus of
+constructions i.e. we prove that all welltyped terms have no infinite reduction
+sequence which implies that all welltyped terms can be reduced to a normal
+form. The presented proof is based on the proof of Herman Geuvers in his paper
+\emph{A short and flexible proof of strong normalization for the calculus of
+constructions}~\cite{geuvers1994}.
+
+The article of Herman Geuvers is a scientific
+paper which assume some good knowledge of type theory. Here we present the proof
+in a text book style which makes the proof more accessible to readers who are
+no experts in type theory.
+
+
+In the last subsection of this chapter we use the proof of strong normalization
+to prove that the calculus of constructions is consistent as a logic i.e. that
+it is impossible to derive a contradiction in the calculus of constructions.
+
+The proof of strong normalization is not trivial and spans nearly the whole part
+of this chapter. Why is the proof nontrivial?
+
+A naive attempt to prove the strong normalization would be to prove
+$$
+    \ruleh{
+        \Gamma \vdash t : T
+    }
+    { t \in \SN }
+$$
+by induction on $\Gamma \vdash t : T$ (where $\SN$ is the set of all strongly
+normalizing terms).
+
+This attempt passes a lot of rules of the typing relation. But it fails at the
+rule for application. In the rule for application we have to prove the strong
+normalization of $f a$ by using the induction hypotheses that the function term
+$f$ and the argument term $a$ are strongly normalizing. The impossibility of
+this proof step can be seen by looking at a counterexample.
+
+The term $\lambda x^A. x x$ is strongly normalizing because it is in normal
+form. If we apply the term to any argument we get the reduction
+
+$$
+    (\lambda x^A. x x) a \reduce a a
+$$
+%
+If we apply the term to itself we get
+%
+$$
+    (\lambda x^A. x x) (\lambda x^A. x x)
+    \reduce
+    (\lambda x^A. x x) (\lambda x^A. x x)
+$$
+%
+It is obvious that no normal form can be reached because the reduction steps can
+be carried out forever.
+
+The problem with this naive approach is that the goal $t \in \SN$ gives
+induction hypotheses which are too weak. The set of strongly normalizing terms
+$\SN$ is not connected to the type $T$ of the term $t$.
+
+\begin{itemize}
+    \item \emph{Type Interpretation}
+
+        It is better to find a subset of the strongly normalizing terms $\dbrack
+        T \subseteq \SN$ which reflects a set of strongly normalizing terms
+        which can represent terms of type $T$.  We call $\dbrack T$ an
+        \emph{interpretation} of the type $T$. The interpretation of a type
+        shall be chosen in a way such that
+        %
+        $$
+            \rulev
+            {f \in \dbrack {\Pi x^A. B} \\ a \in \dbrack A}
+            {fa \in \dbrack{B[x:=a]}}
+        $$
+        %
+        is valid where $\Pi x^A. B$ is the type of $f$ and $A$ is the type of
+        $a$.
+
+    \item \emph{Saturated Sets}
+
+        In the proof on strong normalization we use \emph{saturated sets} as
+        interpretations of types. Saturated sets are sets of strongly
+        normalizing terms which are closed in the sense that they contain all
+        base terms (strongly normalizing terms of the form $x a_1 a_2 \ldots
+        a_n$) and that they contain all strongly normalizing terms which reduce
+        by beta reduction of a redex in the leftmost position of the term to a
+        term in the set (key reductions).
+
+        These closure conditions are important in the proof.
+        The set of saturated set will be denoted by $\SAT$. Note that $\SAT$ is
+        a set of sets of strongly normalizing terms.
+
+    \item \emph{Lambda Function Space}
+
+        Having a type interpretation $\dbrack A$ for the type $A$ and a type
+        interpretation $\dbrack B$ it is possible to form a saturated set
+        $$
+            \dbrack A \tolambda \dbrack B
+        $$
+        which is the set of lambda terms $f$ which whenever applied to a term $a
+        \in \dbrack A$ guarantees that $fa \in \dbrack A \tolambda \dbrack B$ is
+        valid. Note that $\dbrack A \tolambda \dbrack B$ is a set of strongly
+        normalizing lambda terms and not a relation. We call such a set of
+        stronly normalizing terms  a \emph{lambda function space}. We use sets
+        in the form of a lambda function space as type interpretations of types
+        of the form $\Pi x^A.B$.
+
+        This lambda function space solves the problem of proving $fa \in \dbrack
+        B$ from the induction hypotheses $f \in \dbrack A \tolambda \dbrack B$
+        and $a \in \dbrack A$.
+
+        In the previous paragraph we have ignored the detail that the variable
+        $x$ might be contained in the type $B$ within the product $\Pi x^A.B$
+        and that each different value of the variable $x$ might generate a
+        different interpretation $\dbrack B$ of the type $B$. In the detailed
+        proof we will see that this fact is important when the type $A$ of the
+        variable $x$ is a kind. In that case we have to form the lambda function
+        space
+        %
+        $$
+            \dbrack A \tolambda \bigcap_x \dbrack B
+        $$
+        %
+        where for the purposes of this overview we understand that $\bigcap_x
+        \dbrack B$ is the intersection of all possible interpretations $\dbrack
+        B$ for all possible values of $x$. In the detailed proof we give a
+        precise definition of this lambda function space. Here we get a first
+        hint why the closure conditions in the definition of saturated sets are
+        important. They guarantee that any intersection of saturated sets is a
+        saturated set.
+
+
+    \item \emph{Type Functions}
+
+        It is not sufficient to have interpretations $\dbrack A$ of types $A$.
+        E.g. a term which represents list $L$ in the calculus of constructions
+        is not a type. It is a type function of type $\Pi X^\Prop . \Prop$. We
+        have to find an interpretation for $L$ as well. But its interpretation
+        cannot be a saturated set. Its interpretation $\dbrack L$ has to be a
+        mathematical function which maps saturated sets to saturated sets.
+
+        In that case the term $L T$ which represents the type of a list of
+        elements of type $T$ where $\dbrack T \in \SAT$ and $\dbrack {L T} \in
+        \SAT$ are valid. Therefore the interpretation of $L$ must be a
+        mathematical function which maps saturated sets to saturated sets i.e.
+        $\dbrack L \in \SAT \to \SAT$.  Note that $\SAT \to \SAT$ is a set of
+        mathematical functions.
+
+        Since type functions can be arbitrarily nested, interpretations for type
+        functions can be drawn e.g from $\SAT$ for types i.e. $0$-ary type
+        functions, $\SAT \to \SAT$ for unary type functions, $(\SAT \to \SAT)
+        \to \SAT$ for unary type functions having a unary type function as
+        argument, $\SAT \to \SAT \to \SAT$ for binary type functions (e.g.
+        pairs), ... to arbitrary depth.
+
+    \item \emph{Models and Context Interpretations}
+
+        In the chapter \emph{Typing}~\ref{sec:Typing} we have shown that
+        \emph{kinds} are the types of $n$-ary type functions where the corner
+        case $n = 0$ is allowed. Based on this it is possible to define a
+        function $\nu$ which maps any kind $K$ to its appropriate set of models
+        $\nu(K)$ which is the set of possible interpretations of terms of type
+        $K$.
+
+        Kinds have the advantage that they can be recognized by pure syntactical
+        analysis. This makes the definition of the function $\nu$ easy.
+
+        By looking at the types in a context $\Gamma$ it is decidable whether
+        the type $A$ of a variable $x$ is a kind or not. A \emph{context
+        interpretation} $\xi = [x_1^{M_1}, \ldots, x_n^{M_n}]$ is a sequence of
+        models for all variables in the context whose type is a kind. We say
+        that $\xi$ is a valid interpretation of a valid context $\Gamma$ which
+        we denote by $\xi \vDash \Gamma$ if $\xi$ associates to each variable in
+        the context which is a type function a model from the corresponding set
+        $\nu(K)$ where $K$ is the type of the variable (which has to be a kind).
+
+    \item \emph{Type Interpretation Function}
+
+        Based on a valid context interpretation $\xi \vDash \Gamma$ it is
+        possible to define a function $\typeinter{F}{\xi\Gamma}$ which maps each
+        welltyped type function $F$ (i.e. not only the variables which are type
+        functions) into a type interpretation which is in the set $\nu(K)$ where
+        $K$ is the type of $F$.
+
+        In the definition of the type interpretation function it is crucial to
+        map all types to saturated sets i.e. that all types are interpreted by
+        staturated sets i.e. sets of strongly normalizing terms.
+
+        The definition of the type interpretation function is nontrivial because
+        it has to be shown in each case that the return value is in the correct
+        set.
+
+        Furthermore it has to be proved that the type interpretation function
+        returns for equivalent types the same interpretation. This is important
+        because beta equivalent types are practically the same types. Therefore
+        it is not allowed that they have different interpretations. In order to
+        prove this fact we have to show that substitutions which are the basis
+        of beta reduction and beta equality are treated in a consistent manner.
+        This prove is nontrivial either.
+
+
+    \item \emph{Term Interpretations and Context Models}
+
+        In addition to type interpretations $\xi$ we add term interpretations
+        $\rho$. Term interpretations or better variable interpretations are
+        a mapping from variables to terms which are an element of the type
+        interpretation of the corresponding type i.e. strongly normalizing
+        terms.
+
+        The term interpretation $\terminter{t}{\rho}$ replaces in the term $t$
+        all free occurrences of a variable by its corresponding variable
+        interpretation.
+
+        A context model $\rho\xi \vDash \Gamma$ is a variable
+        interpretation $\rho$ and a type variable interpretation $\xi$ which are
+        consistent.
+
+        The additional complexity of term interpretations $\terminter t \rho$ is
+        necessary to be able to enter binders like $\lambda x^A. e$ and $\Pi x^A
+        B$ and get sufficiently strong induction hypotheses.
+
+    \item \emph{Soundness Theorem}
+
+        The whole machinery culminates in the proof of the soundness theorem
+        which states that for all context models with $\rho\xi \vDash \Gamma$
+        and all welltyped term $t$ with $\Gamma \vdash t : T$ we
+        can prove $\terminter t \rho \in \typeinter T {\xi\Gamma}$.
+
+        Since all type interpretations of types are saturated sets i.e. sets of
+        strongly normalizing terms and there is a canonical interpretation of
+        type variables and the term interpretation which is the identity
+        function is possible (base terms include variables and are in all
+        saturated sets) we easily conclude that all welltyped terms are strongly
+        normalizing.
+\end{itemize}
+
+
+
+
+
+\subsection{Strong Normalization}
+%------------------------------------------
+
+We start the proof of strong normalization with a definition of the set of
+\emph{normal forms} $\NF$ and the set of \emph{strongly normalizing terms} $\SN$
+and prove some properties based on these definitions.
+
+\begin{definition}
+    The set $\NF$ of terms in \emph{normal form} is the set of all terms which
+    do not reduce (i.e. which do not have any redex).
+    $$
+    \ruleh{
+        \ruleallh{b}{a \reduce b}{\perp}
+    }
+    {
+        a \in \NF
+    }
+    $$
+\end{definition}
+
+
+
+\begin{definition}
+    The set $\SN$ of \emph{strongly normalizing} terms is defined inductively
+    by the rule
+    $$
+        \ruleh{
+            \ruleall{b}{a \reduce b}{b \in \SN}
+        }
+        {
+            a \in \SN
+        }
+    $$
+\end{definition}
+
+In words: A term $a$ is strongly normalizing if all its reducts $b$ are strongly
+normalizing.
+
+We can view the strongly normalizing terms more intuitively in the following
+manner.
+
+\begin{itemize}
+
+    \item A term which is already in normalform i.e. it has no reducts is
+        strongly normalizing. In hat case all its reducts (there are none) are
+        vacuously strongly normalizing. I.e. terms in normal form form the
+        $0$-th generation of strongly normalizing terms.
+
+    \item The $1$st generation of strongly normalizing terms are terms which
+        reduce only to terms in normal form.
+
+    \item The $(n+1)$th generation of strongly normalizing terms are terms which
+        reduce only to terms of the $n$th generation of strongly normalizing
+        terms.
+
+    \item $\ldots$
+
+\end{itemize}
+
+This intuitive definition defines the terms which are guaranteed to reduce in at
+most $n$ steps to terms in normal form. The strongly normalizing terms are terms
+which are guaranteed to reduce in $n$ steps to terms in normal form for some
+natural number $n$.
+
+With this intuitive definition we could prove properties of strongly normalizing
+terms by doing induction on the maximal number of steps $n$ needed to reduce to
+normal form.
+
+
+However the formal definition is better suited for doing induction proofs. In
+order to prove that some term $a$ which is strongly normalizing has some
+property $p(a)$ one can assume that all its reducts have this property. I.e. we
+can use an induction scheme similar to rule based induction.
+
+$$
+    \begin{array}{l|l}
+        \ruleall{b}{a \reduce b}{b \in \SN}
+        &
+        \ruleall{b}{a \reduce b}{p(b)}
+        \\
+        \hline
+        a \in \SN
+        &
+        p(a)
+    \end{array}
+$$
+
+In order to prove the goal $p(a)$ in the lower right corner we can assume all
+the other statements especially the induction hypothesis in the upper right
+corner.
+
+
+
+\begin{theorem}
+    \label{StronglyNormalizingSubterm}
+    \emph{All subterms of a strongly normalizing term are strongly normalizing}.
+    %     --------------------------------------------------------------------
+    \begin{proof} Sorts and variables don't have subterms. A product $\Pi
+        x^A.B$ has the subterms $A$ and $B$, an abstraction $\lambda x^A.e$ has
+        the subterms $A$ and $e$ and an application $ab$ has the subterms $a$
+        and $b$. All proofs that subterms of strongly normalizing terms are
+        strongly normalizing follow the same pattern. Here we prove $\ruleh{ab
+        \in SN}{a \in \SN}$ which we transform into the equivalent statement
+        $$
+        \ruleh{
+            t \in \SN
+        }
+        {
+            \ruleall{ab}{t = ab}{a \in \SN}
+        }
+        $$
+        and prove by induction on $t \in \SN$.
+        $$
+        \snproof t u
+        {\ruleall{u a_1 b}{t \reduce u \\ u = a_1 b}{a_1 \in \SN}}
+        {\ruleall{ab}{t = ab}{a \in \SN}}
+        $$
+        In order to prove the goal in the lower right corner we assume $t = ab$
+        and $a \reduce a_1$ and prove $a_1 \in \SN$.
+
+        From $a \reduce a_1$ we infer $ab \reduce a_1 b$ and get the final goal
+        from the induction hypothesis by using $u = a_1 b$.
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+
+\begin{theorem}
+    \label{StronglyNormalizingRedex}
+    \emph{A redex is strongly normalizing if its reduct and all its
+    subexpressions are strongly normalizing}.
+    $$
+    \rulev{
+        e \in \SN
+        \\
+        e[x:=a] \in \SN
+        \\
+        a \in \SN
+        \\
+        A \in \SN
+    }
+    {
+        (\lambda x^A.e) a \in SN
+    }
+    $$
+
+    \begin{proof}
+        We do induction on $e \in \SN$, $a \in \SN$ and $A \in \SN$ to get
+        good induction hypotheses and then prove the final goal.
+
+        \begin{itemize}
+        \item Induction on $e \in \SN$:
+            $$
+            \snproof e f
+            {
+                \ruleall{faA}{
+                    e \reduce f
+                    \\
+                    f[x:=a] \in \SN
+                    \\
+                    a \in \SN
+                    \\
+                    A \in \SN
+                }
+                {(\lambda x^A. f)a \in SN}
+            }
+            {
+                \ruleall{aA}{
+                    e[x:=a] \in \SN
+                    \\
+                    a \in \SN
+                    \\
+                    A \in \SN
+                }
+                {(\lambda x^A.e) a \in \SN}
+            }
+            $$
+
+        \item Assume $e[x:=a] \in \SN$ and do induction on $a \in \SN$:
+            $$
+            \snproof a b
+            {
+                \ruleall{bA}{
+                    a \reduce b
+                    \\
+                    A \in \SN
+                }
+                {(\lambda x^A. e)b \in SN}
+            }
+            {
+                \ruleall{A}{
+                    A \in \SN
+                }
+                {(\lambda x^A.e) a \in \SN}
+            }
+            $$
+
+        \item Induction on $A \in \SN$:
+            $$
+            \snproof A B
+            {\ruleall{B}{ A \reduce B}{(\lambda x^B. e)a \in SN}}
+            {(\lambda x^A.e) a \in \SN}
+            $$
+
+        \item I.e. we have to prove the goal $(\lambda x^A.e)a \in SN$ under the
+            following assumptions $e \in \SN$, $e[x:=a] \in \SN$, $a \in \SN$,
+            $A \in \SN$ and the following induction hypotheses:
+            \begin{enumerate}
+            \item $\ruleall{faA}
+                {
+                    e \reduce f
+                    \\
+                    f[x:=a] \in \SN
+                    \\
+                    a \in \SN
+                    \\
+                    A \in \SN
+                }
+                {(\lambda x^A.f)a \in \SN}$
+
+            \item $\ruleall{bA}
+                {
+                    a \reduce b
+                    \\
+                    A \in \SN
+                }
+                {(\lambda x^A.e)b \in \SN}$
+
+            \item $\ruleall{B}
+                {
+                    A \reduce B
+                }
+                {(\lambda x^B.e)a \in \SN}$
+            \end{enumerate}
+        \end{itemize}
+
+        In order to prove the goal $(\lambda x^A.e)a \in SN$ we have to prove
+        $$
+        \ruleall{c}{(\lambda x^A.e)a \reduce c}{c \in \SN}
+        $$
+
+        We assume $(\lambda x^A.e)a \reduce c$. An application can reduce by
+        definition of reduction only if the application is a redex (which is the
+        case) or if the function term reduces or if the argument reduces. Since
+        the function term $\lambda x^A.e$ is an abstraction it reduces either if
+        the type of the argument $A$ reduces or the body $e$ reduces. I.e. we
+        have 4 cases to consider:
+        \begin{enumerate}
+        \item $(\lambda x^A.e)a \reduce e[x:=a]$. Trivial. The goal $e[x:=a]$ is
+            valid by assumption.
+
+        \item $(\lambda x^A.e)a \reduce (\lambda x^A.f)a$, where $e \reduce f$:
+            In that case we have to prove the goal
+            $$
+                (\lambda x^A.f)a \in \SN
+            $$
+            by using $e \reduce f$ and the above assumptions. We can use the
+                induction hypothesis 1 to prove the goal. The
+                only thing missing is a prove of $f[x:=a] \in \SN$. From the
+                theorem~\ref{SubstituteReduction} we infer $e[x:=a] \reduce
+                f[x:=a]$. Since $e[x:=a] \in \SN$, all its
+                reducts must be strongly normalizing by definition of strong
+                normalization. This completes the proof for that case.
+
+        \item $(\lambda x^A.e)a \reduce (\lambda x^B.e)a$, where $A \reduce B$:
+            In that case we have to prove the goal
+            $$
+                (\lambda x^B.e)a \in \SN
+            $$
+            By using $A \reduce B$ and the induction hypothesis 3 we prove the
+            goal.
+
+        \item $(\lambda x^A.e)a \reduce (\lambda x^A.e)b$, where $a \reduce
+            b$: In that case we have to prove the goal
+            $$
+                (\lambda x^A.e)b \in \SN
+            $$
+            By using $a \reduce b$ and the induction hypothesis 2 we prove the
+            goal.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+
+
+
+
+\subsection{Base Terms}
+%------------------------------------------
+
+
+
+\begin{definition}
+    The set of \emph{base terms} $\BT$ is the set of all variables applied to
+    zero or more strongly normalizing arguments i.e. terms of the form $x a_1
+    \ldots a_n$ where $a_i \in \SN$ for all $i$. We formally define the set
+    $\BT$ by the rules
+    \begin{enumerate}
+    \item $x \in \BT$ where $x$ ranges over variables.
+
+    \item
+        $\ruleh{
+            a \in \BT
+            \\
+            b \in \SN
+        }
+        {
+            ab \in \BT
+        }$
+    \end{enumerate}
+\end{definition}
+
+\begin{theorem}
+    \label{BaseTermsStronglyNormalizing}
+    \emph{All base terms are strongly normalizing}.
+    $$
+    \rulev{
+        a \in \BT
+    }
+    {
+        a \in \SN
+    }
+    $$
+    \begin{proof}
+        Because a base terms begins with a variable followed by zero or more
+        strongly normalizing arguments, it has no redex whose reduction can
+        change the structure. I.e. only the arguments can reduce and they are by
+        definition strongly normalizing.
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+
+\subsection{Key Reduction}
+%------------------------------------------
+
+\begin{definition}
+    The \emph{key reduction} $a \keyreduce b$ is a relation defined by the rules
+    \begin{enumerate}
+    \item
+        $$(\lambda x^A.e) a \keyreduce e[x:=a]$$
+
+    \item
+        $$
+        \rulev{
+            a \keyreduce b
+        }
+        {
+            ac \keyreduce bc
+        }
+        $$
+    \end{enumerate}
+    I.e. a key reduction reduces only a leftmost redex in an application.
+\end{definition}
+
+
+
+
+
+\begin{lemma}
+    \label{KeyReductionDiamond}
+    \emph{Let $a \keyreduce b$ and $a \reduce a_1$ where $a_1 \ne b$. Then there
+    exists a term $b_1$ with $a_1 \keyreduce b_1$ and $b \reducestar b_1$}.
+    $$
+    \begin{array}{ccc}
+        a
+        & \keyreduce
+        & b
+        \\
+        \reducedown
+        &
+        & \reducedownstar
+        \\
+        \underbrace{a_1}_{\ne b}
+        & \keyreduce
+        & \exists b_1
+    \end{array}
+    $$
+    \begin{proof}
+        By induction on $a \keyreduce b$:
+        \begin{enumerate}
+            \item $(\lambda y^A.e) a \keyreduce e[x:=a]$:
+
+                Assume $\lambda x^A.e
+                \reduce a_1$ and $a_1 \ne e[x:=a]$. The goal is to find $b_1$
+                such that $a_1 \keyreduce b_1$ and $e[x:=a] \reducestar b_1$.
+
+                There are 4 cases to consider:
+                \begin{enumerate}
+                    \item $(\lambda x^A.e)a \reduce e[x:=a]$:
+
+                        This case is
+                        contradictory because $e[x:=a] \ne e[x:=a]$ is not
+                        satisfiable.
+
+                    \item $(\lambda x^A.e)a \reduce (\lambda x^{A_1}.e) a$ where
+                        $A \reduce A_1$: In that case have $(\lambda x^{A_1}.e)
+                        a \keyreduce e[x:=a]$ and we choose $b_1 = e[x:=a]$.
+
+                    \item $(\lambda x^A.e)a \reduce (\lambda x^A.f) a$ where $e
+                        \reduce f$:
+
+                        In that case we have $(\lambda x^A.f)a
+                        \keyreduce f[x:=a]$ and we choose $b_1 = f[x:=a]$. This
+                        is possible because $e[x:=a] \reducestar f[x:=a]$ by
+                        theorem~\ref{SubstituteReduction}.
+
+                    \item $(\lambda x^A.e)a \reduce (\lambda x^A.e)b$ where $a
+                        \reduce b$:
+
+                        In that case we have $(\lambda x^A.e)b \keyreduce
+                        e[x:=b]$ and we choose $b_1 = e[x:=b]$. This is possible
+                        because $e[x:=a] \reducestar e[x:=b]$ by
+                        theorem~\ref{ReducedSubstitutionTerm}.
+                \end{enumerate}
+
+            \item
+                $$
+                \begin{array}{l|l}
+                    a \keyreduce b
+                    &
+                    \ruleall {a_1}{a \reduce a_1}{
+                        \exists b_1. a_1 \keyreduce b_1 \land b \reducestar b_1
+                    }
+                    \\
+                    \hline
+                    ac \keyreduce bc
+                    &
+                    \ruleall {d}{ac \reduce d}
+                    {
+                        \exists d_1. d \keyreduce d_1 \land bc \reducestar d_1
+                    }
+                \end{array}
+                $$
+
+                We prove the goal in the lower right corner by assuming $ac
+                \reduce d$ and find some $d_1$ with the required properties.
+
+                Since $a \keyreduce b$ we know that $a$ is not an abstraction.
+                Therefore we have two cases to consider:
+                \begin{enumerate}
+                    \item $ac \reduce a_1 c$ where $a \reduce a_1$:
+
+                        From the induction hypothesis we postulate the existence
+                        of $b_1$ such that $a_1 \keyreduce b_1$ and $b
+                        \reducestar b_1$. We choose $d_1 = b_1 c$ which
+                        satisfies $a_1 c \keyreduce b_1 c$ and $bc \reducestar
+                        b_1 c$.
+
+                    \item $ac \reduce a c_1$ where $c \reduce c_1$:
+
+                        We choose $d_1 = b c_1$ which satisfies $a c_1
+                        \reducestar b c_1$ and $b c \reducestar b c_1$.
+                \end{enumerate}
+        \end{enumerate}
+    \end{proof}
+\end{lemma}
+
+
+
+
+
+\begin{theorem}
+    \label{StronglyNormalizingKeyExpansion}
+    \emph{Let's have $a \keyreduce b$ and $a$ and $bc$ are strongly normalizing.
+    Then $ac$ is strongly normalizing as well}.
+    $$
+    \rulev{
+        a \keyreduce b
+        \\
+        a, bc \in \SN
+    }
+    {
+        ac \in \SN
+    }
+    $$
+    \begin{proof}
+        Since $bc \in \SN$ implies $c \in \SN$ we can prove the equivalent
+        theorem
+        $$
+        \rulev{
+            a \in \SN
+            \\
+            a \keyreduce b
+            \\
+            c \in \SN
+            \\
+            bc \in \SN
+        }
+        {
+            ac \in \SN
+        }
+        $$
+        This modified theorem has the advantage that we can do induction on $c
+        \in \SN$ in the course of the proof.
+
+        \begin{enumerate}
+        \item Induction on $a \in \SN$:
+            $$
+            \snproof a {a_1}
+                {
+                    \ruleall{a_1 b_1 c}{
+                        a \reduce a_1
+                        \\
+                        a_1 \keyreduce b_1
+                        \\
+                        c \in \SN
+                        \\
+                        b_1 c \in \SN
+                    }{a_1 c \in \SN}
+                }
+                {
+                    \ruleall{b c}{
+                        a \keyreduce b
+                        \\
+                        c \in \SN
+                        \\
+                        bc \in \SN
+                    }{ac \in \SN}
+                }
+            $$
+
+        \item Assume $a \keyreduce b$.
+
+        \item Induction on $c \in \SN$:
+            $$
+            \snproof c {c_1}
+                {
+                    \ruleall{c_1}{
+                        c \reduce c_1
+                        \\
+                        bc_1 \in \SN
+                    }{a c_1 \in \SN}
+                }
+                {
+                    \rulev
+                    {
+                        bc \in \SN
+                    }
+                    {ac \in \SN}
+                }
+            $$
+
+            We prove the goal in the lower right corner by assuming $bc \in \SN$
+                and prove the final goal $ac \in \SN$.
+
+        \item In order to prove $ac \in \SN$ we assume $ac \reduce d$ and prove
+            $d \in \SN$ for all $d$.
+
+            Since $a \keyreduce b$ we know that $a$ is not an abstraction.
+            Therefore there are only three cases to consider.
+            \begin{enumerate}
+            \item $ac \reduce bc$ where $a \reduce b$: In that case we have to
+                prove the goal
+                $$
+                    d = bc \in \SN
+                $$
+                This is trivial since $bc \in \SN$ is an assumption.
+
+            \item $ac \reduce a_1c$ where $a \reduce a_1$ and $a_1 \ne b$: We
+                have to prove the goal
+                $$
+                    d = a_1 c \in \SN
+                $$
+
+                Since we have $a \keyreduce b$ by
+                lemma~\ref{KeyReductionDiamond} there exists a $b_1$ such
+                that $a_1 \keyreduce b_1$ and $b \reducestar b_1$. Because of
+                $bc \in \SN$ we have $b_1c \in \SN$ as well. Therefore all
+                premises of the induction hypothesis of step 1 are satisfied and
+                we get $a_1 c \in \SN$ from it.
+
+            \item $ac \reduce ac_1$ where $c \reduce c_1$: We have to prove the
+                goal
+                $$
+                    d = a c_1 \in \SN
+                $$
+                Because of $bc \in \SN$ we have $bc_1 \in \SN$ as well.
+                    Therefore the preconditions of the induction hypothesis of
+                    step 3 are satisfied and the goal is an immediate
+                    consequence of the induction hypothesis.
+            \end{enumerate}
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+
+
+
+\subsection{Saturated Sets}
+%------------------------------------------
+
+
+\begin{definition}
+    A \emph{saturated set} $S$ is a set of strongly normalizing terms (i.e. $S
+    \subseteq \SN$) which is closed under the rules
+    \begin{enumerate}
+    \item All base terms are in a saturated set:
+        $$ \rulev{b \in \BT}{b \in S}$$
+
+    \item All strongly normalizing terms which keyreduce to a term in the
+        saturated set are in the saturated set as well:
+            $$
+            \rulev{
+                a \in \SN
+                \\
+                b \in S
+                \\
+                a \keyreduce b
+            }
+            {
+                a \in S
+            }
+            $$
+    \end{enumerate}
+    The set of all saturated sets is abbreviated by $\SAT$.
+\end{definition}
+
+
+
+\begin{theorem}
+    \label{SaturatedSetsIntersection}
+    \emph{An arbitrary intersection of saturated sets is a saturated set}.
+    $$
+    \rulev{
+        C \subseteq \SAT
+    }
+    {
+        \bigcap C \in \SAT
+    }
+    $$
+    \begin{proof}
+        We have to prove three things:
+        \begin{enumerate}
+        \item All terms in $\bigcap C$ are strongly normalizing:
+
+            Since all sets in $C$ contain only strongly normalizing
+            terms, the intersection contains only strongly normalizing terms
+            as well.
+
+            Note the cornercase $\bigcap \emptyset = \SN$ since $\SN$ is the
+                base set.
+
+        \item $\bigcap C$ contains all base terms:
+
+            Since all sets in $C$ contain all base terms, the intersection of
+            all sets in $C$ contain all base terms as well.
+
+        \item $\bigcap C$ contains all strongly normalizing key redexes which
+            reduce to a term in it:
+
+            Assume that the term $b$ is in $\bigcap C$. Then by definition of
+                intersection $b \in S$ for all $S \in C$. Since all $S \in C$
+                are saturated any strongly normalizing term $a$ with $a
+                \keyreduce b$ is in all sets $S$ as well. Therefore $a$ has to
+                be in the intersection $\bigcap C$.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+Remark:
+\begin{quote}
+
+    For those interested in lattice theory. The set of all subsets of the set of
+    strongly normalizing terms (i.e. the powerset of $\SN$) is a complete
+    lattice with intersection and union as the meet and join operations. The
+    subset relation induces a partial order.
+
+    The function which maps any set of
+    strongly normalizing terms into a saturated set (i.e. which adds all base
+    terms and all strongly normalizing key redexes) is monotonic, increasing and
+    idempotent. I.e. it is a closure map. The saturated sets are fixpoints of
+    that function.
+
+    The fixpoints of such a map form in general a complete
+    lattice which is closed with respect to intersection and union.
+
+\end{quote}
+
+
+
+
+
+
+
+\subsection{Lambda Function Space}
+%------------------------------------------
+
+
+\begin{definition}
+    \emph{If $A$ and $B$ are sets of lambda terms we define the lambda functions
+    space $A \tolambda B$ as the set of lambda terms $f$ such that whenever $a$
+    is in $A$ then $fa$ is in $B$}.
+    $$
+    A \tolambda B := \set{f \mid \forall a. a \in A \imp fa \in B}
+    $$
+\end{definition}
+
+
+
+
+
+
+
+\begin{theorem}
+    \label{LambdaSpaceSaturated}
+    \emph{The lambda function space between saturated sets is a saturated set}.
+
+    $$
+    \rulev{
+        A \in \SAT
+        \\
+        B \in \SAT
+    }
+    {
+        A \tolambda B \in \SAT
+    }
+    $$
+
+    \begin{proof}
+        We have to prove three things:
+        \begin{enumerate}
+        \item All terms in $A \tolambda B$ are strongly normalizing: Assume $f
+            \in A \tolambda B$. Then by definition $fa \in B \subseteq \SN$ for
+                all $a \in A$. Therefore $fa$ is strongly normalizing. Since all
+                subterms of a strongly normalizing term are strongly normalizing
+                as well~\ref{StronglyNormalizingSubterm} $f$ is strongly
+                normalizing.
+
+        \item $A \tolambda B$ contains all base terms:
+
+            We have to prove two things according to the definition of base
+            terms:
+
+            \begin{enumerate}
+            \item All variables are in $A \tolambda B$:
+
+                Since $B$ is saturated, it contains all terms of the form $xa$
+                where $a \in A$, because $xa$ is a base term. Therefore $x
+                \in A \tolambda B$ for all variables $x$.
+
+            \item If $c \in A \tolambda B$ where $c$ is a baseterm, then $cd
+                \in A \tolambda B$ for all strongly normalizing terms $d$:
+
+                Since $B$ is saturated it contains all terms of the form $cda$
+                for $a \in A \subseteq \SN$, because $cda$ is a base term.
+                Therefore by definition of the lambda function space $cd \in
+                A \tolambda B$.
+            \end{enumerate}
+
+        \item $A \tolambda B$ contains all strongly normalizing key redexes
+            which reduce to a term in it:
+
+            Assume $d \in A \tolambda B$, $c \keyreduce d$ and $c \in \SN$. We
+            have to prove that $c \in A \tolambda B$.
+
+            By definition of keyreduction we have $ca \keyreduce da$ for all $a
+            \in A$ and by definition of the lambda function space $da \in
+            B \subseteq \SN$.
+
+            Since $B$ is saturated, it contains $ca$ provided that $ca$ is
+            strongly normalizing. $ca$ is strongly normalizing by
+            theorem~\ref{StronglyNormalizingKeyExpansion} since $ca \keyreduce
+            da$ and $da \in \SN$.
+
+            Therefore by definition of
+            the lambda function space $c \in A \tolambda B$.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+
+\subsection{Model Set}
+%------------------------------------------
+
+\begin{definition}
+    \emph{Model Set} For $K \in \Kinds$ we define the model set
+    $\nu(K)$ by
+    $$
+        \nu(K) :=
+        \left \{
+        \begin{array}{llll}
+            \nu(s) &:=& \SAT & s \text{ is a sort}
+            \\
+            \nu(\Pi x^A. B) &:=& \nu(A)\to \nu(B) & A,B \in \Kinds
+            \\
+            \nu(\Pi x^A. B) &:=& \nu(B) & A \notin \Kinds \land B \in \Kinds
+        \end{array}
+        \right.
+    $$
+\end{definition}
+
+
+
+\begin{definition}
+    \emph{Canonical Model} For $K \in \Kinds$ we define the
+    canonical model $\nu^c(K)$ by
+    $$
+        \nu^c(K) :=
+        \left \{
+        \begin{array}{llll}
+            \nu^c(s) &:=& \SN & s \text{ is a sort}
+            \\
+            \nu^c(\Pi x^A. B)
+            &:=&
+            \bullet \mapsto \nu^c(B) & A,B \in \Kinds
+            \\
+            \nu^c(\Pi x^A. B)
+            &:=&
+            \nu^c(B) & A \notin \Kinds \land B \in \Kinds
+        \end{array}
+        \right.
+    $$
+    where $\bullet \mapsto v$ is the constant function which maps any argument
+    to the value $v$.
+\end{definition}
+
+
+The following property of $\nu$ is convenient:
+$$
+    \rulev{
+        K \in \Kinds
+        \\
+        \Gamma \vdash F: K
+        \\
+        \Gamma \vdash F: T
+    }
+    {
+        T \in \Kinds \land \nu(K) = \nu(T)
+    }
+$$
+
+
+In order to prove the property we first prove a similar lemma for kinds.
+
+\begin{lemma}
+    \label{ModelEquivalentKinds}
+    \emph{The model set of a welltyped kind is the same as the model set of any beta
+    equivalent welltyped type}.
+    $$
+    \rulev{
+        K \in \Kinds
+        \\
+        \Gamma \vdash K: \Any
+        \\
+        \Gamma \vdash T: s_T
+        \\
+        K \betaeq T
+    }
+    {
+        T \in \Kinds \land \nu(K) = \nu(T)
+    }
+    $$
+
+    \begin{proof}
+        By induction on the structure of $K$.
+
+        General observation: Since $K$ and $T$ are betaequivalent we get from
+        theorem~\ref{TypeUniqueness3} $s_T = \Any$ and
+        by~\ref{TypeAnyImpliesKind} that $T$ is a syntactical kind. This is
+        valid for all induction hypotheses.
+
+        For the induction proof we distiguish three cases:
+        \begin{enumerate}
+        \item $K = s$: In that case $K$ has to be $\Prop$, otherwise it would
+            not be welltyped.
+
+            Using the general observation above we conclude that
+            $T$ is a syntactical kind. $\Prop$ is the only possible syntactical
+                kind beta equivalent to $\Prop$. Therefore $T = \Prop$ which
+                implies the goal $\nu(T) = \nu(\Prop)$ trivially.
+
+        \item $K = \Pi x^{K_1}. K_2$:
+            Since $T$ is a syntactical kind betaequivalent to $K$ it must have
+                the form of a product (a sort is not possible). I.e. $T = \Pi
+                x^A.B$ for some types $A$ and $B$.
+
+            By theorem~\ref{EquivalentBinders} we get the equivalences $K_1
+                \betaeq A$ and $K_2 \betaeq B$.
+
+            From both induction hypotheses we conclude $\nu(K_1) = \nu(A)$ and
+            $\nu(K_2) = \nu(B)$.
+
+
+        \item $K = \Pi x^A . K_2$ (where $A \notin \Kinds$):
+            By the same reasoning as above we get $T = \Pi x^{A_T}.B$ for some
+            types $A_T$ and $B$ with $A \betaeq A_T$ and $ K_2 \betaeq B$.
+
+                From the induction hypothesis we get $\nu(K_2) = \nu(B)$.
+
+            Since both $A$ and $A_T$ are valid types and $A$ is not a
+                syntactical kind, we conclude by using~\ref{TypeUniqueness3}
+                that $A_T$ cannot be a syntactical kind either.
+
+            Therefore we get
+            $$
+                \nu(K) = \nu(K_2) = \nu(B) = \nu(T).
+            $$
+        \end{enumerate}
+    \end{proof}
+\end{lemma}
+
+
+\begin{theorem}
+    \label{ModelAllTypesSame}
+    \emph{If a type function $F$ is welltyped (i.e. its type is a kind), then
+    the model sets of all its possible types are the same}.
+    $$
+    \rulev{
+        K \in \Kinds
+        \\
+        \Gamma \vdash F: K
+        \\
+        \Gamma \vdash F: T
+    }
+    {
+        T \in \Kinds \land \nu(K) = \nu(T)
+    }
+    $$
+
+    \begin{proof}
+        From~\ref{TypeUniqueness1} we infer $T \betaeq U$ and
+        from~\ref{TypeUniqueness3} we infer that either both are $\Any$ or both
+        are types of the same sort.
+
+        If both are $\Any$, then $\nu(K) = \nu(T)$ is valid trivially.
+
+        Assume both are types of the same sort i.e. we have $\Gamma \vdash K: s$
+        and $\Gamma \vdash T: s$. Since $K$ is a syntactical kind $s = \Any$ is
+        valid.
+
+        Therefore the assumptions of lemma~\ref{ModelEquivalentKinds} are valid
+        and we infer the goal by applying the lemma.
+    \end{proof}
+\end{theorem}
+
+
+
+As a next step we prove the fact that the model set of a kind is not affected by
+a welltyped substitution.
+
+
+\begin{theorem}
+    \label{ModelSubstitutionSame}
+    \emph{A type correct variable substitution does not affect the model set of
+    a kind}.
+    $$
+    \rulev{
+        K \in \Kinds
+        \\
+        \Gamma,x^A \vdash K: \Any
+        \\
+        \Gamma \vdash a : A
+    }
+    {
+        \nu(K) = \nu(K[x:=a])
+    }
+    $$
+    \begin{proof}
+
+        By induction on $K \in \Kinds$.
+
+        \def\goal#1#2{
+            \forall #1.
+            \left[
+                \rulev{
+                    \Gamma,x^A,#1 \vdash #2: \Any
+                }
+                {
+                    \nu(#2) = \nu((#2)[x:=a])
+                }
+            \right]
+        }
+
+        \begin{enumerate}
+        \item $s \in \Kinds$: Trivial
+
+        \item
+            $$
+            \begin{array}{l|l}
+                B \notin \Kinds
+                \\
+                K \in \Kinds
+                &
+                \goal {\Delta'} K
+                \\
+                \hline
+                \Pi y^B. K \in \Kinds
+                &
+                \goal \Delta {\Pi y^B. K}
+            \end{array}
+            $$
+
+            We assume $\Gamma,x^A,\Delta \vdash \Pi y^B.K : \Any$ and derive the
+            goal $\nu(\Pi y^B. K) = \nu((\Pi y^B.K)[x:=a])$.
+
+            From the generation lemma~\ref{GenerationLemmata} for products we
+            postulate the existence of $s_B$ and $s_K$ such that
+            $$
+            \begin{array}{lll}
+                \Gamma,x^A,\Delta &\vdash& B: s_B
+                \\
+                \Gamma,x^A,\Delta,y^B &\vdash& K : s_K
+                \\
+                s_K \betaeq \Any
+            \end{array}
+            $$
+            This implies $s_B = \Prop$ (because $B\notin \Kinds$ and
+            corollary~\ref{NotKindImpliesProp}) and $s_K = \Any$.
+
+            Applying the substitution lemma~\ref{SubstitutionLemma} we get
+            $$
+            \Gamma,x^A,\Delta[x:=a] \vdash B[x:=a] : \Prop
+            $$
+            which by theorem~\ref{KindImpliesTypeAny} implies $B[x:=a] \notin
+            \Kinds$.
+
+            We use $\Delta' = \Delta,y^B$ and derive $\nu(K) = \nu(K[x:=a])$
+            from the induction hypothesis.
+
+            Therefore by the equalities
+            $$
+            \begin{array}{lll}
+                \nu(\Pi y^B.K)
+                &=& \nu(K)
+                \\
+                &=& \nu(K[x:=a])
+                \\
+                &=& \nu(\Pi y^{B[x:=a]}. K[x:=a])
+                \\
+                &=& \nu((\Pi y^B . K)[x:=a])
+            \end{array}
+            $$
+            we derive the desired goal.
+
+        \item
+            $$
+            \begin{array}{l|l}
+                B \in \Kinds
+                &
+                \goal \Delta B
+                \\
+                K \in \Kinds
+                &
+                \goal {\Delta'} K
+                \\
+                \hline
+                \Pi y^B. K \in \Kinds
+                &
+                \goal \Delta {\Pi y^B. K}
+            \end{array}
+            $$
+            We assume $\Gamma,x^A,\Delta \vdash \Pi y^B.K : \Any$ and derive the
+            goal $\nu(\Pi y^B. K) = \nu((\Pi y^B.K)[x:=a])$.
+
+            From the generation lemma~\ref{GenerationLemmata} for products we
+            postulate the existence of $s_B$ and $s_K$ such that
+            $$
+            \begin{array}{lll}
+                \Gamma,x^A,\Delta &\vdash& B: s_B
+                \\
+                \Gamma,x^A,\Delta,y^B &\vdash& K : s_K
+                \\
+                s_K \betaeq \Any
+            \end{array}
+            $$
+            This implies $s_B = \Any$ and $s_K = \Any$ because of $B,K \in
+            \Kinds$ and therorem~\ref{KindImpliesTypeAny}.
+
+            By using $\Delta' = \Delta,y^B$ the preconditions of both induction
+            hypotheses are satisfied and we derive the facts
+            $$
+            \begin{array}{lll}
+                \nu(B) &=& \nu(B[x:=a])
+                \\
+                \nu(K) &=& \nu(K[x:=a])
+            \end{array}
+            $$
+
+            Therefore by the equalities
+            $$
+            \begin{array}{lll}
+                \nu(\Pi y^B.K)
+                &=& \nu(B) \to \nu(K)
+                \\
+                &=& \nu(B[x:=a]) \to \nu(K[x:=a])
+                \\
+                &=& \nu(\Pi y^{B[x:=a]}. K[x:=a])
+                \\
+                &=& \nu((\Pi y^B . K)[x:=a])
+            \end{array}
+            $$
+            we derive the desired goal.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+\subsection{Context Interpretation}
+%------------------------------------------
+
+\begin{definition}
+    \emph{Context Interpretation}:
+    We call $\xi = [x_1^{M_1}, x_2^{M_2}, \ldots, x_n^{M_n}]$ an interpretation
+    of a context $\Gamma$ if and only if it satisfies the relation $\xi \vDash
+    \Gamma$ defined by the rules
+    \begin{enumerate}
+    \item Empty context
+        $$
+        [] \vDash []
+        $$
+    \item Term variable
+        $$
+        \rulev{
+            \xi \vDash \Gamma
+            \\
+            \Gamma \vdash A : \Prop
+            \\
+            x \notin \Gamma
+        }
+        {
+            \xi \vDash \Gamma,x^A
+        }
+        $$
+    \item Type (function) variable
+        $$
+        \rulev{
+            \xi \vDash \Gamma
+            \\
+            \Gamma \vdash K: \Any
+            \\
+            F \notin \Gamma
+            \\
+            M \in \nu(K)
+        }
+        {
+            \xi,F^M \vDash \Gamma,F^K
+        }
+        $$
+    \end{enumerate}
+\end{definition}
+
+
+\begin{theorem}
+    \label{CanonicalContextInterpretation}
+    \emph{For every valid context $\Gamma$ there exists a unique canonical
+    context interpretation $\xi^c(\Gamma)$ with $\xi^c(\Gamma) \vDash \Gamma$}.
+    \begin{proof}
+        We construct the canonical context interpretation recursively.
+        $$
+        \xi^c(\Gamma)
+        :=
+        \left\{
+            \begin{array}{llll}
+                \xi^c([]) &:=& []
+                \\
+                \xi^c(\Gamma,x^A) &:=& \xi^c(\Gamma)
+                & A \notin \Kinds
+                \\
+                \xi^c(\Gamma,x^A) &:=& \xi^c(\Gamma),x^{\nu^c(A)}
+                & A \in \Kinds
+            \end{array}
+        \right.
+        $$
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+
+\subsection{Type Interpretation}
+%------------------------------------------
+
+The goal of this section is to find a function which maps any welltyped type
+function $F$
+for all types $K$ it can have in a certain context $\Gamma$ into a value
+$\typeinter{F}{\xi\Gamma} \in \nu (K)$ or $\Any$ into
+$\typeinter{\Any}{\xi\Gamma} \in \SAT$. The function is based on a context
+interpretation $\xi$ which assigns to each type variable $x$ of type $A$ (which
+is a kind) in the context a model which is an element of $\nu(A)$.
+
+\begin{definition}
+    \label{SpecificationTypeInterpretation}
+    \emph{The type interpretation function $\typeinter{F}{\xi\Gamma}$ must
+    satisfy the following specification}.
+    $$
+    \rulev{
+        \xi \vDash \Gamma
+        \\
+        \Gamma \vdash F : K
+        \\
+        K \in \Kinds
+    }
+    {
+        \typeinter{F}{\xi\Gamma} \in \nu(K)
+    }
+    \land
+    \ruleh{
+        \xi \vDash \Gamma
+    }
+    {
+        \typeinter{\Any}{\xi\Gamma} \in \SAT
+    }
+    $$
+
+    I.e. it has the preconditions
+    \begin{itemize}
+    \item The context $\Gamma$ has to be valid and $\xi$ is a context
+        interpretation (i.e. $\xi \vdash \Gamma$).
+
+    \item $F$ is either $\Any$ or it is a welltyped type function (i.e. there
+        exist some type $K \in \Kinds$ such that $\Gamma \vdash t : K$ is
+            valid).
+    \end{itemize}
+
+    In the case that $F$ is a welltyped type function, then the
+    typeinterpretation has to be an element of $\nu(T)$ for all possible types
+    of $F$. If $F$ is $\Any$
+    then the typeinterpretation must be a saturated set.
+\end{definition}
+
+
+\begin{definition}
+    \label{DefinitionTypeInterpretation}
+    \emph{The type interpretation function $\typeinter{F}{\xi\Gamma}$ is defined
+    recursively on the structure of $F$}.
+
+    Note that by theorem~\ref{ModelAllTypesSame} we can choose any type of a
+    welltyped type function to prove the satisfaction of the specification.
+
+    \begin{enumerate}
+    \item Sort:
+        $$
+        \typeinter{s}{\xi\Gamma} := \SN
+        $$
+        This definition satisfies the
+            specification~\ref{SpecificationTypeInterpretation}. There are two
+            cases possible.
+
+            If $s = \Prop$ then it is welltyped and its type is $\Any$ and we
+            have $\SN \in \SAT$ and $\SAT = \nu(\Any)$.
+
+            If $s = \Any$ then the specification is trivially satisfied.
+
+    \item Variable:
+        $$
+        \typeinter{x}{\xi\Gamma} := M
+        $$
+        where $x^{M} \in \xi$.
+
+        The precondition $\xi \vDash \Gamma$ is possible only if there is a type
+        $A$ such that $x^A \in \Gamma$ and $\Gamma \vdash A: \Any$ is valid.
+        By the start lemma~\ref{StartLemma} $\Gamma \vdash x : A$ is valid
+        and since $\xi$ is a valid context interpretation for the context
+        $\Gamma$ we get $M \in \nu(A)$.
+
+
+    \item Product:
+        $$
+            \typeinter{\Pi x^A.B}{\xi\Gamma}
+            :=
+            \typeinter{A}{\xi\Gamma} \tolambda I_B
+        $$
+        where
+            $$
+            I_B :=
+            \left\{
+            \begin{array}{ll}
+                \typeinter{B}{\xi(\Gamma,x^A)}
+                & \text{if } A \notin \Kinds
+                \\
+                \bigcap_{M\in\nu(A)}
+                \typeinter{B}{(\xi,x^M)(\Gamma,x^A)}
+                & \text{if }  A \in \Kinds
+            \end{array}
+            \right.
+        $$
+
+        Since a product is not $\Any$ we have to prove the left part of the
+            specification
+        $$
+        \rulev{
+            \xi \vDash \Gamma
+            \\
+            \Gamma \vdash \Pi x^A.B : K
+            \\
+            K \in \Kinds
+        }
+        {
+            \typeinter{A}{\xi\Gamma} \tolambda I_B \in \nu(K)
+        }
+        $$
+        where $I_B$ is the type interpretation of $B$ (see above).
+
+        From the generation lemma~\ref{GenerationLemmata} for products we
+        postulate the existence of the sorts $s_A$ and $s_B$ such that
+        $\Gamma\vdash A: s_A$ and $\Gamma,x^A\vdash B: s_B$ are valid and
+        $s_B$ is beta equivalent to $K$.
+
+        Since products cannot be beta equivalent to sorts
+        by~\ref{BinderNotEquivalentSortVariable} $K$ must be a sort and the only
+        sort beta equivalent to $s_B$ is $s_B$. Therefore we have $K = s_B$ and
+        $\nu(K) = \SAT$.
+
+        In order to prove that $\typeinter{A}{\xi\Gamma} \tolambda I_B$ is a
+        saturated set by theorem~\ref{LambdaSpaceSaturated} it is sufficient to
+        prove that $\typeinter{A}{\xi\Gamma}$ and $I_B$ are saturated sets.
+        \begin{enumerate}
+        \item $\typeinter{A}{\xi\Gamma} \in \SAT$: The preconditions $\xi \vDash
+            \Gamma$, $\Gamma \vdash A : s_A$ and $s_A \in \Kinds$ of the
+                typeinterpretation function are satisfied. Therefore we can
+                conclude the goal.
+        \item $I_B \in \SAT$: We have to distinguish two cases:
+            \begin{enumerate}
+            \item $A \notin \Kinds$:
+                In that case we have $\xi \vDash \Gamma,x^A$ i.e. the
+                    preconditions for the typeinterpretation function are
+                    satisfied and we get $\typeinter{B}{\xi(\Gamma,x^A)} \in
+                    \SAT$.
+
+                \item $A \in \Kinds$: By
+                    theorem~\ref{SaturatedSetsIntersection} it is sufficient to
+                    prove $\typeinter{B}{(\xi,x^M)(\Gamma,x^A)} \in \SAT$ for
+                    all $M \in \nu(A)$.
+
+                    Assume $M \in \nu(A)$. Then $\xi,x^M \vDash \Gamma,x^A$ i.e.
+                    the preconditions of the typeinterpretation function are
+                    satisfied and we infer the goal.
+            \end{enumerate}
+        \end{enumerate}
+
+    \item Abstraction:
+        $$
+        \typeinter{\lambda x^A. e}{\xi\Gamma} :=
+            \left\{
+            \begin{array}{ll}
+                \typeinter{e}{\xi(\Gamma,x^A)}
+                & \text{if } A \notin \Kinds
+                \\
+                M \mapsto \typeinter{e}{(\xi,x^M)(\Gamma,x^A)}
+                & \text{if }  A \in \Kinds, M \in \nu(A)
+            \end{array}
+            \right.
+        $$
+
+        Since an abstraction is not $\Any$ we have to prove the left part of the
+        specification
+        $$
+        \rulev{
+            \xi \vDash \Gamma
+            \\
+            \Gamma \vdash \lambda x^A. e : K
+            \\
+            K \in \Kinds
+        }
+        {
+            \typeinter{\lambda x^A.e}{\xi\Gamma} \in \nu(K)
+        }
+        $$
+        By the generation lemma~\ref{GenerationLemmata} for abstractions we
+        postulate the existence of $B$ and $s$ such that $\Gamma \vdash \Pi x^A
+        . B : s$, $\Gamma,x^A \vdash e : B$ and $K \betaeq \Pi x^A. B$ are
+        satisfied.
+
+        By the lemma~\ref{ModelAllTypesSame} we get $\Pi x^A.B \in \Kinds$
+        and $\nu(K) = \nu(\Pi x^A. B)$.
+
+        In order to prove the goal $\typeinter{\lambda x^A.e}{\xi\Gamma} \in
+        \nu(\Pi x^A.B)$ we distinguish two cases:
+        \begin{enumerate}
+        \item $A \notin \Kinds$:
+            In that case the goal is
+            $$
+                \typeinter{e}{\xi(\Gamma,x^A)} \in \nu(B)
+            $$
+            Since $A$ is not a kind we have $\xi \vDash \Gamma,x^A$
+            and therefore the preconditions for
+            $\typeinter{e}{\xi(\Gamma,x^A)}$ are satisfied and the
+            specification of the typeinterpretation function guarantees the
+            goal.
+
+        \item $A \in \Kinds$:
+            In that case the goal is
+            $$
+                M \mapsto \typeinter{e}{(\xi,x^M)(\Gamma,x^A)}
+                \in \nu(A) \to \nu(B)
+            $$
+                where $M \in \nu(A)$. The function argument is in the correct
+                domain. Because of $\xi,x^M \vDash \Gamma,x^A$ the preconditions
+                of $\typeinter{e}{(\xi,x^M)(\Gamma,x^A)}$ are satisfied and the
+                specification of the typeinterpretation function guarantees that
+                the function maps its argument to a value in the correct range.
+        \end{enumerate}
+
+    \item Application:
+        $$
+        \typeinter{Fa}{\xi\Gamma} :=
+        \left\{
+        \begin{array}{ll}
+            \typeinter{F}{\xi\Gamma}
+            &
+            \text{if $\Gamma \vdash a : A$ for some $A \notin \Kinds$}
+            \\
+            \typeinter{F}{\xi\Gamma}(
+                \typeinter{a}{\xi\Gamma}
+            )
+            &
+            \text{if $\Gamma \vdash a : A$ for some $A \in \Kinds$}
+        \end{array}
+        \right.
+        $$
+        where $\Gamma \vdash a : A$ for some $A$.
+
+        Since an application is not $\Any$ we have to prove the left part of the
+        specification
+        $$
+        \rulev{
+            \xi \vDash \Gamma
+            \\
+            \Gamma \vdash F a: K
+            \\
+            K \in \Kinds
+        }
+        {
+            \typeinter{F a}{\xi\Gamma} \in \nu(K)
+        }
+        $$
+        \begin{itemize}
+        \item
+            By the generation lemma~\ref{GenerationLemmata} for applications we
+            postulate the existence of $A$ and $B$ such that
+            $$
+            \begin{array}{l}
+                \Gamma \vdash F : \Pi x^A. B
+                \\
+                \Gamma \vdash a : A
+                \\
+                K \betaeq B[x:=a]
+            \end{array}
+            $$
+            are valid. By the lemma~\ref{ModelAllTypesSame} we get $B[x:=a] \in
+            \Kinds$ and $\nu(K) = \nu(B[x:=a])$ i.e. we have to prove the goal
+            $$\typeinter{F a}{\xi\Gamma} \in \nu(B[x:=a])
+            $$
+
+        \item
+            Using the type of types lemma~\ref{TypeOfTypes} we can derive the
+            existence of some sort $s$ such that $\Gamma \vdash \Pi x^A.B :
+            s$ is valid. This implies by the generation
+            lemma~\ref{GenerationLemmata} for products the existence of the
+            sorts $s_A$ and $s_B$ such that
+            $\Gamma \vdash A : s_A$, $\Gamma,x^A \vdash B : s_B$ and $s \betaeq
+            s_B$ are valid (i.e. $s = s_B$). Furthermore by the substitution
+            theorem~\ref{SubstitutionLemma} we get $\Gamma \vdash B[x:=a] : s$.
+
+            This implies that $K$ and $B[x:=a]$ are welltyped and therefore
+            cannot be $\Any$. Since $K$ is a kind, $s = \Any$ must be valid.
+
+            I.e. we get
+            $$
+            \begin{array}{lll}
+                \Gamma &\vdash& A : s_A
+                \\
+                \Gamma,x^A &\vdash& B: \Any
+                \\
+                \Gamma &\vdash& \Pi x^A. B : \Any
+            \end{array}
+            $$
+
+            Because of theorem~\ref{TypeAnyImpliesKind} we have
+            $B \in \Kinds$ and $\Pi x^A . B \in \Kinds$
+            i.e. $F$ is a type function.
+
+        \item
+            Since $F$ is a type function, the preconditions for the type
+                interpretation are satisfied and we get
+            $$
+                \typeinter{F}{\xi\Gamma} \in \nu(\Pi x^A.B)
+            $$
+
+
+        \item
+            We distinguish two cases
+            \begin{enumerate}
+            \item $A \notin \Kinds$: In that case we have to prove the goal
+                $$
+                    \typeinter{F}{\xi\Gamma} \in \nu(B[x:=a])
+                $$
+
+                We prove the goal by using the equivalence
+                $$
+                \begin{array}{llll}
+                    \nu(B[x:=a]
+                    &=& \nu(B)
+                    &\text{\ref{ModelSubstitutionSame}}
+                    \\
+                    &=& \nu(\Pi x^A.B)
+                    &\text{definition of $\nu$}
+                \end{array}
+                $$
+
+            \item $A \in \Kinds$: In that case the  preconditions of the type
+                interpretation function for $a$ are satisfied and we get
+                $$
+                    \typeinter{a}{\xi\Gamma} \in \nu(A)
+                $$
+                Furthermore we have $\typeinter{F}{\xi\Gamma} \in \nu(A) \to
+                    \nu(B)$ and therefore
+                    $\typeinter{F}{\xi\Gamma}(\typeinter{a}{\xi\Gamma}$ is a
+                    valid function application with
+                $$
+                    \typeinter{F}{\xi\Gamma}(\typeinter{a}{\xi\Gamma})
+                    \in \nu(B)
+                $$
+                Since typesafe substitution does not change the model we get by
+                    using~\ref{ModelSubstitutionSame} $\nu(B) = \nu(B[x:=a])$
+                    which proves the goal
+                $$
+                    \typeinter{F}{\xi\Gamma)}(\typeinter{a}{\xi\Gamma})
+                    \in \nu(B[x:=a])
+                $$
+            \end{enumerate}
+        \end{itemize}
+    \end{enumerate}
+\end{definition}
+
+
+
+\begin{theorem}
+    \label{TypeInterpretationSubstitution}
+    \emph{Type interpretation treats substitution consistently}
+    $$
+    \rulev{
+        \xi \vDash \Gamma
+        \\
+        \Gamma \vdash a: A
+        \\
+        \Gamma,x^A \vdash F : K
+        \\
+        K \in \Kinds
+    }
+    {
+        \typeinter{F[x:=a]}{\xi\Gamma}
+        =
+        \left\{
+        \begin{array}{ll}
+            \typeinter{F}{\xi(\Gamma,x^A)}
+            &
+            A \notin \Kinds
+            \\
+            \typeinter{F}{(\xi,x^{\typeinter{a}{\xi\Gamma}})(\Gamma,x^A)}
+            &
+            A \in \Kinds
+        \end{array}
+        \right.
+    }
+    $$
+    Note: Due to the substitution lemma~\ref{SubstitutionLemma} we get $\Gamma
+    \vdash F[x:=a] : K[x:=a]$. A substituted kind remains a kind (easy induction
+    on the structure of the kind). Therefore the preconditions for the type
+    interpretation function are satisfied for the substituted term as
+    well.
+
+    \begin{proof}
+        \def\tintera{{\typeinter{a}{\xi\Gamma}}}
+
+        We distinguish two cases:
+        \begin{itemize}
+        \def\subgoal#1#2#3#4{
+            \typeinter{(#1)'}{(\xi,#4)(\Gamma,#3')}
+            =
+            \typeinter{#1}{(\xi,x^\tintera,#4)(\Gamma,x^A,#3)}
+        }
+        \def\goal#1#2#3#4{
+            \ruleall{#2#3#4}
+            {
+                \Gamma,x^A,#3 \vdash #1 : #2
+                \\
+                \xi,x^\tintera,\eta \vDash \Gamma,x^A,#3
+                \\
+                #2 \in \Kinds
+            }
+            {
+                \subgoal {#1} {#2} {#3} {#4}
+            }
+        }
+        \item $A \in \Kinds$: Assume $\xi \vDash \Gamma$ and $\Gamma \vdash a:
+            A$ and prove the more general lemma:
+            $$
+                \goal F K \Delta \eta
+            $$
+            where $Y'$ is an abbreviation for $Y[x:=a]$.
+
+            Note: Since the model set function $\nu$ respects substitution
+                (lemma~\ref{ModelSubstitutionSame}) the fact
+                $\xi,x^\tintera,\eta \vDash \Gamma,x^A,\Delta$ implies the fact
+                $\xi,\eta \vDash \Gamma, \Delta'$.
+
+            We prove this lemma by
+            induction on the structure of $F$.
+            \begin{enumerate}
+            \item Sort: Trivial, becaus a substituted sort remains the same sort
+                and the type interpretation of a sort is always $\SN$.
+
+            \item Variable $y$: We distinguish two cases
+                \begin{enumerate}
+                \item $y = x$: In that case we prove the goal by the equivalence
+                    $$
+                    \begin{array}{lll}
+                        \typeinter{x'}{(\xi,\eta)(\Gamma,\Delta')}
+                        &=&
+                        \typeinter{a}{(\xi,\eta)(\Gamma,\Delta')}
+                        \\
+                        &=&
+                        \typeinter{a}{\xi\Gamma}
+                        \\
+                        &=&
+                        \typeinter{x}{(\xi,x^\tintera,\eta)(\Gamma,x^A,\Delta)}
+                    \end{array}
+                    $$
+
+                \item $y \ne x$: In that case we prove the goal by the
+                    equivalence
+                    $$
+                    \begin{array}{lll}
+                        \typeinter{y'}{(\xi,\eta)(\Gamma,\Delta')}
+                        &=&
+                        \typeinter{y}{(\xi,\eta)(\Gamma,\Delta')}
+                        \\
+                        &=&
+                        \typeinter{y}{(\xi,x^\tintera,\eta)(\Gamma,x^A,\Delta)}
+                    \end{array}
+                    $$
+                    Since $y \ne x$ and its type is a kind, the type
+                        interpretation by definition depends only on $\xi$ and
+                        $\eta$.
+                \end{enumerate}
+
+            \item Product $\Pi y^C.D$:
+                We have to prove the goal
+                $$
+                    \goal {\Pi y^C.D} K \Delta \eta
+                $$
+                We can use the two induction hypotheses:
+                \begin{enumerate}
+
+                \item $\goal C {s_C} \Delta \eta$
+
+                \item $\goal D {s_D} {\Delta_D} {\eta_D}$
+
+                \end{enumerate}
+
+                We prove the goal below the line by assuming all statements
+                    above the line and use the equivalence
+                $$
+                \begin{array}{llll}
+                \typeinter{(\Pi y^C.D)'}{(\xi,\eta)(\Gamma,\Delta')}
+                &=&
+                I_{C'} \tolambda I_{D'}
+                \\
+                &=&
+                I_C \tolambda I_D  &\text{see below}
+                \\
+                &=&
+                \typeinter{\Pi y^C.D}{(\xi,x^\tintera,\eta)(\Gamma,x^A,\Delta)}
+                \end{array}
+                $$
+                where
+                $$
+                \begin{array}{llll}
+                    I_{C'}
+                    &=&
+                    \typeinter{C'}{(\xi,\eta)(\Gamma,\Delta')}
+                    \\
+                    I_C
+                    &=&
+                    \typeinter{C}{(\xi,x^\tintera,\eta)(\Gamma,x^A,\Delta)}
+                    \\
+                    I_{D'}
+                    &=&
+                    \bigcap_{N \in \nu(C)}
+                        \typeinter
+                        {D'}
+                        {(\xi,\eta,y^N)(\Gamma,x^A,\Delta,y^{C'})}
+                    & C \in \Kinds
+                    \\
+                    I_D
+                    &=&
+                    \bigcap_{N \in \nu(C)}
+                        \typeinter
+                        {D}
+                        {(\xi,x^\tintera,\eta,y^N)(\Gamma,x^A,\Delta,y^C)}
+                    & C \in \Kinds
+                    \\
+                    I_{D'}
+                    &=&
+                    \typeinter{D'}{(\xi,\eta)(\Gamma,\Delta',y^{C'})}
+                    & C \notin \Kinds
+                    \\
+                    I_D
+                    &=&
+                    \typeinter{D}{(\xi,x^\tintera,\eta)(\Gamma,x^A,\Delta,y^C)}
+                    & C \notin \Kinds
+                \end{array}
+                $$
+                We still have to prove $I_{C'} = I_C$ and $I_{D'} = I_D$.
+
+                $I_{C'} = I_C$ follows immediately from the first induction
+                hypothesis. In order to prove $I_{D'} = I_D$ we have to
+                distinguish two cases:
+                \begin{enumerate}
+                \item $C \notin \Kinds$: Consequence of the second induction
+                    hypothesis by using $\eta_D = \eta$ and $\Delta_D =
+                        \Delta,y^C$.
+
+                \item $C \in \Kinds$: Consequence of the second induction
+                    hypothesis by using $\eta_D = \eta,y^N$ and $\Delta_D =
+                        \Delta,y^C$.
+                \end{enumerate}
+
+            \item Abstraction $\lambda y^C. e$: We have to prove the goal
+                $$
+                \goal {\lambda y^C.e} K \Delta \eta
+                $$
+                We can use the two induction hypotheses
+                \begin{enumerate}
+                \item
+                    $\goal C {s_C} \Delta \eta$
+
+                \item
+                    $\goal e {K_e} {\Delta_e} {\eta_e}$
+                \end{enumerate}
+
+                We prove the goal below the line by assuming all statements
+                    above the line and distinguish two cases:
+                \begin{enumerate}
+                \item $C \notin \Kinds$:
+                    $$
+                    \begin{array}{lll}
+                        \typeinter
+                        {(\lambda y^C.e)'}
+                        {(\xi,\eta)(\Gamma,\Delta')}
+                        &=&
+                        \typeinter{e'}{(\xi,\eta)(\Gamma,\Delta')}
+                        \\
+                        &=&
+                        \typeinter{e}
+                        {(\xi,x^\tintera,\eta)(\Gamma,y^C,\Delta)}
+                        \\
+                        &=&
+                        \typeinter
+                        {\lambda y^C.e}
+                        {(\xi,x^\tintera,\eta)(\Gamma,\Delta)}
+                    \end{array}
+                    $$
+                    In this equivalence we used the definition of
+                        type interpretation for abstractions and the second
+                        induction hypothesis with $\eta_e = \eta$ and $\Delta_e
+                        = \Delta$.
+
+                \item $C \in \Kinds$:
+                    $$
+                    \begin{array}{lll}
+                        \typeinter
+                        {(\lambda y^C.e)'}
+                        {(\xi,\eta)(\Gamma,\Delta')}
+                        &=&
+                        \underbrace N_{\in \nu(C')}
+                        \mapsto
+                        \typeinter{e'}{(\xi,\eta)(\Gamma,\Delta')}
+                        \\
+                        &=&
+                        \underbrace N_{\in \nu(C)}
+                        \mapsto
+                        \typeinter{e}
+                        {(\xi,x^\tintera,\eta,y^N)(\Gamma,y^C,\Delta,y^C)}
+                        \\
+                        &=&
+                        \typeinter
+                        {\lambda y^C.e}
+                        {(\xi,x^\tintera,\eta)(\Gamma,\Delta)}
+                    \end{array}
+                    $$
+                    In this equivalence we used the definition of
+                        type interpretation for abstractions,
+                        $\nu(C') = \nu(C)$ by~\ref{ModelSubstitutionSame}
+                        and the second
+                        induction hypothesis with
+                        $\eta_e = \eta,y^N$ and
+                        $\Delta_e = \Delta,y^C$.
+                \end{enumerate}
+
+
+            \item Application: We have to prove the goal
+                $$
+                \goal {G b} K \Delta \eta
+                $$
+                We assume all statements above the line and prove the final goal
+                under the line.
+
+
+                From the generation lemma~\ref{GenerationLemmata} for
+                applications we postulate the existence of $B$ and $C$ such that
+                $$
+                \begin{array}{lll}
+                    \Gamma,x^A,\Delta &\vdash& G : \Pi y^B.C
+                    \\
+                    \Gamma,x^A,\Delta &\vDash& b : B
+                    \\
+                    C[y:=b] &\betaeq& K
+                \end{array}
+                $$
+                are valid. Since $C[x:=a]$ is a kind, $C$ and $\Pi y^B.C$ are
+                kinds as well. Therefore we get the induction hypothesis for $G$
+                $$
+                \goal G {K_G} \Delta \eta
+                $$
+
+                We distinguish two cases:
+                \begin{enumerate}
+                \item $B \notin \Kinds$:
+                    $$
+                    \begin{array}{lll}
+                    \typeinter{(G b)'}{(\xi,\eta)(\Gamma,\Delta')}
+                    &=&
+                    \typeinter{G'}{(\xi,\eta)(\Gamma,\Delta')}
+                    \\
+                    &=&
+                    \typeinter{G}{(\xi,x^\tintera,\eta)(\Gamma,x^A,\Delta)}
+                    \\
+                    &=&
+                    \typeinter{G b}{(\xi,x^\tintera,\eta)(\Gamma,x^A,\Delta)}
+                    \end{array}
+                    $$
+                    where we used the definition of type interpretation for
+                        applications and the induction hypothesis for $G$.
+
+                \item $B \in \Kinds$: In that case we get an additional
+                    induction hypothesis for $b$:
+                    $$
+                    \goal b {B} \Delta \eta
+                    $$
+                    and prove the goal by the equivalence
+                    $$
+                    \begin{array}{lll}
+                    \typeinter{(G b)'}{(\xi,\eta)(\Gamma,\Delta')}
+                    &=&
+                    \typeinter{G'}{(\xi,\eta)(\Gamma,\Delta')}
+                        (\typeinter{b'}{(\xi,\eta)(\Gamma,\Delta')})
+                    \\
+                    &=&
+                    \typeinter{G}{(\xi,x^\tintera,\eta)(\Gamma,x^A,\Delta)}
+                        (\typeinter
+                        {b}
+                        {(\xi,x^\tintera,\eta)(\Gamma,x^A,\Delta)}
+                        )
+                    \\
+                    &=&
+                    \typeinter{G b}{(\xi,x^\tintera,\eta)(\Gamma,x^A,\Delta)}
+                    \end{array}
+                    $$
+                    where we used the definition of type interpretation for
+                        applications and both induction hypotheses.
+                \end{enumerate}
+
+
+            \end{enumerate}
+
+        \item $A \notin \Kinds$:
+            Assume $\xi \vDash \Gamma$ and $\Gamma \vdash a : A$ and prove the
+            more general lemma
+            $$
+            \ruleall
+            {K \Delta \eta}
+            {
+                \Gamma,x^A,\Delta \vdash F : K
+                \\
+                \xi,\eta \vDash \Gamma,x^A,\Delta
+                \\
+                K \in \Kinds
+            }
+            {
+                \typeinter{F'}{(\xi,\eta)(\Gamma,\Delta')}
+                =
+                \typeinter{F}{(\xi,\eta)(\Gamma,\Delta)}
+            }
+            $$
+
+            The proof is practically the same as the proof for the case
+            $A \in \Kinds$ except that $x^\tintera$ is never needed, because $A$
+            is not a kind and therefore $a$ is not a type function. The variable
+            case is even simpler, because the variable cannot be $x$ (the type
+            of $x$ is not a kind).
+        \end{itemize}
+    \end{proof}
+\end{theorem}
+
+
+
+\begin{theorem}
+    \label{TypeInterpretationRespectsReduction}
+    \emph{Type interpretation respects reduction}
+    $$
+    \rulev{
+        F \reduce G
+        \\
+        \xi \vDash \Gamma
+        \\
+        \Gamma \vdash F : K
+        \\
+        K \in \Kinds
+    }
+    {
+        \typeinter{F}{\xi\Gamma} = \typeinter{G}{\xi\Gamma}
+    }
+    $$
+    \begin{proof} By induction on $F \reduce G$. The only interesting case is
+        the case of a redex. In all the other case the reduction does not change
+        the toplevel structure of the term and the goal can be derived from the
+        induction hypotheses and the definition of type interpretation.
+
+        Therefore here we prove only the redex case i.e. we prove
+        $$
+        \rulev{
+            (\lambda x^A.e)a \reduce e[x:=a]
+            \\
+            \xi \vDash \Gamma
+            \\
+            \Gamma \vdash \lambda x^A.e : K
+            \\
+            K \in \Kinds
+        }
+        {
+            \typeinter{(\lambda x^A.e) a}{\xi\Gamma}
+            =
+            \typeinter{e[x:=a]}{\xi\Gamma}
+        }
+        $$
+        We distinguish two cases:
+        \begin{enumerate}
+        \item $A \notin \Kinds$: We prove the goal by the equivalence
+            $$
+            \begin{array}{lll}
+                \typeinter{(\lambda x^A.e)a}{\xi\Gamma}
+                &=&
+                \typeinter{e}{\xi(\Gamma,x^A)}
+                \\
+                &=&
+                \typeinter{e[x:=a]}{\xi\Gamma}
+            \end{array}
+            $$
+            We have used the definition of type interpretation for applications and
+                abstractions and
+                theorem~\ref{TypeInterpretationSubstitution}.
+
+        \item $A \in \Kinds$: We prove the goal by the equivalence
+            $$
+            \begin{array}{lll}
+                \typeinter{(\lambda x^A.e)a}{\xi\Gamma}
+                &=&
+                (
+                    \underbrace M_{M \in \nu(A)}
+                    \mapsto
+                    \typeinter{e}{(\xi,x^M)(\Gamma,x^A)}
+                )
+                (
+                    \typeinter{a}{\xi\Gamma}
+                )
+                \\
+                &=&
+                \typeinter
+                {e}
+                {(\xi,x^{\typeinter{a}{\xi\Gamma}})(\Gamma,x^A)}
+                \\
+                &=&
+                \typeinter{e[x:=a]}{\xi\Gamma}
+            \end{array}
+            $$
+            We have used the definition of type interpretation for applications and
+                abstractions and
+                theorem~\ref{TypeInterpretationSubstitution}.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+\begin{theorem}
+    \label{TypeInterpretationEquivalence}
+    \emph{Equivalent type functions have the same type interpretation}
+    $$
+    \rulev{
+        F \betaeq G
+        \\
+        \xi \vDash \Gamma
+        \\
+        \Gamma \vdash F : K
+        \\
+        \Gamma \vdash G : s
+        \\
+        K \in \Kinds
+    }
+    {
+        \typeinter{F}{\xi\Gamma} = \typeinter{G}{\xi\Gamma}
+    }
+    $$
+    \begin{proof} By induction on $F \betaeq G$. The reflexive case is trivial.
+        The forward and the backward cases can be proved by the corresponding
+        induction hypothesis and
+        theorem~\ref{TypeInterpretationRespectsReduction}.
+    \end{proof}
+\end{theorem}
+
+
+\begin{theorem}
+    \label{TypeInterpretationTypeSaturated}
+    \emph{The type interpretation of a type is a saturated set}.
+    $$
+    \rulev{
+        \xi \vDash \Gamma
+        \\
+        \Gamma \vdash T : s
+    }
+    {
+        \typeinter{T}{\xi\Gamma} \in \SAT
+    }
+    $$
+    \begin{proof}
+        The type interpretation function satisfies the specification
+        $$
+        \typeinter{T}{\xi\Gamma} \in \nu(s) = \SAT
+        $$
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+
+
+\subsection{Term Interpretation}
+%------------------------------------------
+
+\begin{definition}
+    \emph{A variable interpretation $\rho$ is a list of variables which
+    associates to each variable a term. No duplicate variables are allowed.}
+    $$
+        \rho = \set{x_1^{t_1}, x_2^{t_2}, \ldots, x_n^{t_n}}
+    $$
+\end{definition}
+
+
+\begin{definition}
+    \emph{A term interpretation $\terminter u \rho$ replaces each free
+    variable $x$ in the term $u$ with the term $t$ when $x^t \in \rho$,
+    otherwise leaves the variable unchanged.}
+    $$
+    \terminter u \rho :=
+    \left\{
+    \begin{array}{lll}
+        \terminter s \rho &:=& s
+        \\
+        \terminter x \rho &:=&
+        \begin{cases}
+            t & x^t \in \rho
+            \\
+            x & \text{otherwise}
+        \end{cases}
+        \\
+        \terminter {\Pi x^A. B} \rho &:=&
+        \Pi x^{\terminter A \rho} . \terminter B {\rho,x^x}
+        \\
+        \terminter {\lambda x^A. e} \rho &:=&
+        \lambda x^{\terminter A \rho} . \terminter e {\rho,x^x}
+        \\
+        \terminter {a b} \rho &:=&
+        \terminter a \rho \terminter b \rho
+    \end{array}
+    \right.
+    $$
+\end{definition}
+
+A term interpretation is just a parallel substitution of the free variables in a
+term. In the following we use only variable interpretations which contain all
+variables of a context and apply it only to terms which are welltyped in a
+context.
+
+
+
+
+
+
+\subsection{Context Model}
+%------------------------------------------
+
+\begin{definition}
+    \label{DefinitionContextModel}
+    \emph{Context Model}: We call a variable interpretation $\rho$ and a context
+    interpretation $\xi$ (i.e. $\xi \vDash \Gamma$) a model of a context which
+    we write
+    $$
+        \rho\xi \vDash \Gamma
+    $$
+    when
+    $\rho$ and $\Gamma$ have the form
+    $$
+    \begin{array}{lll}
+        \Gamma &=& [x_1^{A_1}, \ldots, x_n^{A_n}]
+        \\
+        \rho   &=& [x_1^{t_1}, \ldots, x_n^{t_n}]
+    \end{array}
+    $$
+    where $t_i \in \typeinter{A_i}{\xi\Gamma}$ for all $i \in \set{1,\ldots,n}$.
+\end{definition}
+
+
+
+
+\subsection{Soundness Theorem}
+
+\begin{theorem}
+    \label{SoundnessTheorem}
+    \emph{Let $\rho\xi$ be a model of the context $\Gamma$ and $\Gamma \vdash t
+    : T$ a valid typing judgement. Then the term interpretation
+    $\terminter{t}{\rho}$ is an element of the type interpretation
+    $\typeinter{T}{\xi\Gamma}$}.
+
+    \def\goala#1#2#3#4#5{
+        \rulev{
+            #1 \vdash #2 : #3
+            \\
+            #4 #5 \vDash #1
+        }
+        {
+            \terminter{#2}{#4} \in \typeinter{#3}{#5#1}
+        }
+    }
+    \def\goalb#1#2#3#4#5{
+        \ruleall
+        {#1 #3 #4 #5}
+        {
+            #1 \vdash #2 : #3
+            \\
+            #4 #5 \vDash #1
+        }
+        {
+            \terminter{#2}{#4} \in \typeinter{#3}{#5#1}
+        }
+    }
+    \def\goal#1#2#3#4#5{
+        \forall #1 #2.
+        \left[
+        \ruleh{
+            #1#2 \vDash #3
+        }
+        {
+            \terminter{#4}{#1} \in \typeinter{#5}{#2#3}
+        }
+        \right]
+    }
+
+    $$
+    \goala \Gamma t T \rho \xi
+    $$
+    \begin{proof}
+        By induction on the structure of $t$.
+
+        \begin{enumerate}
+        \item Sort: We have to prove the goal
+            $$
+                \goala \Gamma s T \rho \xi
+            $$
+
+            From the generation lemma~\ref{GenerationLemmata} for sorts we
+            get
+            $$
+            \begin{array}{l}
+                s = \Prop
+                \\
+                T \betaeq \Any
+            \end{array}
+            $$
+            and prove the goal by
+            $$
+                \terminter{\Prop}{\rho} = \Prop
+                \;\in\;
+                \SN =
+                \typeinter{\Any}{\xi\Gamma}
+                =
+                \typeinter{T}{\xi\Gamma}
+            $$
+            and using the fact that type interpretation respects beta
+                equivalence~\ref{TypeInterpretationEquivalence}
+
+        \item Variable: We have to prove the goal
+            $$
+                \goala \Gamma x T \rho \xi
+            $$
+
+            From the generation lemma~\ref{GenerationLemmata} for variables
+            we postulate the existence of $A$ and $s$ with
+            $$
+            \begin{array}{l}
+                \Gamma \vdash A : s
+                \\
+                x^A \in \Gamma
+                \\
+                T \betaeq A
+            \end{array}
+            $$
+            and prove the goal by
+            $$
+                \terminter{x}{\rho} = t
+                \;\in\;
+                \typeinter{A}{\xi\Gamma}
+                =
+                \typeinter{T}{\xi\Gamma}
+            $$
+            where $x^t \in \rho$ and we used the definition of $\rho\xi \vDash
+                \Gamma$ and the fact that type interpretation respects beta
+                equality~\ref{TypeInterpretationEquivalence}
+
+
+        \item Product: We have to prove the goal
+            $$
+                \goala \Gamma {\Pi x^A.B} T \rho \xi
+            $$
+            From the generation lemma~\ref{GenerationLemmata} for products
+            we postulate the existence of the sorts $s_b$ and $s_c$ with
+            $$
+            \begin{array}{l}
+                \Gamma \vdash A: s_a
+                \\
+                \Gamma,x^A \vdash B: s_b
+                \\
+                T \betaeq s_b
+            \end{array}
+            $$
+
+            We can use the induction hypotheses
+            \begin{enumerate}
+            \item
+                $\goalb \Gamma  A {T_a} \rho \xi$
+
+            \item
+                $\goalb {\Gamma_b}  B {T_b} {\rho_b} {\xi_b}$
+            \end{enumerate}
+
+            The final goal is
+            $\terminter{\Pi x^A.B}{\rho}
+            \;\in\;
+            \typeinter{T}{\xi\Gamma}
+            = \typeinter{s_b}{\xi\Gamma}
+            =\SN$
+            which requires the subgoals
+            $$
+            \begin{array}{lll}
+                \terminter{A}{\rho} &\in& \SN
+                \\
+                \terminter{B}{\rho,x^x} &\in& \SN
+            \end{array}
+            $$
+
+            The first subgoal is proved by the first induction hypothesis by
+            using $T_a = s_a$.
+
+            The second subgoal is proved by the second induction hypothesis by
+            using
+            $$
+            \begin{array}{lll}
+                \Gamma_b &=& \Gamma,x^A
+                \\
+                T_b      &=& s_b
+                \\
+                \rho_b   &=& \rho,x^x
+                \\
+                \xi_b    &=&
+                    \left\{
+                    \begin{array}{ll}
+                        \xi & A \notin \Kinds
+                        \\
+                        \xi,x^{\nu^c(A)}  & A \in \Kinds
+                    \end{array}
+                    \right.
+            \end{array}
+            $$
+
+        \item Abstraction: We have to prove the goal
+            $$
+                \goala \Gamma {\lambda x^A.e} T \rho \xi
+            $$
+            From the generation lemma~\ref{GenerationLemmata} for abstractions
+            we postulate the existence of the type $B$ and the sort $s$ with
+            $$
+            \begin{array}{l}
+                \Gamma \vdash \Pi x^A. B : s
+                \\
+                \Gamma,x^A \vdash e : B
+                \\
+                T \betaeq \Pi x^A. B
+            \end{array}
+            $$
+
+            We can use the induction hypotheses
+            \begin{enumerate}
+            \item
+                $\goalb \Gamma  A {T_a} \rho \xi$
+
+            \item
+                $\goalb {\Gamma_e}  e {T_e} {\rho_e} {\xi_e}$
+            \end{enumerate}
+
+            We have to prove the final goal
+            $$
+            \terminter{\lambda x^A. e}{\rho}
+            \;\in\;
+            \typeinter{T}{\xi\Gamma}
+            = \typeinter{\Pi x^A.B}{\xi\Gamma}
+            = \typeinter{A}{\xi\Gamma} \tolambda I_B
+            $$
+            where
+            $
+            I_B =
+            \begin{cases}
+                \typeinter{B}{\xi(\Gamma,x^A)} & A \notin \Kinds
+                \\
+                \bigcap_{M \in \nu(A)}
+                \typeinter{B}{(\xi,x^M)(\Gamma,x^A)} & A \in \Kinds
+            \end{cases}
+            $
+
+            By definition of $\tolambda$ we have to prove
+            $$
+            \terminter{\lambda x^A.e}{\rho} a \in I_B
+            $$
+            for all $a \in \typeinter{A}{\xi\Gamma}$.
+
+            From the second induction hypothesis we infer
+            $$
+            \terminter{e}{\rho,x^a} \in \typeinter{B}{\xi_e(\Gamma,x^A)}
+            $$
+            with
+            $\xi_e =
+            \begin{cases}
+                \xi & A \notin \Kinds
+                \\
+                \xi,x^M & A \in \Kinds \; M \in \nu(A)
+            \end{cases}
+            $ because $(\rho,x^A)\xi_e \vDash \Gamma, x^A$, since $a \in
+            \typeinter{A}{\xi\Gamma}$.
+
+            This is true for all $M \in \nu(A)$, if $A \in \Kinds$. Therefore we
+            infer from the second induction hypothesis
+            $$
+            \terminter{e}{\rho,x^a} \in I_B
+            $$
+            for all $a \in \typeinter{A}{\xi\Gamma}$.
+
+            Since $I_B$ is a saturated set it includes all strongly normalizing
+            terms $t$ with $t \keyreduce \terminter{e}{\rho,x^a}$. By definition
+            of $\keyreduce$ and term interpretation we have
+            $$
+            \begin{array}{lll}
+                \terminter{\lambda x^A. e}{\rho} a
+                &=&
+                (\lambda x^{\terminter{A}{\rho}}. \terminter{e}{\rho,x^x}) a
+                \\
+                &\keyreduce&
+                \terminter{e}{\rho,x^x} [x:=a]
+                \\
+                &=&
+                \terminter{e}{\rho,x^a}
+            \end{array}
+            $$
+            Therefore it remains to prove that $(\lambda
+            x^{\terminter{A}{\rho}}. \terminter{e}{\rho,x^x}) a$ is strongly
+            normalizing. This can be proved by
+            theorem~\ref{StronglyNormalizingRedex} provided that
+            \begin{enumerate}
+            \item $\terminter{A}{\rho} \in \SN$: This can be infered from the
+                first induction hypothesis, because $\terminter{A}{\rho} \in
+                \typeinter{T_a}{\xi\Gamma}$ and the type of $A$ must be a
+                sort whose type interpretation is the set of strongly
+                normalizing terms.
+
+            \item $a \in \SN$: Since $a \in \typeinter{A}{\xi\Gamma}$ and $A$ is
+                a type we infer from
+                theorem~\ref{TypeInterpretationTypeSaturated} that $a$ is in
+                a saturated set which by definition has only strongly
+                normalizing terms.
+
+            \item
+                $\terminter{e}{\rho,x^x}[x:=a]
+                = \terminter{e}{\rho,x^a}
+                \in \SN$:
+                We have already inferred from the second induction
+                hypothesis $\terminter{e}{\rho,x^a} \in I_B$. Since $I_B$
+                is either a type interpretation of a type or an intersection
+                of type interpretations of a type and saturated sets are
+                closed with respect to intersection, $I_B$ is a saturated
+                set which by definition contains only strongly normalizing
+                terms.
+
+            \item $\terminter{e}{\rho,x^x} \in \SN$: Because
+                $\typeinter{A}{\xi\Gamma}$ and type interpretations of types are
+                    saturated and saturated sets contain all base terms, we have
+                    $x \in \typeinter{A}{\xi\Gamma}$. Therefore $(\rho,x^x)\xi_e
+                    \vDash \Gamma,x^A$ which implies the goal.
+            \end{enumerate}
+
+
+        \item Application: We have to prove the goal
+            $$
+            \terminter{f a}{\rho} \in \typeinter{T}{\xi\Gamma}
+            $$
+            under the assumptions
+            $$
+            \begin{array}{lll}
+                \Gamma &\vdash& f a : T
+                \\
+                \rho\xi &\vDash& \Gamma
+            \end{array}
+            $$
+            From the generation lemma~\ref{GenerationLemmata} for applications
+            we postulate the existence of the types $A$ and $B$ such that
+            $$
+            \begin{array}{lll}
+                \Gamma &\vdash& f : \Pi x^A.B
+                \\
+                \Gamma &\vdash& a : A
+                \\
+                T &\betaeq& B[x:=a]
+            \end{array}
+            $$
+
+            Furthermore we have the following induction hypotheses available:
+            $$
+            \begin{array}{lll}
+                \terminter{f}{\rho}
+                &\in& \typeinter{A}{\xi\Gamma} \tolambda I_B
+                \\
+                \terminter{a}{\rho} &\in& \typeinter{A}{\xi\Gamma}
+            \end{array}
+            $$
+            where
+            $$
+            I_B =
+            \left\{
+            \begin{array}{ll}
+                \typeinter{B}{\xi(\Gamma,x^A)}
+                & A \notin \Kinds
+                \\
+                \bigcap_{M \in \nu(A)}
+                \typeinter{B}{(\xi,x^M)(\Gamma,x^A)}
+                & A \in \Kinds
+            \end{array}
+            \right.
+            $$
+
+            By using the theorem~\ref{TypeInterpretationSubstitution}, the
+            theorem~\ref{TypeInterpretationEquivalence} and $T
+            \betaeq B[x:=a]$ we have to prove the goal
+            $$
+            \terminter{f}{\rho}
+            \terminter{a}{\rho}
+            \in
+            \typeinter{T}{\xi\Gamma}
+            =
+            \typeinter{(B[x:=a])}{\xi\Gamma}
+            =
+            \left\{
+                \begin{array}{ll}
+                    \typeinter{B}{\xi(\Gamma,x^A)}
+                    &
+                    A \notin \Kinds
+                    \\
+                    \typeinter
+                    {B}
+                    {(\xi,x^{\typeinter{a}{\xi\Gamma}})(\Gamma,x^A)}
+                    &
+                    A \in \Kinds
+                \end{array}
+            \right.
+            $$
+            We distinguish two cases:
+            \begin{enumerate}
+            \item $A \notin \Kinds$: The goal follows immediately from the
+                induction hypotheses and the definition of $\tolambda$.
+
+            \item $A \in \Kinds$: From the induction hypotheses and the
+                definition of $\tolambda$ we get
+                $$
+                    \ruleall{M}{M \in \nu(A)}
+                    {
+                        \terminter{f}{\rho}
+                        \terminter{a}{\rho}
+                        \in
+                        \typeinter{B}{(\xi,x^M)(\Gamma,x^A)}
+                    }
+                $$
+                and from the specification of the type interpretation we get
+                $$
+                    \typeinter{a}{\xi\Gamma} \in \nu(A)
+                $$
+                which finally proves the goal.
+            \end{enumerate}
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+\subsection{Strong Normalization Proof}
+%------------------------------------------
+
+
+\begin{theorem}
+    \label{StrongNormalizationProof}
+    \emph{All welltyped terms are strongly normalizing}.
+    $$
+    \ruleh{
+        \Gamma \vdash t : T
+    }
+    {
+        t \in \SN
+    }
+    $$
+
+
+    \begin{proof}
+        Assume $\Gamma \vdash t : T$, i.e. $\Gamma = [x_1 : A_1, \ldots, x_n :
+        A_n]$ is a valid context.
+
+        By theorem~\ref{CanonicalContextInterpretation} $\xi := \xi^c(\Gamma)$ is
+        a valid interpretation for the context $\Gamma$ with $\xi \vDash
+        \Gamma$.
+
+        We can form a context model
+        $$
+        \rho\xi \vDash \Gamma
+        $$
+        where
+        $$
+        \rho = [x_1^{x_1}, \ldots, x_n^{x_n}]
+        $$
+
+        Then we have by the soundness theorem~\ref{SoundnessTheorem}
+        $$
+        t = \terminter{t}{\rho} \in \typeinter{T}{\xi\Gamma} \in \SAT
+        $$
+        which proves the goal because type interpretations of types are
+        saturated sets~\ref{TypeInterpretationTypeSaturated} and saturated sets
+        contain only strongly normalizing terms by definition.
+    \end{proof}
+\end{theorem}
+
+
+
+
+\subsection{Logical Consistency}
+%------------------------------------------
+
+Logical consistency of the calculus of constructions means that it is not
+possible to prove contradictions in the calculus. Since a contradiction implies
+everything we can state logical consistency as \emph{It is not possible to prove
+every proposition}.
+
+Via the Curry-Howard correspondence we interpret types as propositions and terms
+of a type as a proof of the proposition which corresponds to that type. In the
+calculus of constructions terms of the type $\Pi X^\Prop. X$ are functions which
+map every type $X$ into a proof of that type.
+
+Therefore in the calculus of contructions logical consistency means that there
+does not exist a term $t$ of type $\Pi X^\Prop. X$ in the empty context.
+
+It is important to use the empty context here because a context $\Gamma =
+[x_1^{A_1}, \ldots, x_n^{A_n}]$ is a sequence of assumptions and it is perfectly
+possible to make contradictory assumptions e.g. having $f^{\Pi X^\Prop. X}$ as
+one assumption. In such a context $f$ is a term of type $\Pi X^\Prop. X$.
+
+In the previous section we have proved that all welltyped terms in the calculus
+of constructions are strongly normalizing. I.e. all welltyped terms can be
+reduced to their normal form. Therefore it is sufficient to prove that in the
+empty context there exists no term in normal form which has the type $\Pi
+X^\Prop. X$.
+
+
+
+\begin{lemma}
+    \label{NormalWelltypedTerms}
+    \emph{All welltyped terms in normal form are either sorts, products,
+    abstractions or base terms}.
+    \begin{proof}
+        We prove the goal by induction on the structure of $t$.
+
+        \begin{enumerate}
+            \item For sorts, variables, products and abstractions there is
+                nothing to do, because they fall trivially into one of the
+                alternatives.
+
+            \item It remains to prove that a welltyped application in normal
+                form is a base term. Assume $\Gamma \vdash fa : T$ and $fa \in
+                \NF$.
+
+                By the generation lemma~\ref{GenerationLemmata} for applications
+                we postulate the existence of the types $A$ and $B$ such that
+                $\Gamma \vdash f: \Pi x^A. B$.
+
+                The first induction hypothesis states that $f$ falls into one of
+                the categories.
+
+                However it cannot be a sort nor a product,
+                because neither of them can have a type equivalent to $\Pi
+                x^A.B$.
+
+                $f$ cannot be an abstraction, otherwise $fa$ would not
+                be in normal form. Therefore $f$ can only be a base term.
+
+                If $f$ is a base term, then by definition of base terms $fa$ is
+                a base term as well, because $a\in\NF \subseteq \SN$.
+        \end{enumerate}
+    \end{proof}
+\end{lemma}
+
+
+
+\begin{theorem}
+    \emph{There are no welltyped terms in normal form which have the
+    type $\Pi X^\Prop : X$} in the empty context.
+    $$
+    \rulev{
+        [] \vdash t: \Pi X^\Prop. X
+        \\
+        t \in \NF
+    }
+    {\perp}
+    $$
+
+    \begin{proof}
+        We assume $t \in \NF$ and $[] \vdash t : \Pi X^\Prop. X$ and derive a
+        contradiction.
+
+        \begin{enumerate}
+            \item By the previous theorem~\ref{NormalWelltypedTerms} $t$ has to
+                be either a sort, a product an abstraction or a base term. $t$
+                cannot be a sort nor a product, because they cannot have a type
+                equivalent to a product (the only valid type of both are sorts).
+                It cannot be a base term, because a base term has a free
+                variable in the head position and we are in the empty context
+                (only closed terms).
+
+                Therefore $t$ must be an abstraction, say $\lambda y^B.e$.
+
+            \item By the generation lemma~\ref{GenerationLemmata} for
+                abstractions we postulate the existence of a type $C$ such
+                that $[X^\Prop] \vdash e : C$ and $\Pi X^\Prop. X \betaeq \Pi
+                X^\Prop.C$ which imply $X \betaeq C$. Therefore we have
+                $$
+                [X^\Prop] \vdash e : X
+                $$ and $e$ must be in normal form.
+
+            \item $e$ cannot be a sort nor a product nor an abstraction, because
+                the type of the first two must be a sort and the type of the
+                last must be a product. Neither a sort nor a product can be beta
+                equivalent to a variable.
+
+                Therefore $e$ must be a base term. There are two possibilities:
+
+            \item $e$ is a variable, say $y$:
+
+                In that case we have $y = X$, because $X$ is the only free
+                variable available. By the generation
+                lemma~\ref{GenerationLemmata} for variables we get $\Prop
+                \betaeq X$ which is not possible.
+
+            \item $e$ has the form $y a_1, \ldots, a_n$ with $n > 0$: We get $y
+                = X$ as well for the same reason. Since $y$ is in a function
+                position its type must be beta equivalent to some product $\Pi
+                y^B.C$. However its type is $\Prop$ which cannot beta equivalent
+                to a product.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}

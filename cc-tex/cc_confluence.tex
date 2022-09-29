@@ -1,0 +1,1128 @@
+\section{Confluence}
+\label{sec:Confluence}
+%------------------------------------------------------------
+
+\begin{comment}
+
+    Why: Make lambda calculus really a model of computation. Result (i.e. a
+    term in normal form) is independent of the reduction sequence.
+
+    Goal: Uniqueness of normal forms and beta equivalent terms have a common
+    reduct. Corollaries: Equivalent binders have equivalent subterms and binders
+    cannot reduce to be beta equivalent with sorts or variables.
+
+    Basic Property: Beta reduction is confluent.
+
+
+    Prove of confluence:
+
+    - Definition via diamonds
+
+    - Diamond between a relation and its reflexive transitive closure proves the
+    confluence of the relation.
+
+    - Parallel beta reduction is a diamond between beta reduction and its
+    reflexive transitive closure.
+
+
+\end{comment}
+
+
+
+
+\subsection{Overview}
+
+We want to be able to use the calculus of constructions for computation.
+The basic computation step is beta reduction. A computation in the calculus ends
+if no more reduction is possible i.e. if the term has been reduced to a normal
+form.
+
+However beta reduction is ambiguous. There might be more than one possibility to
+make a beta reduction.
+
+\begin{example}
+    \label{ex:Confluence}
+    $$
+    \begin{array}{cccccc}
+        & & (\lambda x. f x x) ((\lambda y.y) z)
+        \\
+        & \swarrow_{\beta}
+        & & \searrow_\beta
+        \\
+        f ((\lambda y.y) z) ((\lambda y.y) z)
+        \\
+        \downarrow_\beta
+        & & & & (\lambda x . f x x) z
+        \\
+        f z ((\lambda y.y) z)
+        \\
+        & \searrow_\beta
+        & &  \swarrow_\beta
+        \\
+        & & f z z
+    \end{array}
+    $$
+\end{example}
+
+In the left path we reduce first the outer redex. This reduction duplicates the
+redex in the argument. Therefore we need three reduction steps to reach the
+final term $f z z$.
+
+In the right path we reduce first the redex in the argument of the application
+and then the outer redex. Therefore we need only two reduction steps to reach
+the final term $f z z$.
+
+In that specific example we have shown that both paths end up in the same
+result. However we have to prove that this is always the case. Otherwise the
+calculus of constructions would be useless as a calculus.
+
+It turns out that \emph{confluence} is a key property in the proof of uniqueness
+of results. We define a relation as \emph{confluent} if going an arbitrary
+number of steps in two directions there are always continuations of the paths to
+join them.  We want to prove confluence of beta reduction.
+
+Before proving confluence of beta reduction we define the confluence of a
+relation by defining first a diamond property of a relation. The diamond
+property of a relation is something like a \emph{one step confluence}. Then we
+show that the confluence of a relation can be proved by finding a diamond
+between it and its reflexive transitive closure.
+
+In a next step we define a parallel beta reduction, prove that it is a diamond
+between beta reduction and the reflexive transitive closure of beta reduction.
+This proves the confluence of beta reduction.
+
+Having the confluence of beta reduction it is easy to prove that beta equivalent
+terms always have a common reduct, normal forms are unique and some other
+interesting properties of binders.
+
+
+
+
+
+\subsection{Diamonds and Confluence}
+
+
+\begin{definition}
+    \emph{Diamond Property} A relation $r$ has the diamond property (or is a
+    diamond) if $a \torel{r} b$ and $a \torel{r} c$ implies the existence of
+    some $d$ such that $b \torel{r} d$ and $c \torel{r} d$ are valid.
+
+    $$
+    \ruleh{
+        a \torel r b
+        \\
+        a \torel r c
+    }
+    {
+        \exists d. b \torel{r} d \land c \torel{r} d
+    }
+    $$
+\end{definition}
+
+We can state the diamond property of a relation $r$ more pictorially as
+$$
+\begin{array}{lll}
+    a   &  \torel{r} &   b
+    \\
+    \downarrow_r & & \downarrow_r
+    \\
+    c & \torel{r} & \exists d
+\end{array}
+$$
+which looks like a diamond if tilted by $45^\circ$ clockwise.
+
+
+\begin{definition}
+    \emph{Confluence} A relation $r$ is confluent if its reflexive transitive
+    closure $r^*$ is a diamond.
+\end{definition}
+
+
+\begin{theorem}
+    \label{RelationBetween}
+    \emph{Let $r$ and $s$ be two relations. If $s$ is between $r$ and its
+    reflexive transitive closure i.e. $r \subseteq s \subseteq r^*$ then both
+    closures are the same i.e. $r^* = s^*$.}
+
+    \begin{proof}
+        Note that $r \subseteq s$ is defined by $\ruleall{ab}{a \torel{r} b}{a
+        \torel{s} b}$.
+
+        Assume $r \subseteq s \subseteq r^*$.
+        %
+        In order to prove $r^* = s^*$ we have to prove $r^* \subseteq s^*$ and
+        $s^* \subseteq r^*$.
+
+        \begin{enumerate}
+            \item $r^* \subseteq s^*$: We have to prove the goal
+                $$
+                \ruleh{a \torel{r^*} b}{a \torel{s^*} b}
+                $$
+                We use induction on $a \torel{r^*} b$.
+                \begin{enumerate}
+                    \item $a = b$: Trivial since $a \torel{s*} a$ is valid by
+                        definition.
+
+                    \item
+                        $$
+                        \begin{array}{l|l}
+                            a \torel{r^*} b
+                            &
+                            a \torel{s^*} b
+                            \\
+                            b \torel{r} c
+                            \\
+                            \hline
+                            a \torel{r^*} c
+                            &
+                            a \torel{s^*} c
+                        \end{array}
+                        $$
+                        In order to prove the final goal in the lower right
+                        corner we start from the induction hypothesis $a
+                        \torel{s^*} b$.
+
+                        Since $r \subseteq s$ we have $b \torel{s} c$ by
+                        definition of $\subseteq$ and the second premise.
+
+                        Then by definition of the reflexive transitive closure
+                        we conclude the final goal.
+                \end{enumerate}
+
+            \item $s^* \subseteq r^*$: We have to prove the goal
+                $$
+                \ruleh{a \torel{s^*} b}{a \torel{r^*} b}
+                $$
+                We use induction on $a \torel{s^*} b$.
+                \begin{enumerate}
+                    \item $a = b$: Trivial since $a \torel{r*} a$ is valid by
+                        definition.
+
+                    \item
+                        $$
+                        \begin{array}{l|l}
+                            a \torel{s^*} b
+                            &
+                            a \torel{r^*} b
+                            \\
+                            b \torel{s} c
+                            \\
+                            \hline
+                            a \torel{s^*} c
+                            &
+                            a \torel{r^*} c
+                        \end{array}
+                        $$
+                \end{enumerate}
+
+                Start with the induction hypothesis $a \torel{r^*} b$.
+
+                Since $s \subseteq r^*$ is given we can infer $b \torel{r^*} c$
+                from the second premise.
+
+                $r^*$ is transitive and therefore $a \torel{r^*} c$ must be
+                valid.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+
+\begin{lemma}
+    \label{StripLemma1}
+    If $r$ is a diamond then
+    $$
+    \diamond a b c d {r^*} r
+    $$
+    is valid.
+
+    \begin{proof}
+        By induction on $a \torel{r^*} b$.
+
+        \begin{enumerate}
+        \item In the reflexive case we have $a = b$. We choose $d = c$ which
+        satisfies the required properties.
+
+        \item
+            $$
+            \begin{array}{l|l}
+                a \torel{r^*} b
+                &
+                \allbracket d {\diamond a b d e {r^*} r}
+                \\
+                b \torel r c
+                \\
+                \hline
+                a \torel{r^*} c
+                &
+                \allbracket d {\diamond a c d f {r^*} r}
+            \end{array}
+            $$
+            To prove the goal in the lower right corner we assume $a \torel r d$
+            and try to find some $f$ with the required properties.
+
+            From the induction hypothesis we find some $e$ which satisfies $b
+            \torel r e$ and $d \torel{r^*} e$.
+
+            Since $r$ is a diamond there exists some $f$ with $\diamond b c e f
+            r r$. By glueing the boxes together we see that $f$ satisfies
+            the required properties.
+            $$
+            \begin{array}{ccccc}
+                a            &\torel{r^*}& b           &\torel r& c
+                \\
+                \downarrow_r &           & \downarrow_r&        & \downarrow_r
+                \\
+                d            &\torel{r^*}& e           &\torel r& f
+            \end{array}
+            $$
+        \end{enumerate}
+    \end{proof}
+
+\end{lemma}
+
+
+
+\begin{lemma}
+    \label{StripLemma2}
+    \emph{ If $r$ is a diamond, then $r^*$ is a diamond as well.}
+    $$
+    \diamond a b c d {r^*} {r^*}
+    $$
+
+    \begin{proof}
+        We assume that $r$ is a diamond and $a \torel{r^*} b$ and do induction
+        on $a \torel{r^*} c$
+
+        \begin{enumerate}
+            \item In the reflexive case we have $a = c$. We use $d = b$ which
+                satisfies the required properties.
+
+            \item
+                $$
+                \begin{array}{l|l}
+                    a \torel{r^*} c
+                    &
+                    \diamond a b c e {r^*} {r^*}
+                    \\
+                    c \torel r d
+                    \\
+                    \hline
+                    a \torel{r^*} d
+                    &
+                    \diamond a b d f {r^*} {r^*}
+                \end{array}
+                $$
+                We have to prove the goal in the lower right corner i.e. find
+                some $f$ with the required properties.
+
+                From the induction hypothesis we find some $e$. Using the
+                previous lemma~\ref{StripLemma1} we find some $f$ such that we
+                can glue the boxes together in order to see that $f$ satisfies
+                the required properties.
+                $$
+                \begin{array}{ccc}
+                    a & \torel{r^*} & b
+                    \\
+                    \downarrow_{r^*} & & \downarrow{r^*}
+                    \\
+                    c & \torel{r^*} & e
+                    \\
+                    \downarrow_r & & \downarrow_r
+                    \\
+                    d & \torel{r^*} & f
+                \end{array}
+                $$
+        \end{enumerate}
+    \end{proof}
+\end{lemma}
+
+
+Now we can prove the basic theorem of this subsection:
+
+\begin{theorem}
+    \label{DiamondBetween}
+    \emph{In order to prove the confluence of a relation it is sufficient to
+    find a diamond between it and its reflexive transitive closure}.
+
+    $$
+    \rulev{
+        r \subseteq s \subseteq r^*
+        \\
+        s \text{ is a diamond}
+    }
+    {
+        r \text{ is confluent}
+    }
+    $$
+
+    \begin{proof}
+        Assume $r \subseteq s \subseteq r^*$ and $s$ is a diamond.
+
+        By~\ref{RelationBetween} we know that both reflexive transitive closures
+        are the same i.e. $r^* = s^*$.
+
+        From~\ref{StripLemma2} we conclude that $s^*$ is a diamond. This implies
+        that $r^*$ is a diamond as well and proves the fact that $r$ is
+        confluent by definition of confluence.
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+
+
+
+
+
+\subsection{Parallel Reduction Relation}
+
+Looking at the example~\ref{ex:Confluence} it can be seen that beta reduction is
+not a diamond. Let's analyze the example a little bit to see why beta reduction
+is not a diamond. Assume there is a redex like
+$$
+    (\lambda x^A. e) a
+$$
+where the subterm $a$ contains redexes as well i.e. there is some $b$ with $a
+\reduce b$. Then the following two reduction paths are possible.
+$$
+\begin{array}{lllll}
+    (\lambda x^A. e) a
+    &\reduce& (\lambda x^A. e) b
+    &\reduce& e[x:=b]
+    \\
+    (\lambda x^A. e) a
+    &\reduce& e[x:=a]
+    &\reducestar& e[x:=b]
+\end{array}
+$$
+
+In the first path we reach the term $e[x:=b]$ in two reduction steps. In the
+second path we can reach the term $e[x:=b]$ as well. But the needed number of
+steps depends on how often the variable $x$ is present in the term $e$. If $x$
+is contained in the term $e$ $n$ times we need $n+1$ reduction steps in total
+because we have to reduce the term $a$ in $e[x:=a]$ to the term $b$ $n$ times.
+If beta reduction were a diamond, it would be required that $n$ is always $1$
+which is not the case in general.
+
+In order to prove the confluence of beta reduction we have to find a diamond
+between beta reduction and its reflexive transitive closure. Let's call this
+relation $\beta_p$. This relation is like beta reduction $\beta$ but must allow
+more reductions steps to remedy the situation that in a redex $(\lambda x^A.e)a$
+the variable $x$ might be contained zero or more times in the subterm $e$.
+
+\begin{itemize}
+    \item In order to remedy the situation that the variable $x$ is not
+        contained in the subterm $e$ we make the relation $\beta_p$ reflexive.
+
+    \item In order to remedy the situation that the variable $x$ is contained
+        two or more times in the subterm $e$ we allow that $\beta_p$ reductions
+        can happen in any subterm of a term. Therefore we call $\beta_p$
+        \emph{parallel} beta reduction because the reduction can happen in the
+        subterms in parallel.
+\end{itemize}
+
+
+\begin{definition}
+    The \emph{parallel reduction relation} $a \preduce b$ is defined inductively
+    by the rules
+    \begin{enumerate}
+    \item Reflexive
+    $$
+        a \preduce a
+    $$
+
+    \item Redex
+    $$
+        \rulev {
+            a \preduce b
+            \\
+            e \preduce f
+        }
+        {
+            (\lambda x^A. e) a \preduce f[x:=b]
+        }
+    $$
+
+    \item Product
+    $$
+    \rulev {
+        A \preduce C
+        \\
+        B \preduce D
+    }
+    {
+        \Pi x^A. B \preduce \Pi x^C. D
+    }
+    $$
+
+    \item Abstraction
+    $$
+    \rulev {
+        A \preduce B
+        \\
+        e \preduce f
+    }
+    {
+        \lambda x^A. e \preduce \lambda x^B. f
+    }
+    $$
+
+    \item Application
+    $$
+    \rulev {
+        a \preduce c
+        \\
+        b \preduce d
+    }
+    {
+        a b \preduce c d
+    }
+    $$
+    \end{enumerate}
+\end{definition}
+
+
+\begin{lemma}
+    \label{ReductionLeParallelReduction}
+    \emph{Parallel beta reduction is a superset of beta reduction}
+
+    \begin{proof} This fact is trivial, because all rules of beta reduction are
+    contained as special cases within the rules of parallel beta reduction.
+    \end{proof}
+\end{lemma}
+
+
+
+\begin{lemma}
+    \label{ParallelReductionLeReductionStar}
+    \emph{Parallel beta reduction is a subset of the transitive closure of beta
+    reduction}
+
+    \begin{proof}
+        All rules of parallel beta reduction are satisfied by the transitive
+        closure of beta reduction. Since an inductive relation defined by some
+        rules is the smallest relation which satisfies the rules, it is evident
+        that parallel beta reduction must be smaller than the transitive closure
+        of beta reduction.
+    \end{proof}
+\end{lemma}
+
+
+
+
+
+
+
+\begin{lemma}
+    \label{ParallelReductionSubstitution1}
+    \emph{Basic compatibility of parallel reduction and substitution}
+    $$
+    \ruleh{
+        t \preduce u
+    }
+    {
+        a[x:=t] \preduce a[x:=u]
+    }
+    $$
+
+    \begin{proof}
+    By induction on the structure of $a$.
+    \begin{enumerate}
+    \item $a$ is a sort: Trivial, because substitution does not change a sort
+    and parallel beta reduction is reflexive.
+
+    \item $a$ is a variable, let's say $y$: In the case $x=y$ the goal is
+    implied by the premise. In the case $x \ne y$ the goal is implied by
+    reflexivity.
+
+    \item $a$ is the product $\Pi y^B. C$: We have to prove the goal
+    $(\Pi y^B. C)[x:=t] \preduce (\Pi y^B.C)[x:=u]$ from the premise $t \preduce
+    u$ and the induction hypotheses  $B[x:=t] \preduce B[x:=u]$ and
+    $C[x:=t] \preduce C[x:=u]$. The validity of the goal can be seen from the
+    following derivation.
+    $$
+    \begin{array}{lllll}
+        (\Pi y^B. C)[x:=t]
+        &=& \Pi y^{B[x:=t]}. C[x:=t]
+        &\text{definition of substitution}
+        \\
+        &\preduce& \Pi y^{B[x:=u]}. C[x:=u]
+        &\text {induction hypothesis}
+        \\
+        &=& (\Pi y^B. C)[x:=u]
+        &\text{definition of substitution}
+    \end{array}
+    $$
+
+    \item $a$ is the abstraction $\lambda y^B. e$: Same reasoning as with
+    product.
+
+    \item $a$ is the application $f a$: Same reasoning as with
+    product.
+    \end{enumerate}
+    \end{proof}
+\end{lemma}
+
+
+\begin{lemma}
+    \label{ParallelReductionSubstitution2}
+    \emph{Full compatibility of parallel reduction and substitution}
+    $$
+    \rulev{
+        a \preduce b
+        \\
+        t \preduce u
+    }
+    {
+        a[x:=t] \preduce b[x:=u]
+    }
+    $$
+
+    \begin{proof}
+        By induction on $a \preduce b$.
+
+        \begin{enumerate}
+        \item Reflexive: In that case we have $a = b$. The goal is an immediate
+        consequence of lemma~\ref{ParallelReductionSubstitution1}
+
+        \item Redex:
+        $$
+        \begin{array}{l|l}
+            a \preduce b
+            & a[x:=t] \preduce b[x:=u]
+            \\
+            e \preduce f
+            & e[x:=t] \preduce f[x:=u]
+            \\
+            \hline
+            (\lambda y^A. e) a \preduce f[y:=b]
+            &
+            ((\lambda y^A. e) a)[x:=t] \preduce f[y:=b][x:=u]
+        \end{array}
+        $$
+
+        The validity of the goal in the lower right corner can be seen from the
+        following reasoning:
+        $$
+        \begin{array}{lllll}
+            ((\lambda y^A. e) a)[x:=t]
+            &=& (\lambda y^{A[x:=t]}. e[x:=t]) a[x:=t]
+            &\text{definition of substitution}
+            \\
+            &\preduce& f[x:=u][y:=b[x:=u]]
+            &\text{induction hypotheses}
+            \\
+            &=& f[y:=b][x:=u]
+            &\text{double substitution~\ref{DoubleSubstitution}}
+        \end{array}
+        $$
+
+        \item Product, abstraction and application: Some reasoning as with
+        \emph{redex}. The lemma~\ref{DoubleSubstitution} is not needed in these
+        cases.
+        \end{enumerate}
+    \end{proof}
+\end{lemma}
+
+
+\begin{lemma}
+    \label{ParallelReductionProductAbstraction}
+    \emph{The product and abstraction are preserved under parallel
+    reduction}
+
+    \begin{enumerate}
+    \item
+        $\ruleh{\lambda x^A. e \preduce c}
+        {\exists B f. c = \lambda x^B. f
+            \land A \preduce B \land e \preduce f}$
+
+    \item
+        $\ruleh{\Pi x^A. B \preduce c}
+        {\exists C D. c = \Pi x^C. D
+            \land A \preduce C \land B \preduce D}$
+    \end{enumerate}
+
+    \begin{proof} By induction on the premise. In both cases only one rule
+    is syntactically possible which guarantees the existence of the
+    corresponding terms.
+    \end{proof}
+\end{lemma}
+
+
+
+
+
+\begin{theorem}
+    \label{ParallelReductionDiamond}
+    \emph{Parallel reduction is a diamond}
+    \def\diap#1#2#3#4{\diamond {#1} {#2} {#3} {#4} {\beta_p} {\beta_b}}
+    $$
+    \diap a b c d
+    $$
+
+    \begin{proof} By induction on $a \preduce b$. Note that we keep the variable
+        $c$ in the following universally quantified.
+
+        \begin{enumerate}
+        \item Reflexive
+            $$
+            \begin{array}{l|l}
+                a \preduce a
+                &
+                \allbracket c {\diap a a c d}
+            \end{array}
+            $$
+            To prove the goal on the right side we assume $a \preduce c$. Then
+            we use $c$ for $d$ which satisfies the required property of $d$
+            trivially.
+
+        \item Redex
+        $$
+        \begin{array}{l|l}
+            e \preduce f
+            &
+            \allbracket g {\diap e f g h}
+            \\
+            a \preduce b
+            &
+            \allbracket c {\diap a b c d}
+            \\
+            \hline
+            (\lambda x^A. e) a \preduce f[x:=b]
+            &
+            \allbracket k {\diap {(\lambda x^A.e)a} {f[x:=b]} k n}
+        \end{array}
+        $$
+        To prove the goal in the lower right corner we assume $(\lambda x^A.e)a
+        \preduce k$ and do a case split on the construction of this relation.
+
+            \begin{enumerate}
+            \item Reflexive: In that case $k = (\lambda x^A. e) a$. We use $n =
+            f[x:=b]$ which has the required property.
+
+
+            \item Redex: In that case $k = g[x:=c]$ for some $g$ and $c$ with the
+            properties $e \preduce g$ and $a \preduce c$.
+
+            We have to find a term $n$ with $f[x:=b] \preduce n \land g[x:=c]
+            \preduce n$. The term
+            $$
+                n = h[x:=d]
+            $$
+            with the terms $h$ and $d$ which exist by the induction hypotheses. It
+            is easy to see that the properties
+            $$
+            \begin{array}{lll}
+                f[x:=b] &\preduce& h[x:=d]
+                \\
+                g[x:=c] &\preduce& h[x:=d]
+            \end{array}
+            $$
+            are satisfied because of the induction hypotheses and
+            lemma~\ref{ParallelReductionSubstitution2}
+
+
+            \item Product: This case is syntactically impossible because
+            $(\lambda x^A.e) a$ cannot be a product.
+
+
+            \item Abstraction: This case is syntactically impossible because
+            $(\lambda x^A.e) a$ cannot be an abstraction.
+
+
+            \item Application: In that case $k = (\lambda x^B. g) c$ for some
+            $B$, $g$ and $c$ with $A \preduce B$, $e \preduce g$ and $a \preduce
+            c$. Because of lemma~\ref{ParallelReductionProductAbstraction} we
+            have chosen the more specific term $\lambda x^B. g$ instead of a
+            more general term.
+
+            We have to find a term $n$ which satisfies $(\lambda x^B. g) c
+            \preduce n$ and $f[x:=b] \preduce n$.
+
+            We use the term
+            $$
+                n = h[x:=d]
+            $$
+            with the terms $h$ and $d$ which exist by the induction hypotheses
+            satisfying
+            $$
+            \begin{array}{lll}
+                f &\preduce& h
+                \\
+                g &\preduce& h
+                \\
+                b &\preduce& d
+                \\
+                c &\preduce& d
+            \end{array}
+            $$
+            Therefore the goals
+            $$
+            \begin{array}{lll}
+                (\lambda x^B.g) c &\preduce& h[x:=d]
+                \\
+                f[x:=b] &\preduce& h[x:=d]
+            \end{array}
+            $$
+            are satisfied
+            \end{enumerate}
+
+
+        \item Product
+        $$
+        \begin{array}{l|l}
+            A \preduce C
+            &
+            \allbracket E {\diap A C E H}
+            \\
+            B \preduce D
+            &
+            \allbracket F {\diap B D F J}
+            \\
+            \hline
+            \Pi x^A. B \preduce \Pi x^C. D
+            &
+            \allbracket
+            {EF}
+            {\diap {\Pi x^A.B} {\Pi x^C.D} {\Pi x^E.F} n}
+        \end{array}
+        $$
+        In order to prove the goal in the lower right corner we assume $\Pi x^A.
+        B \preduce \Pi x^E.F$.
+
+        Because of lemma~\ref{ParallelReductionProductAbstraction} which says
+        that parallel reduction preserves products we have chosen the more
+        specific $\Pi x^E.F$ which satisfies $A \preduce E$ and $B \preduce F$
+        instead of a more general term.
+
+        From the induction hypotheses we conclude the existence of the terms $H$
+        and $J$ such that
+        $$
+            n = \Pi x^H. J
+        $$
+        satisfies the required properties.
+
+        \item Abstraction: Same reasoning as with product.
+
+        \item Application
+        $$
+        \begin{array}{l|l}
+            a \preduce c
+            &
+            \allbracket e {\diap a c e g}
+            \\
+            b \preduce d
+            &
+            \allbracket f {\diap b d f h}
+            \\
+            \hline
+            a b \preduce c d
+            &
+            \allbracket k {\diap {ab} {cd} k n}
+        \end{array}
+        $$
+        To prove the goal in the lower right corner we assume $a b \preduce k$
+        and do a case split on the construction of this relation.
+
+            \begin{enumerate}
+            \item Reflexive: In that case $k = a b$. We use $n = c d$ which
+            satisfies the required properties.
+
+            \item Redex: In this case $a b$ has to be a redex, let's say
+            $(\lambda x^A.m) b$. Therefore and because of
+            lemma~\ref{ParallelReductionProductAbstraction} $a b \preduce c d$
+            becomes $(\lambda x^A. m) b \preduce (\lambda x^B. o) d$ for some
+            $B$ and $o$ with $A \preduce B$ and $m \preduce o$.
+
+            $k$ has to be the reduct $p[x:=f]$ for some $p$, $f$ with $m
+            \preduce p$ and $b \preduce f$.
+
+            We have to find some term $n$ which satisfies
+            $$
+            \begin{array}{lll}
+                (\lambda x^B. o) d &\preduce& n
+                \\
+                p[x:=f] &\preduce& n
+            \end{array}
+            $$
+
+            From the first induction hypothesis and
+            lemma~\ref{ParallelReductionProductAbstraction} we postulate the
+            existence of $q$ with $o \preduce q$ and $p \preduce q$.
+
+            From the second induction hypothesis we conclude the existence of
+            some $h$ with with $d \preduce h$ and $f \preduce h$.
+
+            Therefore the term
+            $$
+                n = q[x:=h]
+            $$ satisfies the requirement.
+
+            \item Product: This case is syntactically impossible because $a b$
+            cannot be a product.
+
+            \item Abstraction: This case is syntactically impossible because $a b$
+            cannot be an abstraction.
+
+            \item Application: In that case $k = e f$ for some terms $e$, $f$ which
+            satisfy $a \preduce e$ and $b \preduce f$. We have to find some term
+            $n$ which satisfies $c d \preduce n$ and $ e f \preduce n$.
+
+            By the induction hypotheses there exist some terms $g$ and $h$
+            satisfying $c \preduce g$, $e \preduce g$, $d \preduce h$ and $f
+            \preduce h$ such that the term
+            $$
+                n = g h
+            $$
+            satisfies the requirement.
+            \end{enumerate}
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+\begin{theorem}
+    \label{ChurchRosser}
+    \emph{Church Rosser theorem: Beta reduction is confluent.}
+
+    \begin{proof}
+        With the parallel beta reduction we have found a relation which is
+        \begin{enumerate}
+            \item a diamond (\ref{ParallelReductionDiamond})
+
+            \item between beta reduction and its reflexive transitive closure
+                (\ref{ReductionLeParallelReduction},
+                \ref{ParallelReductionLeReductionStar})
+        \end{enumerate}
+
+        I.e. with parallel beta reduction we have found a diamond between beta
+        reduction and its reflexive transitive closure which implies
+        by~\ref{DiamondBetween} that beta reduction is confluent.
+    \end{proof}
+\end{theorem}
+
+
+
+\subsection{Equivalent Terms}
+
+One of the most important consequences of the Church Rosser theorem (i.e.
+confluence of beta reduction) is the fact that beta equivelent terms have a
+common reduct. I.e. for two beta equivalent terms $a$ and $b$ there exists
+always a term $c$ to which both reduce
+$$
+    \begin{array}{lllll}
+    a & & \betaeq & & b
+    \\
+    &\searrow_{\beta^*}
+    &
+    &\swarrow_{\beta^*}
+    \\
+    & & \exists c
+    \end{array}
+$$
+
+\begin{theorem}
+    \label{BetaEquivalentCommonReduct}
+    \emph{Equivalent terms have a common reduct}.
+    $$
+    \ruleh {
+        a \betaeq b
+    }
+    {
+        \exists c. a \reducestar c \land b \reducestar c
+    }
+    $$
+
+    \begin{proof}
+        By induction on $a \betaeq b$.
+        \begin{enumerate}
+            \item Reflexive: In that case $a = b$. We use $c = a$ which satisfies
+            the required properties trivially.
+
+            \item Forward:
+            $$
+            \begin{array}{l|l}
+                a \betaeq b
+                &
+                \exists d. a \reducestar d \land b \reducestar d
+                \\
+                b \reduce c
+                \\
+                \hline
+                a \betaeq c
+                &
+                \exists e. a \reducestar e \land c \reducestar e
+            \end{array}
+            $$
+            In order to prove the goal in the lower right corner we construct
+            terms $d$ and $e$ which satisfy the following diagram and therefore
+            $e$ satisfies the required properties.
+            $$
+            \begin{array}{lllll}
+                a
+                &\betaeq
+                &b
+                &\reduce
+                &c
+                \\
+                &\searrow_{\beta^*}
+                &\downarrow_{\beta^*}
+                &
+                &\downarrow_{\beta^*}
+                \\
+                &
+                &d
+                &\reducestar
+                &e
+            \end{array}
+            $$
+            $d$ exists by the induction hypothesis and $e$ exists by
+            confluence~\ref{ChurchRosser}
+
+            \item Backward:
+            $$
+            \begin{array}{l|l}
+                a \betaeq b
+                &
+                \exists d. a \reducestar d \land b \reducestar d
+                \\
+                c \reduce b
+                \\
+                \hline
+                a \betaeq c
+                &
+                \exists d. a \reducestar d \land c \reducestar d
+            \end{array}
+            $$
+            In order to prove the goal in the lower right corner we construct
+            term $d$ which satisfies the following diagram and therefore the
+            required properties.
+            $$
+            \begin{array}{lllll}
+                a
+                &\betaeq
+                &b
+                &\fromrel{\beta}
+                &c
+                \\
+                &\searrow_{\beta^*}
+                &\downarrow_{\beta^*}
+                &\swarrow_{\beta^*}
+                \\
+                &
+                &d
+            \end{array}
+            $$
+            The term $d$ exists by the induction hypothesis.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+
+
+\subsection{Uniqueness of Normal Forms}
+
+\begin{theorem}
+    \label{NormalFormUnique}
+    \emph{The normal form of a lambda term is unique}.
+    $$
+    \ruleh{
+        t \reducestar u
+        \\
+        t \reducestar v
+        \\
+        \text{$u$ and $v$ are in normal form}
+    }
+    {
+        u = v
+    }
+    $$
+
+    \begin{proof}
+        $u$ and $v$ are beta equivalent. According to the
+        theorem~\ref{BetaEquivalentCommonReduct} both have to reduce to a common
+        reduct, say $w$. Since both are in normal form, the common reduct has to
+        be reached in zero reduction steps (no reduction step is possible in
+        normal form) which is possible only if $u$ and $v$ are the same term.
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+\subsection{Equivalent Binders}
+
+\begin{theorem}
+    \label{EquivalentBinders}
+    \emph{In beta equivalent binders i.e. terms of the form $\lambda x^A. e$ or
+    $\Pi x^A.B$ corresponding subterms are beta equivalent}.
+    $$
+    \ruleh{
+        \Pi x^A.B \betaeq \Pi x^C.D
+    }
+    {
+        A \betaeq C \land B \betaeq D
+    }
+    \quad
+    \ruleh{
+        \lambda x^A.e \betaeq \lambda x^B.f
+    }
+    {
+        A \betaeq B \land e \betaeq f
+    }
+    $$
+
+    \begin{proof}
+        We only prove the theorem for products (the proof for
+        abstractions is practically the same).
+
+        Since both products are beta equivalent they have
+        by~\ref{BetaEquivalentCommonReduct} a common reduct.
+        By~\ref{ReductionProductAbstraction} products (and abstractions) are
+        preserved under beta reduction. Therefore the common reduct must have
+        the form $\Pi x^E.F$ with $A \reducestar E$, $B \reducestar F$, $C
+        \reducestar E$ and $D \reducestar F$.
+
+        Since reduction implies beta equivalence and beta equivalence is
+        transitive and symmetric we get $A \betaeq C$ and $B \betaeq D$.
+    \end{proof}
+\end{theorem}
+
+
+
+
+
+\subsection{Binders are not Equivalent to Variables or Sorts}
+
+\begin{theorem}
+    \label{BinderNotEquivalentSortVariable}
+    \emph{Binders (products or abstractions) cannot be beta equivalent to
+    variables or sorts}.
+    \begin{proof}
+        We only prove
+        $$
+        \ruleh{
+            \Pi x^A.B \betaeq s
+        }
+        {
+            \perp
+        }
+        $$
+        because the proofs of the other variants follow the same pattern.
+
+        Assume $\Pi x^A.B \betaeq s$. Both terms must have a common reduct
+        by~\ref{BetaEquivalentCommonReduct} which must be the sort $s$ since a
+        sort is already in normal form. I.e. we get $\Pi x^A.B \reducestar s$.
+
+        Since reduction preserves the form of binders
+        by~\ref{ReductionProductAbstraction} $\Pi x^A.B \reducestar s$ is not
+        possible and we get the desired contradiction.
+    \end{proof}
+\end{theorem}

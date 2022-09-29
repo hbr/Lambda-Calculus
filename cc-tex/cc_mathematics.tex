@@ -1,0 +1,472 @@
+\section{Basic Mathematics}
+\label{sec:BasicMathematics}
+
+\begin{comment}
+    - Logic:
+        - Rule notation
+        - Universal quantification
+
+    - Inductive Sets
+\end{comment}
+
+
+
+\subsection{Sets and Relations}
+
+It is assumed that the reader is familiar with the following concepts:
+
+\begin{enumerate}
+
+\item Basic set notation: Elements of a set $a \in A$, Subsets $A \subseteq B$
+defined as $a \in A$ implies $a \in B$.
+
+\item Endorelations: An (endo-) relation $r$ over the set $A$ is the set of pairs
+    $(a,b)$ (i.e. $r \subseteq A \times A$) where $a$ and $b$ are drawn from the
+    set $A$. We write $(a,b) \in r$ more pictorially as $a \torel r b$.
+
+\item $n$-ary Relations: An endorelation is a binary relation where the domain
+    and the codomain are the same. An $n$-ary relation over the domains $A_1,
+        A_2, \ldots, A_n$ is a subset from the cartesian product $A_1 \times A_2
+        \times \ldots \times A_n$. In this paper we use a ternary relation as
+        the typing relation.
+
+\item An intuitive understanding of the reflexive transitive closure $r^*$ of a
+relation $r$, the reflexivity, symmetry and transitivity of a relation and
+similar concepts.
+
+\item Logic: The logical connectives of conjunction $a \land b$, disjunction $a
+\lor b$, implication $a \imp b$ and existential $\exists x. p(x)$ and universal
+quantication $\forall x.p(x)$. We use the symbol $\perp$ for falsity i.e. a
+logical statement which can never be proved (a contradiction).
+
+\item An intuitive understanding of mathematical functions from the set $A$ to
+the set $B$. I.e. $A \to B$ is the set of functions mapping each element of the
+set $A$ to a unique element of the set $B$.
+\end{enumerate}
+
+
+
+
+
+\subsection{Logic}
+
+We often have to state that some premises $p_1, p_2, \ldots p_n$ have a certain
+conclusion $c$
+$$
+p_1 \land p_2 \land \ldots \land p_n \imp c
+$$
+
+In many cases this notation with logical connectives is clumsy and not very
+readable. We use the rule notation
+$$
+\ruleh{p_1 \\ p_2 \\ \ldots \\ p_n}{c}
+$$
+to express the same fact.
+
+
+If some variables in logical statements are not quantified, then universal
+quantification is assumed.
+$$
+\begin{array}{ccc}
+
+    \ruleh{a \in A}{a \in B}
+    &
+    \text{means}
+    &
+    \allbracket a {\ruleh {a \in A}{a \in B}}
+
+\end{array}
+$$
+
+Assume that a logical statement has more than one variable. The universal
+quantification can be expressed at the highest level or pushed done to the first
+appearance of the variable. Moreover logical conjunction is commutative.
+Therefore the following interpretations are equivalent.
+
+$$
+\begin{array}{ccc}
+    \ruleh{a \in A \\ b \in A}{a \torel r b}
+    &
+    \text{means}
+    &
+    \begin{array}{l}
+        \allbracket{ab}{\ruleh{a \in A \\ b \in A}{a \torel r b}}
+        \\
+        \allbracket a
+        {
+            \ruleh
+            {a \in A}
+            {\allbracket b {\ruleh{b \in A}{a \torel r B}}}
+        }
+        \\
+        \allbracket b
+        {
+            \ruleh
+            {b \in A}
+            {\allbracket a {\ruleh{a \in A}{a \torel r B}}}
+        }
+    \end{array}
+\end{array}
+$$
+
+All three settings of the universal quantifiers are logically equivalent.
+
+
+
+
+\subsection{Inductively Defined Sets}
+
+Sets can be defined inductively by rules. E.g. we can define the set of even
+numbers by the rules
+
+\begin{enumerate}
+\item $0$ is an even number
+
+\item If $n$ is an even number, then $n+2$ is an even number as well.
+\end{enumerate}
+
+We write this more formally:
+
+\begin{quote}
+
+\emph{The set of even numbers $E$ is defined by the rules}:
+    \begin{enumerate}
+    \item $$ 0 \in E$$
+
+    \item
+        $$
+        \ruleh{n \in E}{n+2 \in E}
+        $$
+    \end{enumerate}
+\end{quote}
+
+We say that $E$ is the smallest set which satisfies the above rules.
+
+Whenever there is an element $m \in E$ it can be in the set only if it is in the
+set because of one of the two rules which define the set. $0$ is in $E$ because
+of the first rule. $2$ is in $E$ because of second rule where $n = 0$ and $0$ is
+in the set. $4$ is in the set because of the second rule where $n = 2$ and $2$
+is in the set.
+
+A number $m \in E$ can be arbitrarily big, but it can be in the set only because
+of finitely many applications of the rules which define the set.
+
+
+
+
+\subsection{Induction Proofs}
+
+With inductively defined sets we can do induction proofs. Let's say that we want
+to prove that all numbers $n$ in $E$ satisfy a certain property $p(n)$ i.e. we
+want to prove
+$$
+\ruleh{n \in E}{p(n)}
+$$
+
+We prove this statement by induction on $n \in E$. Similar to induction proofs
+on natural numbers we have to prove
+
+\begin{enumerate}
+\item $0$ satisfies $p$, i.e. $p(0)$
+
+\item Every $n$ that satisfies $p$ (i.e. $p(n)$) must imply that $n+2$ satisfies
+$p$ as well (i.e. $p(n+2)$).
+
+\end{enumerate}
+
+Because the second rule is recursive we get an induction hypothesis.
+
+We write all induction proofs on an inductively defined set in the following
+manner:
+
+\begin{quote}
+    Theorem: \emph{All even numbers $n \in E$ satisfy $p(n)$}.
+    $$
+    \ruleh{n \in E}{p(n)}
+    $$
+
+    Proof: By induction on $n \in E$.
+    \begin{enumerate}
+    \item
+        $$
+        \begin{array}{l|l}
+        0 \in E
+        & p(0)
+        \end{array}
+        $$
+        $p(0)$ is valid because $\ldots$
+
+    \item
+        $$
+        \begin{array}{l|l}
+            n \in E
+            &
+            p(n)
+            \\
+            \hline
+            n+2 \in E
+            &
+            p(n+2)
+        \end{array}
+        $$
+        In order to prove $p(n+2)$ in the lower right corner we assume $n \in
+        E$, $p(n)$, $n+2 \in E$. $p(n+2)$ is valid because $\ldots$
+    \end{enumerate}
+\end{quote}
+
+For each rule in the inductive definition of the set we write a matrix. The left
+part of the matrix is just the rule. The goal is always in the lower right corner
+of the matrix. For each recursive premise (i.e. that some other elements are
+already in the set we get an induction hypothesis.
+
+In order to prove the goal in the lower right corner we can assume all other
+statements in the matrix.
+
+This schema helps to layout all premises and all induction hypotheses precisely.
+
+As an example we prove that for all even numbers $n \in E$ there exists a number
+$m$ such that $n = 2m$ using the above schema.
+
+\begin{quote}
+    Theorem: \emph{For all even numbers $n \in E$ there exists a number $m$ with
+    $n = 2m$}.
+    $$
+    \ruleh{n \in E}{\exists m. n = 2m}
+    $$
+
+    Proof: By induction on $n \in E$.
+    \begin{enumerate}
+    \item
+        $$
+        \begin{array}{l|l}
+        0 \in E
+        & \exists m. 0 = 2m
+        \end{array}
+        $$
+        $m = 0$ satisfies the goal.
+
+    \item
+        $$
+        \begin{array}{l|l}
+            n \in E
+            &
+            \exists i. n = 2i
+            \\
+            \hline
+            n+2 \in E
+            &
+            \exists m. n+2 = 2m
+        \end{array}
+        $$
+        By the induction hypothesis we get a number $i$ which satisfies $n =
+        2i$. Therefore $n+2 = 2i + 2 = 2(i+1)$. The number $m = i+1$ satisfies
+        the goal in the lower right corner.
+    \end{enumerate}
+\end{quote}
+
+
+Note that the name of the bound variable in existential and universal
+quantification is arbitrary. It is good practice to choose names which do not
+interfere. In the case for the recursive rule we have chosen the different names
+$i$ and $m$ in the existential quantification. This makes the prove more
+readable for humans.
+
+
+
+
+
+
+
+\subsection{Inductively Defined Relations}
+
+An (endo-) relation $r$ over the set $A$ is just a subset of the cartesian
+product $A \times A$. I.e. a relation is just a set which can be defined
+inductively. Since inductively defined relations are used excessively in the
+paper we explain inductive definitions and induction proofs on relations as
+well.
+
+Note that the following is not restricted to binary endorelations over a carrier
+set $A$. It is possibly to define $n$-ary relations over different carrier sets
+as subset of the cartesian product $A_1 \times A_2 \times \ldots \times A_n$ as
+well. E.g. the typing relation in the calculus of constructions (see
+section~\ref{sec:Typing}) is a ternary relation.
+
+As an example we define the reflexive transitive closure of a relation $r$
+inductively.
+
+\begin{quote}
+    \emph{The reflexive transitive closure $r^*$ of the relation $r$ is defined
+    by the rules}
+    \begin{enumerate}
+    \item
+        $$ a \torel {r^*} a $$
+
+    \item
+        $$
+        \rulev{
+            a \torel {r^*} b
+            \\
+            b \torel r c
+        }
+        {
+            a \torel {r^*} c
+        }
+        $$
+    \end{enumerate}
+\end{quote}
+
+
+It should be intuitively clear that $r^*$ is reflexive and transitive. The first
+rule guarantees reflexivity and the second rule guarantees transitivity. While
+reflexivity is expressed explicitely in the first rule, transitive is expressed
+only indirectly in the second rule therefore we need a proof of transitivity.
+
+\begin{quote}
+    \def\rstar{{r^*}}
+
+    Theorem: \emph{The reflexive transitive closure $r^*$ of the relation $r$ is
+    transitive}
+    $$
+    \rulev{
+        a \torel\rstar b
+        \\
+        b \torel\rstar c
+    }
+    {
+        a \torel\rstar c
+    }
+    $$
+
+    Proof: Assume $a \torel\rstar b$ and do induction on $b \torel\rstar c$.
+    \begin{enumerate}
+    \item
+        $$
+        \begin{array}{l|l}
+            b \torel\rstar b
+            &
+            a \torel\rstar b
+        \end{array}
+        $$
+    The goal $a \torel\rstar b$ is trivial because it is an assumption.
+
+    \item
+        $$
+        \begin{array}{l|l}
+            b \torel\rstar c_0
+            &
+            a \torel\rstar c_0
+            \\
+            c_0 \torel r c
+            \\
+            \hline
+            b \torel\rstar c
+            &
+            a \torel\rstar c
+        \end{array}
+        $$
+        By the induction hypothesis we have $a \torel\rstar c_0$. Together with
+        the second premise $c_0 \torel r c$ and the second rule in the
+        definition of $\rstar$ we get the goal in the lower right corner.
+    \end{enumerate}
+\end{quote}
+
+
+
+
+
+\subsection{Term Grammar}
+
+It is possible to define inductive sets by a grammar. E.g. we can define the set
+of natural numbers $\Nat$ by the grammar
+
+
+$$
+\begin{array}{lllll}
+    n
+    &::= & 0 & \text{the number \emph{zero}}
+    \\
+    &\mid & n' & \text{the successor of $n$}
+\end{array}
+$$
+where $n$ ranges over natural numbers and $0$ is a constant.
+
+This grammar defines the natural numbers $\set{0, 0', 0'', \ldots}$ as strings
+over the alphabet $\set{0, '}$.
+
+A definition with a grammar is just a special form of an inductively defined
+set.
+
+\begin{quote}
+    \emph{The set of natural numbers $\Nat$ is defined by the rules}
+    \begin{enumerate}
+    \item $$ 0 \in \Nat $$
+
+    \item
+        $$
+        \ruleh{
+            n \in \Nat
+        }
+        {
+            n' \in \Nat
+        }
+        $$
+    \end{enumerate}
+\end{quote}
+
+
+If we want to prove that all natural numbers $n$ satisfy a certain property $p$
+we have to prove that $0$ satisfies the property (i.e. $p(0)$) and if $n$
+satisfies the property then $n'$ has to satisfy the property as well i.e. $p(n)
+\imp p(n')$.
+
+This is the classical induction principle on natural numbers. Note that this is
+just a special case of the more general induction proof scheme for inductively
+defined sets.
+
+An induction proof over terms defined by a term grammar has the following form:
+
+\begin{quote}
+    Theorem: \emph{All natural numbers $n$ have the property $p(n)$}.
+
+    Proof: By induction on the structure of $n$:
+    \begin{enumerate}
+
+    \item $p(0)$: The goal $p(0)$ is valid because $\ldots$
+
+    \item $p(n')$: By the induction hypothesis $p(n)$ is valid. This implies
+    $p(n')$ because $\ldots$
+
+    \end{enumerate}
+\end{quote}
+
+Note that such a proof corresponds one to one to a proof on inductive sets shown
+above.
+
+Furthermore note that a grammar rule in the term grammar might be recursive in
+more than one subterm. In that case we get more than one induction hypothesis.
+
+
+
+
+\subsection{Recursive Functions}
+
+In the previous section we have shown that for each definition of a set with a
+term grammar there is a corresponding inductive definition. However with terms
+defined via a term grammar we can define recursive functions.
+
+We use the natural numbers defined via a term grammar and define the recursive
+function $p(n,m)$ which computes the sum of the numbers $n$ and $m$.
+$$
+\recfun
+{p(n,m)}
+{
+    p(n,0)  &:=& n
+    \\
+    p(n,m') &:=& p(n,m)'
+}
+$$
+
+The term grammar tells us that we can construct a natural number by using the
+number $0$ and apply zero or more times the successor function $'$ to it. The
+recursive function deconstructs the string generated by the term grammar. Since
+every term has a finite length the recursion is guaranteed to terminate.

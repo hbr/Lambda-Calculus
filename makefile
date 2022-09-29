@@ -1,4 +1,4 @@
-.PHONY: lambda1 lambda2 computability gh-pages
+.PHONY: lambda1 lambda2 computability cc-tex gh-pages
 
 lambda1:
 	make -C lambda1 pass2
@@ -11,6 +11,8 @@ lambda2:
 computability:
 	make -C computability text.html
 
+cc-tex:
+	make -C cc-tex pdf
 
 gh-pages: lambda1 lambda2 computability
 	cp index.html gh-pages/; \
