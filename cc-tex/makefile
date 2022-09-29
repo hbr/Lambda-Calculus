@@ -39,6 +39,9 @@ bib:
 
 
 
+# Copy web content to the $(gh-pages-dir), add and commit it to the github repo.
+# To publish it on the github web page, just issue "git push -f" in the
+# $(gh-pages-dir)
 .PHONY: gh-pages
 gh-pages:
 	(cd $(gh-pages-dir); git rm -r -f cc-tex); \
@@ -46,4 +49,3 @@ gh-pages:
 	cp index.html $(gh-pages-dir)cc-tex/; \
 	cp $(build-dir)cc.pdf $(gh-pages-dir)cc-tex/;
 	(cd $(gh-pages-dir); git add cc-tex; git commit --amend --no-edit)
-
