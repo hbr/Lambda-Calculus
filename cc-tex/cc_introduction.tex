@@ -176,9 +176,10 @@ mainstream programming languages infinite loops are possible.
 %--------------------------------
 Alonzo Church added types to his lambda calculus. But his main intention was not
 to avoid silly expressions. He wanted typed lambda calculus to be a model for
-logic. This laid the basis for the Curry-Howard isomorphism. The Curry-Howard
-isomorphism connects two seemingly unrelated formalisms: computations and proof
-systems.
+logic. This first attempt only described propositions in the lambda calculus.
+More sophisticated typed lambda calculi laid the basis for the Curry-Howard
+isomorphism. The Curry-Howard isomorphism connects two seemingly unrelated
+formalisms: computations and proof systems.
 
 The types in computations are connected to propositions in logic via the
 Curry-Howard isomorphism. The terms of a certain type are proofs of the
@@ -187,7 +188,7 @@ corresponding proposition. A proof of an implication $A \imp B$ is a function
 proof of $B$ i.e. a term of type $B$. The identity function is a proof of $A
 \imp A$.
 
-A proof of $A \land (A \imp B) \imp B$ the \emph{modus ponens rule} is nearly
+A proof of $A\, \land\, (A \imp B) \imp B$ the \emph{modus ponens rule} is nearly
 trivial in this computation analogy. It is a function taking two arguments. It
 takes an object $a$ of type $A$ and a function $f$ of type $A \imp B$ and it
 returns an object of type $B$ by just applying $f$ to $a$.
@@ -225,58 +226,69 @@ lambda calculus which is a good model of computation and logic at the same time.
 The way from untyped lambda calculus to the calculus of constructions can be
 seen as having four steps:
 
+
+
+
 \begin{enumerate}
 
-\item \emph{Simply typed lambda calculus}: The types have no structure. A type
-is a type variable. We have type variables $\set{U, V, W, \ldots}$ and arbitrary
-functions formed over the type variables $\{$ $U \to U$, $U \to V$, $U \to (V \to
-W)$, $\ldots$ $\}$. The computational power of simply typed lambda calculus is fairly
-limited. But it is already a model for the implicational fragment of natural
-deduction.
+\item \emph{Simply typed lambda calculus}:
+    %
+    The types have no structure. A type is a type variable. We have type
+    variables $\set{U, V, W, \ldots}$ and arbitrary functions formed over
+    the type variables $\{$ $U \to U$, $U \to V$, $U \to (V \to W)$,
+    $\ldots$ $\}$. The computational power of simply typed lambda calculus
+    is fairly limited. But it is already a model for the implicational
+    fragment of natural deduction.
 
-\item \emph{Polymorphic types (System $F$)}: We have not only type variables and
-functions over the type variables. We have type functions like lists, arrays,
-pairs etc. A list is a function which maps a type $X$ into a list of $X$s i.e.
-$L X$ is a list of $X$s. A pair takes two types as arguments and returns the
-type of pairs where the first component has the first type and the second
-component has the second type.
+\item \emph{Polymorphic functions (System $F$)}:
+    %
+    In the simply typed lambda calculus it is not possible to express the
+    identity function which works for arbitrary types. Each type needs its
+    own identity function.  \emph{Girard}'s System $F$ allows types as
+    arguments for functions. Now it is possible to express a polymorphic
+    identity function. It is a function receiving two arguments. A type and
+    term of this type. The body of the function just returns the second
+    argument.
 
-System $F$ adds functions to the type domain. However the  functions reversing a
-list of integers and reversing a list of strings are two different functions. It
-is not yet possible to write a generic function which reverses a list of an
-arbitrary element type.
 
-\item \emph{Polymorphic functions (System $F_\omega$)}: This calculus adds
-functions which can receive type and computational arguments and return a
-computational value. Now it is possible to write a generic function for list
-reversal. Such a function receives as a first argument the element type an as a
-second argument the list to reverse and it returns the reversed list.
+\item \emph{Polymorphic types (System $F_\omega$)}:
+    %
+    System $F$ does not yet allow to express types like lists, arrays, pairs,
+    etc. In order to achieve that we need functions receiving types as
+    arguments and returning types. E.g. a list $L$ is a function mapping an
+    element type $X$ to a list $L X$ of elements of type $X$. A pair $P$ is
+    a function mapping two types $X$ and $Y$ to the type $P X Y$ of pairs of
+    elements where the first component of the pair is of type $X$ and the
+    second component of the pair is of type $Y$.
 
-The function which reverses a list is a computational object. However its first
-argument is a type i.e. a non computational object. It can be erased and is not
-necessary for doing the actual computation. It is just an annotation in order to
-carry out the type checking.
+    System $F_\omega$ can express polymorphic types and polymorphic functions
+        operating on polymorphic types. E.g. a function which reverses a list of
+        elements of an arbitrary type. The function reverse receives two
+        arguments. The element type and the list to reverse. The function
+        returns the reversed list.
 
-System $F_\omega$ has very good computational power and is a good model of proof
-systems.
 
-\item \emph{Dependent types (calculus of constructions)}: We need another
-dimension to express interesting logical propositions. We want to express the
-proposition that a certain number is a prime number. Propositions are types in
-the Curry-Howard isomorphism, therefore this proposition is a type. However a
-number is certainly a computational object. In order to express the predicate
-\emph{is prime} we need functions which map a number to a proposition i.e. a
-type.
+    System $F_\omega$ has very good computational power and is a good model of
+    proof systems.
 
-Now we can express the proposition which states that all objects $x$ of a
-certain type $A$ have a certain property $P$ i.e. the proposition $\forall
-(x:A). P x$. $P x$ is a type which depends on the computational object $x$.
-Therefore it is called a dependent type.
+\item \emph{Dependent types (calculus of constructions)}:
+    %
+    We need another dimension to express interesting logical propositions. We
+    want to express the proposition that a certain number is a prime number.
+    Propositions are types in the Curry-Howard isomorphism, therefore this
+    proposition is a type. However a number is certainly a computational
+    object. In order to express the predicate \emph{is prime} we need
+    functions which map a number to a proposition i.e. a type.
 
-A proof of the proposition $\forall (x: A). P x$ is a function which takes an
-object $x$ of type $A$ and returns an object of type $P x$. In the calculus of
-construction we express the proposition $\forall (x: A). P x$ as the type $\Pi
-x^A. P x$.
+    Now we can express the proposition which states that all objects $x$ of
+    a certain type $A$ have a certain property $P$ i.e. the proposition
+    $\forall (x:A). P x$. $P x$ is a type which depends on the computational
+    object $x$.  Therefore it is called a dependent type.
+
+    A proof of the proposition $\forall (x: A). P x$ is a function which
+    takes an object $x$ of type $A$ and returns an object of type $P x$. In
+    the calculus of construction we express the proposition $\forall (x: A).
+    P x$ as the type $\Pi x^A. P x$.
 \end{enumerate}
 
 
