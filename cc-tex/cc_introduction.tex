@@ -250,26 +250,34 @@ seen as having four steps:
     term of this type. The body of the function just returns the second
     argument.
 
+    This addition of polymorphic functions makes system $F$ substantially more
+        powerful than simply type lambda calculus. Functions operating on
+        booleans, natural numbers, lists of values, pairs, trees etc. can be
+        expressed in the calculus. As a logic it can expresses a proof system
+        for second order intutionistic predicate calculus.
 
-\item \emph{Polymorphic types (System $F_\omega$)}:
+
+\item \emph{Polymorphic types i.e. computing types (System $F_\omega$)}:
     %
-    System $F$ does not yet allow to express types like lists, arrays, pairs,
-    etc. In order to achieve that we need functions receiving types as
-    arguments and returning types. E.g. a list $L$ is a function mapping an
-    element type $X$ to a list $L X$ of elements of type $X$. A pair $P$ is
-    a function mapping two types $X$ and $Y$ to the type $P X Y$ of pairs of
-    elements where the first component of the pair is of type $X$ and the
-    second component of the pair is of type $Y$.
+    System $F$ already allows polymorphic functions which operate on lists of a
+        certain element type, pairs of two elements of two different types,
+        trees of certain element types etc.
 
-    System $F_\omega$ can express polymorphic types and polymorphic functions
-        operating on polymorphic types. E.g. a function which reverses a list of
-        elements of an arbitrary type. The function reverse receives two
-        arguments. The element type and the list to reverse. The function
-        returns the reversed list.
+    However a list of integers and a list of booleans are different types. In
+        system $F$ it is not possible to define functions which take type
+        arguments and return type results. E.g. it is not possible to define a
+        function $L$ which takes an element type $A$ as argument and returns the
+        type $L A$ of a list where the elements are of type $A$.
 
 
-    System $F_\omega$ has very good computational power and is a good model of
-    proof systems.
+    System $F_\omega$ adds this possibility to compute types. This adds the
+        necessity to add types of types. It is necessary to express how many
+        arguments a type function takes. The arguments might be types or type
+        functions. The Haskell programming language which is based to some
+        extend on system $F_\omega$ adds kinds. The kind $*$ is the type of a
+        type. The kind $* \to *$ is the type of a type function which takes a
+        type argument a returns a type. The kind $(* \to *) \to *$ takes a type
+        function and returns a type etc.
 
 \item \emph{Dependent types (calculus of constructions)}:
     %
