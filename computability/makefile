@@ -6,8 +6,7 @@ source-files = \
 text.html: $(source-files) meta.yaml
 	pandoc -s --toc --webtex \
 		--toc-depth=2    \
-		-o text.html   \
+		-o text.html     \
 		$(source-files)  \
 		--metadata-file meta.yaml \
-		--filter=pandoc-crossref  \
-		--filter=pandoc-citeproc
+		--filter=pandoc-crossref
