@@ -25,7 +25,7 @@ source-files = \
 # Run it twice to get crossreferences correct if new labels have been
 # introduced.
 .PHONY: pdf
-pdf:
+pdf: mk-build-dir
 	rm $(build-dir)*.tex;  \
 	cp $(source-files) $(build-dir); \
 	(cd $(build-dir); pdflatex cc.tex)
@@ -34,7 +34,7 @@ pdf:
 # Extract citations for the bib database. Run always, if a new citation has been
 # added.
 .PHONY: bib
-bib:
+bib: mk-build-dir
 	(cd $(build-dir); bibtex cc)
 
 
@@ -49,3 +49,9 @@ gh-pages:
 	cp index.html $(gh-pages-dir)cc-tex/; \
 	cp $(build-dir)cc.pdf $(gh-pages-dir)cc-tex/;
 	(cd $(gh-pages-dir); git add cc-tex; git commit --amend --no-edit)
+
+
+
+.PHONY: mk-build-dir
+mk-build-dir:
+	test -d "$(build-dir)" || mkdir -p $(build-dir)
