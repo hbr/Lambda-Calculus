@@ -498,7 +498,7 @@ Self Reference
 
 
 All four functions are needed to encode self referential terms. E.g. to generate
-the encoding of the term `a {a}` i.e. the encoding of the term `a` applied to
+the encoding of the term `a <a>` i.e. the encoding of the term `a` applied to
 its encoding we can use the equivalence
 
 ~~~
@@ -730,74 +730,64 @@ Basic Undecidability
 Theorem: *Any set `A` of lambda terms which is non-trivial and closed does not
 have a decider.*
 
-We proof this theorem by assuming that it is decidable i.e. that there is a
-decider `p` and conclude a contradiction from the assumption.
+We prove this theorem by assuming that it is decidable i.e. that there is a
+decider `p` for the set `A` and derive a contradiction from the assumption.
 
-The steps of the proof are:
+Since the set `A` is nontrivial there is term `m0` which is in the set and a
+term `m1` which is not in the set.
 
-1. From `A` we construct a set `B` and a decider `q` for `B`.
+Using `p`, `self`, `m0` and `m1` we define the term `g`
 
-2. Then we construct a lambda term `g` and derive from it the contradiction that
-   it is an element of `B` and it is not an element of `B`.
+~~~
+    g := (\ x := p (self x) m1 m0)
+~~~
 
+Let's see what happens if we apply `g` to the description of a lambda term `a`.
 
-We define the set `B` as a set of lambda terms
+~~~
+    g <a>   ~>  p (self <a>) m1 m0
+            ~>  p (<a <a>>) m1 m0
 
-```
-    B := {b: b <b> is an element of A}
-```
+            ~>  m1,             if a <a> is in A
+            ~>  m0,             if a <a> is not in A
+~~~
 
-This set has the decider `q`
-
-```
-    q x := p (self x)
-```
-
-Note that `self <b>` returns `< b <b> >`. The term `p` decides if it is in `A`.
-Therefore `q` is a decider for `B`.
-
-Because of the non-triviality of `A` there is a term `m0` which is in `A` and a
-term `m1` which is not in `A`.
-
-Now we construct the term `g`
-
-```
-    g x := q x m1 m0
-```
-
-If we feed `g` with a description `<t>` of some lambda term `t`, then `q <t>`
-decides, if `t` is in `B`. If `t` is in `B`, then `m1` is returned, otherwise
-`m0`.
-
-We can decide the question, if `g` is in `B` by using `q`. Both cases lead to a
-contradiction.
-
-1. `g` is in `B`.
-
-    1. `g <g> ~> m1` by the definition of `g`.
-
-    2. `g <g>` is not in `A`, because `m1` is not in `A` and `A` is closed.
-
-    3. Because `g <g>` is not in `A`, `g` cannot be in `B` by the definition of
-       `B`.
-
-    Therefore the assumption `g` is in `B` leads to a contradiction.
-
-2. `g` in not in `B`.
-
-    1. `g <g> ~> m0` by the definition of `g`.
-
-    2. `g <g>` is in `A`, because `m0` is in `A` and `A` is closed.
-
-    3. Therefore `g` is in `B` by the definition of `B`.
-
-    I.e. the assumption `g` is not in `B` leads to a contradiction as well.
+The whole thing gets more interesting if we apply `g` to its own description. We
+have to distinguish the cases that `g <g>` is in `A` and `g <g>` is not in `A`:
 
 
-This completes the proof of the theorem.
+`g <g>` is in `A`:
 
-Note how the application of a term `g` to its own description `<g>` and the
-definition of `B` are essential to prove the contradiction.
+~~~
+    g <g>   ~>  p (self <g>) m1 m0
+            ~>  p (<g <g>>) m1 m0
+            ~>  true m1 m0
+            ~>  m1
+~~~
+
+`g <g>` and `m1` are betaequivalent. However this would require that `m1` is in
+`A` by the closedness of `A` and contradicts the assumption that `m1` is not in
+`A`.
+
+
+`g <g>` is not in `A`:
+
+~~~
+    g <g>   ~>  p (self <g>) m1 m0
+            ~>  p (<g <g>>) m1 m0
+            ~>  false m1 m0
+            ~>  m0
+~~~
+
+`m0` and `g <g>` are betaequivalent. This would require that `g <g>` is in `A` by
+the closedness of `A` and contradicts the assumuption that `g <g>` is not in
+`A`.
+
+Conclusion: The assumption that there exists a decider `p` for the terms in `A`
+leads to a contradiction. Therefore such a decider cannot exist.
+
+Note how the application of the term `g` to its own description `<g>` and the
+existence of a decider `p` are essential to prove the contradiction.
 
 
 
