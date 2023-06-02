@@ -263,7 +263,7 @@ language we can write the definitions of `true` and `false` as
 
 ~~~
     true  x y := x
-    false y y := y
+    false x y := y
 ~~~
 
 But remember that definitions are just abbreviations to make the terms
@@ -400,7 +400,7 @@ These arithmetic functions are sufficient for the rest of the text.
 
 The paper [Programming with Lambda Calculus][lambda-intro] shows many more
 functions which can be implemented in lambda calculus. All computable functions
-can be implemented on lambda calculus.
+can be implemented in lambda calculus.
 
 
 
@@ -518,8 +518,8 @@ satisfies the specification
 ~~~
 
 
-Godel/Church Numbering
-----------------------
+Goedel/Church Numbering
+-----------------------
 
 In this section we show how to encode lambda terms as Church numerals, i.e. a
 term of the form `<a>` is the Church numeral encoding the term `a`.
