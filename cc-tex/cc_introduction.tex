@@ -89,7 +89,7 @@ and its predecessor NACA hired men and women to carry out computations.
 A \emph{computer} had no authority. He/She had to carry out computations
 following some fixed rules.
 
-Carring out computations according to fixed rules had been present in the whole
+Carrying out computations according to fixed rules had been present in the whole
 history of mankind for more than 2000 years. Think of adding and multiplying
 numbers, using Gaussian elimination to solve a system of linear equations, using
 Newton's method to find the root of a nonlinear function etc.
@@ -198,12 +198,12 @@ then \emph{termination} becomes crucial. Proofs must be finite. An infinite
 proof makes no sense. Nobody can check the correctness of an infinite proof.
 
 In the computational world the definition of a function directly in terms of
-itself e.g.  $f(x: A): B := f(x)$ is welltyped but useless. Calling $f$ with an
+itself e.g.  $f(x: A): B := f(x)$ is well-typed but useless. Calling $f$ with an
 object $a$ of type $A$ ends up in an infinite recursion.
 
 The counterpart of this nonterminating function $f$ in logic is a proof of $A
 \imp B$ which uses a proof of $A \imp B$. This \emph{circular} logic is not
-allowed. Proofs which use circular logic are not wellformed. Anything can be
+allowed. Proofs which use circular logic are not well-formed. Anything can be
 proved by using circular logic.
 
 
@@ -217,7 +217,7 @@ they avoid silly terms and they guarantee termination.
 
 We come from untyped lambda calculus to typed lambda calculus by adding type
 annotations. Type annotations are necessary only to check that terms are
-welltyped. After type checking, types can be thrown away. This is called
+well-typed. After type checking, types can be thrown away. This is called
 \emph{type erasure}. We distinguish between computational objects and types
 (i.e. non computational objects).
 
@@ -274,7 +274,7 @@ seen as having four steps:
         necessity to add types of types. It is necessary to express how many
         arguments a type function takes. The arguments might be types or type
         functions. The Haskell programming language which is based to some
-        extend on system $F_\omega$ adds kinds. The kind $*$ is the type of a
+        extent on system $F_\omega$ adds kinds. The kind $*$ is the type of a
         type. The kind $* \to *$ is the type of a type function which takes a
         type argument a returns a type. The kind $(* \to *) \to *$ takes a type
         function and returns a type etc.
@@ -335,14 +335,14 @@ that the final result (if it exists) is unique.
 
 \item Section \emph{Typing}~\ref{sec:Typing} introduces the typing relation and
 proves important properties about this relation. The typing relation defines the
-welltyped terms. Terms in the calculus formed according to section \emph{The
-Calculus}~\ref{sec:Calculus} are wellformed, but not necessarily welltyped. In
-order to be welltyped they have to be valid terms in the typing relation.
+well-typed terms. Terms in the calculus formed according to section \emph{The
+Calculus}~\ref{sec:Calculus} are well-formed, but not necessarily well-typed. In
+order to be well-typed they have to be valid terms in the typing relation.
 
 
 \item Section \emph{Proof of Strong Normalization}~\ref{sec:NormalizationProof}:
-This section contains the proof that all welltyped terms in the calculus of
-constructions are strongly normalizing. I.e. Every welltyped term reduces in a
+This section contains the proof that all well-typed terms in the calculus of
+constructions are strongly normalizing. I.e. Every well-typed term reduces in a
 finite number of computation steps to a normal form which is the result of the
 computation.
 
