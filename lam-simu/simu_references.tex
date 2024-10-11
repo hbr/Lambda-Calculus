@@ -1,0 +1,307 @@
+\documentclass[12pt]{article}
+%\documentclass{article}
+
+\usepackage{amsmath,amsthm,amssymb,xcolor,graphicx,tikz}
+\usepackage{listings}
+\usepackage{listings}
+\usepackage{comment}
+\usepackage{cite}
+\usepackage[pdftex]{hyperref}
+\usetikzlibrary{positioning}
+
+\begin{document}
+
+\input{simu_macros}
+
+\title{
+    Simulation of Lambda Terms in Lambda Calculus
+}
+
+\author{
+    Helmut Brandl
+    \\
+    \scriptsize (firstname dot lastname at gmx dot net)
+    \\
+    \scriptsize Version x.x
+}
+\date{}
+
+\maketitle
+
+% \href {https://github.com/hbr/Lambda-Calculus} {Link text}
+% \url {https://github.com/hbr/Lambda-Calculus}
+
+\abstract{
+
+    For comments, questions, error reporting feel free to open an issue at
+    \url {https://github.com/hbr/Lambda-Calculus}
+}
+
+
+
+
+
+
+
+\tableofcontents
+
+
+
+
+
+
+\section{Introduction}
+%======================================================================
+
+
+
+
+
+
+
+
+\section{Preliminaries}
+%======================================================================
+
+\cite{brandl-lambda-programming}
+
+\cite{BARENDREGT1987191}
+
+
+
+
+
+
+
+\section{Basics}
+%======================================================================
+
+
+\begin{lam}
+    true  x y := x
+    false y y := y
+
+    and a b := a b false
+    or  a b := a true b
+    not a   := a false true
+\end{lam}
+
+\begin{lam}
+    pair a b f := f a b
+    fst  p     := p (\ a b := a)
+    snd  p     := p (\ a b := b)
+\end{lam}
+
+\begin{lam}
+    zero    f s  := s
+    succ n  f s  := f (n f s) -- or n f (f s)
+
+    one := succ zero
+    two := succ one
+    ...
+
+    is-zero n :=
+        n (\ x := false) true
+
+    (+) a b := a succ b
+
+    nat-rec n f s :=
+        snd (n step (pair zero s)) where
+          step p :=
+            p (\ n0 r0 := pair (succ n0) (f n0 r0))
+
+
+    pred n :=
+        nat-rec (\ n0 r0 := n0) zero
+
+    (-) a b := b pred a
+
+    (<=) a b := is-zero (b - a)
+
+    (=)  a b := (a <= b) and (b <= a)
+
+    (<)  a b := (a <= b) and (not (b <= a))
+
+    if-lt-eq-gt a b x y z
+        -- if 'a < b' then return 'x',
+        -- if 'a = b' then return 'y',
+        -- if 'a > b' then return 'z'
+    :=
+        (a < b) x ((a = b) y z)
+\end{lam}
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Simulator}
+%======================================================================
+
+
+
+
+
+\subsection{Encoding of Lambda Terms in Lambda Calculus}
+%----------------------------------------------------------------------
+
+We use the canonical form of lambda terms with De Bruijn indices which are
+formed according to the grammar
+$$
+\vertlist{
+    t &::=&
+    i 
+    & \text{De Bruijn index of the variable}
+    \\
+    &\mid&
+    t t &
+     \text{application}
+    \\
+    &\mid&
+    \lambda t
+    &\text{lambda abstraction}
+}
+$$
+
+We need 3 constructors to encode an arbitrary canonical lambda term as a lambda
+term. One constructor for variables (i.e. De Bruijn indices), one for
+applications and one for lambda abstractions.
+
+An encoded lambda term is a function with 4 variables:
+\begin{enumerate}
+    \item $b$: Church numeral representing the number of bound variables.
+
+    \item $v$: Function transforming the Church numeral of the De Bruijn index
+        of the variable and the number of bound variables into the result term
+        of the variable.
+
+    \item $a$: Funktion transforming the result terms of function term and the
+        argument term into the result term of the application.
+
+    \item $l$: Function transforming the result term of the body into the result
+        term of the lambda abstraction.
+\end{enumerate}
+
+We assign types to the arguments of the encoded lambda term (note that the types
+are just for our understanding of the arguments; the lambda calculus is untyped)
+\begin{lam}
+    b: Nat                  -- 'Nat' is a Church numeral
+
+    v: Nat -> Nat -> R      -- 'R' is the type of the result
+
+    a: R -> R
+
+    l: R -> R -> R
+\end{lam}
+%
+and an encoded lambda term has therefore the type
+%
+\begin{lam}
+    Nat -> (Nat -> Nat -> R) -> (R -> R -> R) -> R
+\end{lam}
+%
+%
+Now it is easy to design the 3 necessary constructors.
+\begin{lam}
+    var k       b v a l  :=  v k b
+
+    app x y     b v a l  :=  a (x b v a l) (y b v a l)
+
+    lam x       b v a l  :=  l (x (succ b) v a l)
+\end{lam}
+%
+\begin{enumerate}
+
+    \item The constructor for a variable with De Bruijn index $k$ is a function
+        mapping the 4 arguments into an application of the argument $v$ to the
+        index $k$ and the number of the bound variables $b$ (note that numbers
+        are encoded as Church numerals).
+
+    \item The constructor for an application of the function term $x$ to the
+        argument $y$ is a function mapping the 4 arguments into an application of
+        the argument $a$ onto the results obtained from the function term $x b v
+        a l$ and the argument term $y b v a l$.
+
+    \item The constructor for a lambda abstraction with body $x$ is a function
+        mapping the 4 arguments into an application of the argument $l$ onto the
+        result obtained from the body applied to the arguments {x (succ b) v a
+        l}. Note that the number of bound variables has to be increased by one
+        because the lambda abstraction binds one more variable.
+\end{enumerate}
+
+We show for the lambda terms $\lambda x . x$ and $\lambda x y . x$ the
+mathematical notation, the notation in program form, the mathematical notation
+of the canonical form with De Bruijn indices and the encoded term in program
+notation.
+
+\begin{tabular}[t]{|l|l|l|l|}
+    \hline
+    Math
+    & Progr Notation
+    & De Bruijn
+    & Encoded
+    \\
+    \hline
+    $\lambda x. x$
+    & {\tt $\backslash$ x := x}
+    & $\lambda 0$
+    & {\tt lam (var zero)}
+    \\
+    \hline
+    $\lambda x y. x$
+    & {\tt $\backslash$ x y := x}
+    & $\lambda^2 1$
+    & {\tt lam (lam (var one))}
+    \\
+    \hline
+\end{tabular}
+
+Note that the term in program notation and the encoded term in program notation
+are different (to get the complete picture you have to expand the abbreviations
+of {\tt lam}, {\tt var}, {\tt one} and {\tt zero}). I.e. the encoded term is
+much more complex than the original term. The added complexity makes it possible
+to inspect the structure of a lambda term in lambda calculus.
+
+
+In order to demonstrate the handling of encoded lambda terms we show a function
+which computes the number of subterms (including the term) of a lambda term.
+The number of subterms is defined recursively. A variable has one subterm (the
+variable itself), an application has one more subterm than the sum of the
+subterms of the function and the argument term and an abstraction has one more
+subterm than the number of subterms of the body.
+
+
+\begin{lam}
+    size t :=
+        t
+            zero
+            (\ k b := one)
+            (\ x y := succ (x + y))
+            (\ x := succ x)
+\end{lam}
+
+
+
+
+
+
+\subsection{Recursion}
+%----------------------------------------------------------------------
+
+
+
+\section{Bibliography}
+%======================================================================
+
+
+\bibliography{IEEEabrv,../../bibliography}{}
+\bibliographystyle{IEEEtran}
+
+
+\end{document}

@@ -1,0 +1,107 @@
+\def\BT{\text{BT}}
+\def\NF{\text{NF}}
+
+\def\torel#1{\stackrel{#1}\to}
+\def\reduce{\torel{\beta}}
+\def\reduceback{\stackrel{\beta}\leftarrow}
+\def\reducestar{\torel{\beta^*}}
+\def\reducelm{\torel{\beta_{\text{lm}}}}
+\def\reducelmstar{\torel{\beta^*_{\text{lm}}}}
+\def\reducehead{\torel{\beta_{\text{h}}}}
+\def\betaeq{\stackrel{\beta}\sim}
+
+\def\upfrom{\uparrow}
+
+
+
+\def\vec#1{{\overrightarrow {#1}}}
+
+
+\def\set#1{{\{#1\}}}
+
+\def\betaeq{{\stackrel \beta \sim}}
+
+
+
+\def\brackets#1{\left[ {#1} \right]}
+
+\def\vertlist#1{
+    \begin{array}{lllll}
+    #1
+    \end{array}
+}
+
+\def\bracklist#1{\brackets{ \vertlist{#1} }}
+
+
+\def\cases#1{
+    \left\{ \vertlist {#1} \right.
+}
+
+
+\def\rulev#1#2{
+    \begin{array}{l}
+        #1
+        \\
+        \hline
+        #2
+    \end{array}
+}
+
+\def\ruleh#1#2{
+    \begin{array}{c}
+        #1
+        \\
+        \hline
+        #2
+    \end{array}
+}
+
+
+
+
+% Theorems
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section] % envname, text, number base
+\newtheorem{theorem}[definition]{Theorem}    % envname, parent counter, text
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{example}[definition]{Example}
+
+
+
+\lstdefinelanguage{lam}
+{ basewidth=0.45em,
+  basicstyle=\small\tt,  % choices: small, footnotesize, scriptsize, tiny
+  mathescape,
+  %columns=flexible,
+  keywords={
+    let,
+    where
+  },
+  keywordstyle=\color{blue},
+  commentstyle=\color{brown},
+  morecomment=[l]{--},
+  morecomment=[n]{\{-}{-\}}
+}
+
+\lstdefinelanguage{ocaml}
+{ basewidth=0.45em,
+  basicstyle=\small\tt,  % choices: small, footnotesize, scriptsize, tiny
+  mathescape,
+  keywords={
+    let,
+    match,
+    of,
+    rec,
+    type,
+    with
+  },
+  keywordstyle=\color{blue},
+  commentstyle=\color{brown},
+}
+
+
+\lstnewenvironment{lam}   {\lstset{language=lam}} {}
+\lstnewenvironment{ocaml} {\lstset{language=ocaml}} {}
+

@@ -16,7 +16,8 @@ cc-tex:
 
 gh-pages: lambda1 lambda2 computability
 	cp index.html gh-pages/; \
-	cp lambda1/untyped_lambda.pdf gh-pages/lambda1/; \
-	cp lambda2/lambda.html        gh-pages/lambda2/; \
-	cp lambda2/lambda.pdf         gh-pages/lambda2/; \
-	cp computability/*.html	      gh-pages/computability/
+	cp lambda1/untyped_lambda.pdf  gh-pages/lambda1/; \
+	cp lambda1/untyped_lambda.html gh-pages/lambda1/; \
+	cp lambda2/lambda.html         gh-pages/lambda2/; \
+	cp lambda2/lambda.pdf          gh-pages/lambda2/; \
+	cp computability/*.html	       gh-pages/computability/
