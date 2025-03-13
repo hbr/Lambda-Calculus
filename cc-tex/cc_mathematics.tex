@@ -79,7 +79,7 @@ $$
 $$
 
 Assume that a logical statement has more than one variable. The universal
-quantification can be expressed at the highest level or pushed done to the first
+quantification can be expressed at the highest level or pushed down to the first
 appearance of the variable. Moreover logical conjunction is commutative.
 Therefore the following interpretations are equivalent.
 
@@ -217,7 +217,7 @@ manner:
 For each rule in the inductive definition of the set we write a matrix. The left
 part of the matrix is just the rule. The goal is always in the lower right corner
 of the matrix. For each recursive premise (i.e. that some other elements are
-already in the set we get an induction hypothesis.
+already in the set) we get an induction hypothesis.
 
 In order to prove the goal in the lower right corner we can assume all other
 statements in the matrix.
@@ -268,7 +268,7 @@ $m$ such that $n = 2m$ using the above schema.
 Note that the name of the bound variable in existential and universal
 quantification is arbitrary. It is good practice to choose names which do not
 interfere. In the case for the recursive rule we have chosen the different names
-$i$ and $m$ in the existential quantification. This makes the prove more
+$i$ and $m$ in the existential quantification. This makes the proof more
 readable for humans.
 
 
@@ -318,7 +318,7 @@ inductively.
 
 It should be intuitively clear that $r^*$ is reflexive and transitive. The first
 rule guarantees reflexivity and the second rule guarantees transitivity. While
-reflexivity is expressed explicitely in the first rule, transitive is expressed
+reflexivity is expressed explicitely in the first rule, transitivity is expressed
 only indirectly in the second rule therefore we need a proof of transitivity.
 
 \begin{quote}
