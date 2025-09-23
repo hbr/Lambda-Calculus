@@ -250,7 +250,7 @@ predecessor n :=
     nat-rec n (\ i _ := i) zero
 
 ```
-`predezessor zero` is `zero` because of the start value `zero`. `predecessor
+`predecessor zero` is `zero` because of the start value `zero`. `predecessor
 one` is `zero` because the iteration counter is `zero`. `predecessor n`
 receives at the last iteration the iteration counter `n - 1` which is exactly
 the required result. The iteration function `f` just used the iteration counter
